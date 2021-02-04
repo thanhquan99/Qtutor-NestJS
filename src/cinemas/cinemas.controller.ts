@@ -1,3 +1,4 @@
+import { UpdateCinemaDto } from './dto/update-cinema-dto';
 import { CinemasFilterDto } from './dto/get-cinemas-filter.dto';
 import { CinemasService } from './cinemas.service';
 import { CreateCinemaDto } from './dto/create-cinema.dto';
@@ -5,9 +6,11 @@ import { Cinema } from './cinema.entity';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
   UsePipes,
@@ -34,5 +37,19 @@ export class CinemasController {
   @UsePipes(ValidationPipe)
   createCinema(@Body() createCinemaDto: CreateCinemaDto): Promise<Cinema> {
     return this.cinemaService.createCinema(createCinemaDto);
+  }
+
+  @Delete('/:id')
+  deleteCinemaById(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    return this.cinemaService.deleteCinemaById(id);
+  }
+
+  @Patch('/:id')
+  @UsePipes(ValidationPipe)
+  updateCinema(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateCinemaDto: UpdateCinemaDto,
+  ): Promise<Cinema> {
+    return this.cinemaService.updateCinema(id, updateCinemaDto);
   }
 }

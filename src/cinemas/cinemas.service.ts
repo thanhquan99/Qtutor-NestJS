@@ -1,3 +1,4 @@
+import { UpdateCinemaDto } from './dto/update-cinema-dto';
 import { CinemasFilterDto } from './dto/get-cinemas-filter.dto';
 import { Cinema } from './cinema.entity';
 import { CreateCinemaDto } from './dto/create-cinema.dto';
@@ -30,5 +31,30 @@ export class CinemasService {
 
   async getCinemas(filterDto: CinemasFilterDto): Promise<Cinema[]> {
     return this.cinemaRepository.getCinemas(filterDto);
+  }
+
+  async deleteCinemaById(id: number): Promise<void> {
+    const result = await this.cinemaRepository.delete({
+      id,
+    });
+
+    if (!result.affected) {
+      throw new NotFoundException(`Cinema with ID ${id} not found`);
+    }
+  }
+
+  async updateCinema(
+    id: number,
+    updateCinemaDto: UpdateCinemaDto,
+  ): Promise<Cinema> {
+    const cinema = await this.getCinemaById(id);
+    const { city, name } = updateCinemaDto;
+    console.log(city, name);
+
+    cinema.city = city || cinema.city;
+    cinema.name = name || cinema.name;
+
+    await cinema.save();
+    return cinema;
   }
 }
