@@ -1,11 +1,11 @@
-import { IsNotEmpty, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class UpdateCinemaDto {
   @IsOptional()
-  @IsNotEmpty()
+  @IsString()
   name: string;
 
   @IsOptional()
-  @IsNotEmpty()
+  @IsString()
   city: string;
 }
