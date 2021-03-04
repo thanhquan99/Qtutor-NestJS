@@ -12,4 +12,4 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
   synchronize: dbConfig.synchronize,
 };
 
-console.log(typeOrmConfig);
+console.log('Config Database: ', typeOrmConfig);

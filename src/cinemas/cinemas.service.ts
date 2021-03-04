@@ -47,14 +47,6 @@ export class CinemasService {
     id: number,
     updateCinemaDto: UpdateCinemaDto,
   ): Promise<Cinema> {
-    const cinema = await this.getCinemaById(id);
-    const { city, name } = updateCinemaDto;
-    console.log(city, name);
-
-    cinema.city = city || cinema.city;
-    cinema.name = name || cinema.name;
-
-    await cinema.save();
-    return cinema;
+    return await this.cinemaRepository.save({ id, ...updateCinemaDto });
   }
 }
