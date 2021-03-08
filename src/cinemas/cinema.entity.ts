@@ -8,5 +8,5 @@ export class Cinema extends BaseEntity {
   name: string;
 
   @Column()
-  city: string;
+  address: string;
 }
