@@ -7,5 +7,5 @@ export class CreateCinemaDto {
 
   @IsNotEmpty()
   @IsString()
-  city: string;
+  address: string;
 }

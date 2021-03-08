@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class UpdateCinemaDto {
   @IsOptional()
@@ -7,5 +7,5 @@ export class UpdateCinemaDto {
 
   @IsOptional()
   @IsString()
-  city: string;
+  address: string;
 }
