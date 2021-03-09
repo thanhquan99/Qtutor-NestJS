@@ -9,5 +9,5 @@ db:
   }
 
 jwt:
-  expiresIn: 3600
+  expiresIn: 3600 * 10 # 10 hours
   secret: 'cinema123'

@@ -1,4 +1,6 @@
-import { BaseEntity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+
+@Entity()
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -15,6 +17,6 @@ export class User extends BaseEntity {
   @Column({ default: false })
   isActive: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   age: number;
 }
