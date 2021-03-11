@@ -1,4 +1,3 @@
-import { AppModule } from './../app.module';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import * as CONFIG from 'config';
 

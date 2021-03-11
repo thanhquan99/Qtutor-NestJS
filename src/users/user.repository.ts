@@ -6,8 +6,6 @@ import * as bcrypt from 'bcrypt';
 export class UserRepository extends Repository<User> {
   async createUser(userDto: UserDto): Promise<User> {
     const user = User.create(userDto);
-    user.salt = await bcrypt.genSalt();
-    user.password = await bcrypt.hash(user.password, user.salt);
     await user.save();
     return user;
   }
@@ -16,7 +14,8 @@ export class UserRepository extends Repository<User> {
     const { username, password } = userDto;
 
     const user = await this.findOne({ username });
-
+    console.log(user);
+    console.log(await user.validatePassword(password));
     if (user && (await user.validatePassword(password))) {
       return user;
     }
