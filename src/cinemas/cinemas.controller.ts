@@ -13,9 +13,13 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { GetUser } from 'src/auth/get-user.decorator';
+import { User } from 'src/users/user.entity';
 
 @Controller('cinemas')
 export class CinemasController {
@@ -34,8 +38,13 @@ export class CinemasController {
   }
 
   @Post()
+  @UseGuards(AuthGuard())
   @UsePipes(ValidationPipe)
-  createCinema(@Body() createCinemaDto: CreateCinemaDto): Promise<Cinema> {
+  createCinema(
+    @Body() createCinemaDto: CreateCinemaDto,
+    @GetUser() user: User,
+  ): Promise<Cinema> {
+    console.log(user);
     return this.cinemaService.createCinema(createCinemaDto);
   }
 
