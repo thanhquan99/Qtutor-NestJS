@@ -9,6 +9,3 @@ db:
   url: 'postgres://postgres:123456789@localhost:5432/cinema_api'
   synchronize: true
   ssl: null
-
-jwt:
-  secret: 'cinema123'

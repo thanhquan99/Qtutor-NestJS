@@ -1,30 +1,5 @@
-import { CreateCinemaDto } from './dto/create-cinema.dto';
 import { EntityRepository, Repository } from 'typeorm';
 import { Cinema } from './cinema.entity';
-import { CinemasFilterDto } from './dto/get-cinemas-filter.dto';
 
 @EntityRepository(Cinema)
-export class CinemaRepository extends Repository<Cinema> {
-  async createCinema(createCinemaDto: CreateCinemaDto): Promise<Cinema> {
-    const cinema = Cinema.create(createCinemaDto);
-    await cinema.save();
-    return cinema;
-  }
-
-  async getCinemas(filterDto: CinemasFilterDto): Promise<Cinema[]> {
-    const { search } = filterDto;
-    const query = this.createQueryBuilder('cinema');
-
-    if (search) {
-      query.andWhere(
-        'cinema.name LIKE :search OR cinema.address LIKE :search',
-        {
-          search: `%${search}%`,
-        },
-      );
-    }
-
-    const cinemas = await query.getMany();
-    return cinemas;
-  }
-}
+export class CinemaRepository extends Repository<Cinema> {}
