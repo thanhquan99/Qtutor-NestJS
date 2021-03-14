@@ -1,3 +1,5 @@
+import { Theater } from './../theaters/theater.entity';
+import { CreateTheaterDto } from './../theaters/dto/create-theater.dto';
 import { UpdateCinemaDto } from './dto/update-cinema-dto';
 import { CinemasFilterDto } from './dto/get-cinemas-filter.dto';
 import { CinemasService } from './cinemas.service';
@@ -60,5 +62,18 @@ export class CinemasController {
     @Body() updateCinemaDto: UpdateCinemaDto,
   ): Promise<Cinema> {
     return this.cinemaService.updateCinema(id, updateCinemaDto);
+  }
+
+  @Get('/:id/theaters')
+  getOwnTheaters(@Param('id', ParseIntPipe) id: number) {
+    return this.cinemaService.getOwnTheaters(id);
+  }
+
+  @Post('/:id/theaters')
+  createOwnTheater(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() createTheaterDto: CreateTheaterDto,
+  ): Promise<Theater> {
+    return this.cinemaService.createOwnTheater(id, createTheaterDto);
   }
 }
