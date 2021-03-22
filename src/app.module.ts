@@ -7,9 +7,14 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { TheatersModule } from './theaters/theaters.module';
 import { MoviesModule } from './movies/movies.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '../..', 'public'),
+    }),
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot(typeOrmConfig),
     CinemasModule,
