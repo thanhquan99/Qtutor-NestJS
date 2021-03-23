@@ -1,4 +1,5 @@
-import { IsDateString, IsOptional, IsString } from 'class-validator';
+import { Country } from './../movie.entity';
+import { IsDateString, IsEnum, IsOptional, IsString } from 'class-validator';
 
 export class UpdateMovieDto {
   @IsOptional()
@@ -6,8 +7,8 @@ export class UpdateMovieDto {
   name: string;
 
   @IsOptional()
-  @IsString()
-  author: string;
+  @IsEnum(Country)
+  country: Country;
 
   @IsOptional()
   @IsString()

@@ -1,5 +1,7 @@
+import { Country } from './../movie.entity';
 import {
   IsDateString,
+  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsObject,
@@ -12,8 +14,10 @@ export class CreateMovieDto {
   name: string;
 
   @IsNotEmpty()
-  @IsString()
-  author: string;
+  @IsEnum(Country, {
+    message: `Country should be in [${Country.AM},${Country.VN}]`,
+  })
+  country: Country;
 
   @IsNotEmpty()
   @IsString()
