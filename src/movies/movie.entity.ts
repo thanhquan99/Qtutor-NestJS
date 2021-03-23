@@ -1,3 +1,4 @@
+import { Actor } from './../actors/actor.entity';
 import { ApiProperty } from '@nestjsx/crud/lib/crud';
 import {
   BaseEntity,
@@ -43,4 +44,10 @@ export class Movie extends BaseEntity {
   })
   @Column({ type: 'simple-json', nullable: true })
   image: { mainUrl: string; thumbnailUrl: string };
+
+  @OneToMany(() => Actor, (actor) => actor.movie, {
+    cascade: true,
+  })
+  @JoinTable()
+  actors: Actor[];
 }
