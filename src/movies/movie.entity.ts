@@ -7,6 +7,12 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+
+export enum Country {
+  VN = 'VietNam',
+  AM = 'America',
+}
+
 @Entity()
 export class Movie extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -16,9 +22,9 @@ export class Movie extends BaseEntity {
   @Column()
   name: string;
 
-  @ApiProperty({ example: 'string' })
-  @Column()
-  author: string;
+  @ApiProperty({ example: 'VietNam' })
+  @Column({ type: 'enum', enum: Country })
+  country: Country;
 
   @ApiProperty({ example: 'string' })
   @Column()
