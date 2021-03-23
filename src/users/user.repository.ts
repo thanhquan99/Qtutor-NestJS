@@ -1,3 +1,4 @@
+import { NotFoundException } from '@nestjs/common';
 import { UserDto } from './dto/user.dto';
 import { User } from './user.entity';
 import { EntityRepository, Repository } from 'typeorm';
@@ -7,6 +8,8 @@ export class UserRepository extends Repository<User> {
   async createUser(userDto: UserDto): Promise<User> {
     const user = User.create(userDto);
     await user.save();
+    delete user.password;
+    delete user.salt;
     return user;
   }
 
@@ -14,8 +17,10 @@ export class UserRepository extends Repository<User> {
     const { username, password } = userDto;
 
     const user = await this.findOne({ username });
-    console.log(user);
-    console.log(await user.validatePassword(password));
+    if (!user) {
+      throw new NotFoundException('Your account is not exist');
+    }
+
     if (user && (await user.validatePassword(password))) {
       return user;
     }

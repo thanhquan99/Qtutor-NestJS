@@ -1,11 +1,15 @@
+import { UpdateMovieDto } from './dto/updateMovieDto';
 import { CreateMovieDto } from './dto/createMovieDto';
 import { MoviesService } from './movies.service';
 import { Movie } from './movie.entity';
 import {
   Controller,
+  Param,
+  ParseIntPipe,
   Post,
   UploadedFile,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
   UsePipes,
   ValidationPipe,
@@ -25,6 +29,7 @@ import {
 } from '@nestjs/platform-express';
 import { storage } from 'config/storage.config';
 import { Express } from 'express';
+import { AuthGuard } from '@nestjs/passport';
 
 @Crud({
   model: {
@@ -53,6 +58,7 @@ export class MoviesController implements CrudController<Movie> {
   }
 
   @Override()
+  @UseGuards(AuthGuard())
   @UsePipes(ValidationPipe)
   @UseInterceptors(
     FileFieldsInterceptor(
@@ -64,24 +70,29 @@ export class MoviesController implements CrudController<Movie> {
     ),
   )
   async createOne(
-    @ParsedRequest() req: CrudRequest,
     @ParsedBody() createMovieDto: CreateMovieDto,
     @UploadedFiles() files: Express.Multer.File,
-  ) {
-    const image = {};
+  ): Promise<Movie> {
+    return this.service.createMovie(createMovieDto, files);
+  }
 
-    if (files?.['mainImage']?.[0]) {
-      const mainUrl = `${process.env.DOMAIN}/${files['mainImage'][0].filename}`;
-      image['mainUrl'] = mainUrl;
-    }
-    if (files?.['thumbnailImage']?.[0]) {
-      const thumbnailUrl = `${process.env.DOMAIN}/${files['thumbnailImage'][0].filename}`;
-      image['thumbnailUrl'] = thumbnailUrl;
-    }
-
-    const movie = Movie.create({ ...createMovieDto, ...{ image: image } });
-    await movie.save();
-
-    return movie;
+  @Override('updateOneBase')
+  @UseGuards(AuthGuard())
+  @UsePipes(ValidationPipe)
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'mainImage', maxCount: 1 },
+        { name: 'thumbnailImage', maxCount: 1 },
+      ],
+      { storage },
+    ),
+  )
+  updateMovie(
+    @Param('id', ParseIntPipe) id: number,
+    @ParsedBody() updateMovieDto: UpdateMovieDto,
+    @UploadedFiles() files: Express.Multer.File,
+  ): Promise<Movie> {
+    return this.service.updateMovie(id, updateMovieDto, files);
   }
 }
