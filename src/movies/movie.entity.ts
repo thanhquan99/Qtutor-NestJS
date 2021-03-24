@@ -1,3 +1,4 @@
+import { Director } from './../directors/director.entity';
 import { Actor } from './../actors/actor.entity';
 import { ApiProperty } from '@nestjsx/crud/lib/crud';
 import {
@@ -49,4 +50,8 @@ export class Movie extends BaseEntity {
   @ManyToMany(() => Actor, (actor) => actor.movies)
   @JoinTable()
   actors: Actor[];
+
+  @ManyToMany(() => Director, (director) => director.movies)
+  @JoinTable()
+  directors: Director[];
 }
