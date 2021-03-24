@@ -1,3 +1,4 @@
+import { Director } from './../directors/director.entity';
 import { Actor } from './../actors/actor.entity';
 import { ApiProperty } from '@nestjsx/crud/lib/crud';
 import {
@@ -5,6 +6,7 @@ import {
   Column,
   Entity,
   JoinTable,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -50,4 +52,8 @@ export class Movie extends BaseEntity {
   })
   @JoinTable()
   actors: Actor[];
+
+  @ManyToMany(() => Director, (director) => director.movies)
+  @JoinTable()
+  directors: Director[];
 }

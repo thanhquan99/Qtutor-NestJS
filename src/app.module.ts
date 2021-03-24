@@ -10,6 +10,7 @@ import { MoviesModule } from './movies/movies.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ActorsModule } from './actors/actors.module';
+import { DirectorsModule } from './directors/directors.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ActorsModule } from './actors/actors.module';
     TheatersModule,
     MoviesModule,
     ActorsModule,
+    DirectorsModule,
   ],
 })
 export class AppModule {}
