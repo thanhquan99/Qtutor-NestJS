@@ -4,6 +4,7 @@ import {
   BaseEntity,
   Column,
   Entity,
+  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -20,6 +21,6 @@ export class Actor extends BaseEntity {
   @Column()
   description: string;
 
-  @ManyToOne(() => Movie, (movie) => movie.actors)
-  movie: Movie;
+  @ManyToMany(() => Movie, (movie) => movie.actors)
+  movies: Movie[];
 }

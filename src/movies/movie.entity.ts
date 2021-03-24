@@ -5,6 +5,7 @@ import {
   Column,
   Entity,
   JoinTable,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -45,9 +46,7 @@ export class Movie extends BaseEntity {
   @Column({ type: 'simple-json', nullable: true })
   image: { mainUrl: string; thumbnailUrl: string };
 
-  @OneToMany(() => Actor, (actor) => actor.movie, {
-    cascade: true,
-  })
+  @ManyToMany(() => Actor, (actor) => actor.movies)
   @JoinTable()
   actors: Actor[];
 }
