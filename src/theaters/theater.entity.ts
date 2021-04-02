@@ -6,8 +6,10 @@ import {
   Column,
   ManyToOne,
   BaseEntity,
+  Unique,
 } from 'typeorm';
 
+@Unique(['theaterNumber', 'cinema'])
 @Entity()
 export class Theater extends BaseEntity {
   @PrimaryGeneratedColumn() id: number;

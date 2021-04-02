@@ -1,7 +1,8 @@
+import { Actor } from './../actors/actor.entity';
 import { UpdateMovieDto } from './dto/updateMovieDto';
 import { CreateMovieDto } from './dto/createMovieDto';
 import { MoviesService } from './movies.service';
-import { Movie } from './movie.entity';
+import { Country, Movie } from './movie.entity';
 import {
   Controller,
   Param,
@@ -30,6 +31,7 @@ import {
 import { storage } from 'config/storage.config';
 import { Express } from 'express';
 import { AuthGuard } from '@nestjs/passport';
+import { MoviesModule } from './movies.module';
 
 @Crud({
   model: {
@@ -42,22 +44,8 @@ export class MoviesController implements CrudController<Movie> {
   get base(): CrudController<Movie> {
     return this;
   }
-  @Post('/upload') // API path
-  @UseInterceptors(
-    FileFieldsInterceptor(
-      [
-        { name: 'mainUrl', maxCount: 1 },
-        { name: 'thumbnailUrl', maxCount: 1 },
-      ], // name of the field being passed
-      { storage },
-    ),
-  )
-  async upload(@UploadedFiles() files) {
-    console.log(files);
-    return files;
-  }
 
-  @Override()
+  @Override('createOneBase')
   @UseGuards(AuthGuard())
   @UsePipes(ValidationPipe)
   @UseInterceptors(
@@ -69,7 +57,7 @@ export class MoviesController implements CrudController<Movie> {
       { storage },
     ),
   )
-  async createOne(
+  async createMovie(
     @ParsedBody() createMovieDto: CreateMovieDto,
     @UploadedFiles() files: Express.Multer.File,
   ): Promise<Movie> {
