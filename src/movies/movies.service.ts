@@ -11,6 +11,10 @@ export class MoviesService extends TypeOrmCrudService<Movie> {
     super(repo);
   }
 
+  makeImageUrl(fileName: string): string {
+    return `${process.env.DOMAIN}/img/${fileName}`;
+  }
+
   async createMovie(
     createMovieDto: CreateMovieDto,
     files: Express.Multer.File,
@@ -18,11 +22,13 @@ export class MoviesService extends TypeOrmCrudService<Movie> {
     const image = {};
 
     if (files?.['mainImage']?.[0]) {
-      const mainUrl = `${process.env.DOMAIN}/${files['mainImage'][0].filename}`;
+      const mainUrl = this.makeImageUrl(files['mainImage'][0].filename);
       image['mainUrl'] = mainUrl;
     }
     if (files?.['thumbnailImage']?.[0]) {
-      const thumbnailUrl = `${process.env.DOMAIN}/${files['thumbnailImage'][0].filename}`;
+      const thumbnailUrl = this.makeImageUrl(
+        files['thumbnailImage'][0].filename,
+      );
       image['thumbnailUrl'] = thumbnailUrl;
     }
 
@@ -44,14 +50,16 @@ export class MoviesService extends TypeOrmCrudService<Movie> {
     const image = {};
 
     if (files?.['mainImage']?.[0]) {
-      const mainUrl = `${process.env.DOMAIN}/${files['mainImage'][0].filename}`;
+      const mainUrl = this.makeImageUrl(files['mainImage'][0].filename);
       image['mainUrl'] = mainUrl;
     } else {
       image['mainUrl'] = movie.image.mainUrl;
     }
 
     if (files?.['thumbnailImage']?.[0]) {
-      const thumbnailUrl = `${process.env.DOMAIN}/${files['thumbnailImage'][0].filename}`;
+      const thumbnailUrl = this.makeImageUrl(
+        files['thumbnailImage'][0].filename,
+      );
       image['thumbnailUrl'] = thumbnailUrl;
     } else {
       image['thumbnailUrl'] = movie.image.thumbnailUrl;

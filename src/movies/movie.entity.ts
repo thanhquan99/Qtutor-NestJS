@@ -1,3 +1,4 @@
+import { Genre } from './../genres/genre.entity';
 import { Director } from './../directors/director.entity';
 import { Actor } from './../actors/actor.entity';
 import { ApiProperty } from '@nestjsx/crud/lib/crud';
@@ -9,11 +10,11 @@ import {
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
+  RelationId,
 } from 'typeorm';
-
 export enum Country {
   VN = 'VietNam',
-  AM = 'America',
+  AM = 'American',
 }
 
 @Entity()
@@ -37,7 +38,7 @@ export class Movie extends BaseEntity {
   @Column()
   description: string;
 
-  @ApiProperty({ example: '2020-3-1' })
+  @ApiProperty({ example: '2020-01-01' })
   @Column({ type: 'date' })
   releaseDate: Date;
 
@@ -47,11 +48,24 @@ export class Movie extends BaseEntity {
   @Column({ type: 'simple-json', nullable: true })
   image: { mainUrl: string; thumbnailUrl: string };
 
-  @ManyToMany(() => Actor, (actor) => actor.movies)
+  @ManyToMany(() => Actor, (actor) => actor.movies, {
+    eager: true,
+    cascade: true,
+  })
   @JoinTable()
   actors: Actor[];
 
-  @ManyToMany(() => Director, (director) => director.movies)
+  @ManyToMany(() => Director, (director) => director.movies, {
+    eager: true,
+    cascade: true,
+  })
   @JoinTable()
   directors: Director[];
+
+  @ManyToMany(() => Genre, (genre) => genre.movies, {
+    eager: true,
+    cascade: true,
+  })
+  @JoinTable()
+  genres: Genre[];
 }
