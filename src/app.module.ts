@@ -12,6 +12,7 @@ import { join } from 'path';
 import { ActorsModule } from './actors/actors.module';
 import { DirectorsModule } from './directors/directors.module';
 import { GenresModule } from './genres/genres.module';
+import { RolesModule } from './roles/roles.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { GenresModule } from './genres/genres.module';
     ActorsModule,
     DirectorsModule,
     GenresModule,
+    RolesModule,
   ],
 })
 export class AppModule {}
