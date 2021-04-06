@@ -4,6 +4,7 @@ import { UserDto } from './dto/user.dto';
 import {
   Body,
   Controller,
+  Get,
   Post,
   UsePipes,
   ValidationPipe,
@@ -15,7 +16,12 @@ export class UsersController {
 
   @Post()
   @UsePipes(ValidationPipe)
-  createUser(@Body() userDto: UserDto): Promise<User> {
+  createUser(@Body() userDto: UserDto) {
     return this.userService.createUser(userDto);
+  }
+
+  @Get()
+  getManyUsers() {
+    return this.userService.getManyUsers();
   }
 }
