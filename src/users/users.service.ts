@@ -11,11 +11,15 @@ export class UsersService {
     private userRepository: UserRepository,
   ) {}
 
-  async createUser(userDto: UserDto): Promise<User> {
+  async createUser(userDto: UserDto) {
     const { username } = userDto;
     if (await this.userRepository.findOne({ username })) {
       throw new BadRequestException('User is already exist');
     }
     return this.userRepository.createUser(userDto);
+  }
+
+  async getManyUsers() {
+    return this.userRepository.findOne(1);
   }
 }
