@@ -18,7 +18,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signUp(userDto: UserDto): Promise<User> {
+  async signUp(userDto: UserDto) {
     const { username } = userDto;
     if (await this.userRepository.findOne({ username })) {
       throw new BadRequestException('User is already exist');

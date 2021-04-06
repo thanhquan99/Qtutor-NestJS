@@ -51,6 +51,7 @@ export class Movie extends BaseEntity {
   @ManyToMany(() => Actor, (actor) => actor.movies, {
     eager: true,
     cascade: true,
+    onDelete: 'CASCADE',
   })
   @JoinTable()
   actors: Actor[];
@@ -58,6 +59,7 @@ export class Movie extends BaseEntity {
   @ManyToMany(() => Director, (director) => director.movies, {
     eager: true,
     cascade: true,
+    onDelete: 'CASCADE',
   })
   @JoinTable()
   directors: Director[];
@@ -65,6 +67,7 @@ export class Movie extends BaseEntity {
   @ManyToMany(() => Genre, (genre) => genre.movies, {
     eager: true,
     cascade: true,
+    onDelete: 'CASCADE',
   })
   @JoinTable()
   genres: Genre[];

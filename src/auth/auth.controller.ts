@@ -7,7 +7,7 @@ import { AuthService } from './auth.service';
 export class AuthController {
   constructor(private authService: AuthService) {}
   @Post('/signup')
-  signUp(@Body(ValidationPipe) userDto: UserDto): Promise<User> {
+  signUp(@Body(ValidationPipe) userDto: UserDto) {
     return this.authService.signUp(userDto);
   }
 

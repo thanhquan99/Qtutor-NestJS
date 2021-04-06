@@ -21,6 +21,8 @@ export class Actor extends BaseEntity {
   @Column()
   description: string;
 
-  @ManyToMany(() => Movie, (movie) => movie.actors)
+  @ManyToMany(() => Movie, (movie) => movie.actors, {
+    onDelete: 'CASCADE',
+  })
   movies: Movie[];
 }

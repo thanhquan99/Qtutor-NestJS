@@ -18,6 +18,8 @@ export class Theater extends BaseEntity {
   @Column()
   theaterNumber: number;
 
-  @ManyToOne(() => Cinema, (cinema) => cinema.theaters)
+  @ManyToOne(() => Cinema, (cinema) => cinema.theaters, {
+    onDelete: 'CASCADE',
+  })
   cinema: Cinema;
 }

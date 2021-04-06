@@ -16,6 +16,8 @@ export class Genre extends BaseEntity {
   @Column({ unique: true })
   name: string;
 
-  @ManyToMany(() => Movie, (movie) => movie.genres)
+  @ManyToMany(() => Movie, (movie) => movie.genres, {
+    onDelete: 'CASCADE',
+  })
   movies: Movie[];
 }
