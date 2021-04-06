@@ -1,11 +1,14 @@
-import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import * as CONFIG from 'config';
 import { ConnectionOptions } from 'typeorm';
 import { join } from 'path';
-
 const dbConfig = CONFIG.get('db');
 const DATABASE_URL: string = process.env.DATABASE_URL || dbConfig.url;
-export const typeOrmConfig: ConnectionOptions = {
+
+const config = {
+  url: DATABASE_URL,
+};
+
+const connectionOptions: ConnectionOptions = {
   type: 'postgres',
   url: DATABASE_URL,
   entities: [__dirname + '/../**/*.entity.js'],
@@ -17,4 +20,4 @@ export const typeOrmConfig: ConnectionOptions = {
   },
 };
 
-console.log('Config Database: ', typeOrmConfig);
+export = connectionOptions;

@@ -13,6 +13,8 @@ import { ActorsModule } from './actors/actors.module';
 import { DirectorsModule } from './directors/directors.module';
 import { GenresModule } from './genres/genres.module';
 import { RolesModule } from './roles/roles.module';
+import { UserRoleModule } from './user-role/user-role.module';
+import * as connectionOptions from './ormconfig';
 
 @Module({
   imports: [
@@ -20,7 +22,7 @@ import { RolesModule } from './roles/roles.module';
       rootPath: join(__dirname, '../..', 'public'),
     }),
     ConfigModule.forRoot(),
-    TypeOrmModule.forRoot(typeOrmConfig),
+    TypeOrmModule.forRoot(connectionOptions),
     CinemasModule,
     UsersModule,
     AuthModule,
@@ -30,6 +32,7 @@ import { RolesModule } from './roles/roles.module';
     DirectorsModule,
     GenresModule,
     RolesModule,
+    UserRoleModule,
   ],
 })
 export class AppModule {}
