@@ -17,6 +17,7 @@ import { AuthGuard } from '@nestjs/passport';
     type: Role,
   },
 })
+@UseGuards(AuthGuard())
 @Controller('roles')
 export class RolesController implements CrudController<Role> {
   constructor(public service: RolesService) {}
@@ -35,14 +36,12 @@ export class RolesController implements CrudController<Role> {
     return this.base.getOneBase(req);
   }
 
-  @UseGuards(AuthGuard())
   @Override('createOneBase')
   createRole(@ParsedRequest() req: CrudRequest, @ParsedBody() dto: Role) {
     return this.service.createRole(dto);
   }
 
   @Override('createManyBase')
-  @UseGuards(AuthGuard())
   createRoles(
     @ParsedRequest() req: CrudRequest,
     @ParsedBody() dto: CreateManyDto<Role>,
@@ -51,19 +50,16 @@ export class RolesController implements CrudController<Role> {
   }
 
   @Override('updateOneBase')
-  @UseGuards(AuthGuard())
   updateRole(@ParsedRequest() req: CrudRequest, @ParsedBody() dto: Role) {
     return this.base.updateOneBase(req, dto);
   }
 
   @Override('replaceOneBase')
-  @UseGuards(AuthGuard())
   replaceRole(@ParsedRequest() req: CrudRequest, @ParsedBody() dto: Role) {
     return this.base.replaceOneBase(req, dto);
   }
 
   @Override('deleteOneBase')
-  @UseGuards(AuthGuard())
   deleteDirector(@ParsedRequest() req: CrudRequest) {
     return this.base.deleteOneBase(req);
   }

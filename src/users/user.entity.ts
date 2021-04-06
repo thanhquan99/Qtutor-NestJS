@@ -16,7 +16,10 @@ export class User extends BaseEntity {
   id: number;
 
   @Column({ unique: true })
-  username: string;
+  email: string;
+
+  @Column()
+  name: string;
 
   @Column()
   password: string;
@@ -46,8 +49,4 @@ export class User extends BaseEntity {
     this.password = await bcrypt.hash(this.password, this.salt);
   }
 
-  // @AfterInsert() async hashPassword() {
-  //   this.salt = await bcrypt.genSalt();
-  //   this.password = await bcrypt.hash(this.password, this.salt);
-  // }
 }
