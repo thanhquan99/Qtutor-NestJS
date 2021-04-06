@@ -13,7 +13,7 @@ import { ActorsModule } from './actors/actors.module';
 import { DirectorsModule } from './directors/directors.module';
 import { GenresModule } from './genres/genres.module';
 import { RolesModule } from './roles/roles.module';
-// import { UserRoleModule } from './user-role/user-role.module';
+import { UserRoleModule } from './user-role/user-role.module';
 import { AppConfigModule } from './app-config/app-config.module';
 import * as connectionOptions from './ormconfig';
 
