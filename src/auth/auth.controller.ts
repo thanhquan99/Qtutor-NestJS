@@ -1,6 +1,6 @@
 import { LoginUserDto } from './../users/dto/loginUser.dto';
 import { User } from './../users/user.entity';
-import { UserDto } from '../users/dto/user.dto';
+import { RegisterUserDto } from '../users/dto/registerUser.dto';
 import { Body, Controller, Post, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
 
@@ -8,8 +8,8 @@ import { AuthService } from './auth.service';
 export class AuthController {
   constructor(private authService: AuthService) {}
   @Post('/register')
-  signUp(@Body(ValidationPipe) userDto: UserDto) {
-    return this.authService.register(userDto);
+  signUp(@Body(ValidationPipe) registerUserDto: RegisterUserDto) {
+    return this.authService.register(registerUserDto);
   }
 
   @Post('/login')

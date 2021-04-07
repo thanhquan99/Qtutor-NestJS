@@ -1,8 +1,12 @@
+import { CreateUserDto } from './dto/createUser.dto';
 import { User } from './user.entity';
-import { UserDto } from './dto/user.dto';
+import { RegisterUserDto } from './dto/registerUser.dto';
 import { UserRepository } from './user.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { getConnection } from 'typeorm';
+import { Role } from 'src/roles/role.entity';
+import { UserRole } from 'src/user-role/userRole.entity';
 
 @Injectable()
 export class UsersService {
@@ -11,12 +15,44 @@ export class UsersService {
     private userRepository: UserRepository,
   ) {}
 
-  async createUser(userDto: UserDto) {
-    const { email } = userDto;
+  async createUser(createUserDto: CreateUserDto) {
+    const { email, roleName } = createUserDto;
     if (await this.userRepository.findOne({ email })) {
-      throw new BadRequestException('User is already exist');
+      throw new BadRequestException('Email is already exist');
     }
-    return this.userRepository.createUser(userDto);
+
+    let user;
+    const connection = getConnection();
+    const queryRunner = connection.createQueryRunner();
+    await queryRunner.connect();
+
+    await queryRunner.startTransaction();
+
+    try {
+      // execute some operations on this transaction:
+      user = queryRunner.manager.create(User, createUserDto);
+      await user.hashPassword();
+      await user.save();
+      const role = await queryRunner.manager.findOne(Role, {
+        name: roleName,
+      });
+      await queryRunner.manager
+        .create(UserRole, {
+          user,
+          role,
+        })
+        .save();
+      // commit transaction now:
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      // since we have errors let's rollback changes we made
+      await queryRunner.rollbackTransaction();
+      throw new BadRequestException(`Failed due to ${err}`);
+    } finally {
+      // you need to release query runner which is manually created:
+      await queryRunner.release();
+    }
+    return user;
   }
 
   async getManyUsers() {

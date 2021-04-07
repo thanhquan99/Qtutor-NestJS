@@ -1,6 +1,7 @@
+import { RoleName } from './../roles/role.entity';
 import { LoginUserDto } from './../users/dto/loginUser.dto';
 import { User } from './../users/user.entity';
-import { UserDto } from '../users/dto/user.dto';
+import { RegisterUserDto } from '../users/dto/registerUser.dto';
 import { UserRepository } from './../users/user.repository';
 import {
   BadRequestException,
@@ -22,9 +23,12 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async register(userDto: UserDto) {
-    let user;
+  async register(registerUserDto: RegisterUserDto) {
+    if (await this.userRepository.findOne({ email: registerUserDto.email })) {
+      throw new BadRequestException('Email is already exist');
+    }
 
+    let user;
     const queryRunner = getConnection().createQueryRunner();
     await queryRunner.connect();
 
@@ -32,11 +36,11 @@ export class AuthService {
 
     try {
       // execute some operations on this transaction:
-      user = queryRunner.manager.create(User, userDto);
+      user = queryRunner.manager.create(User, registerUserDto);
       await user.hashPassword();
       await user.save();
       const role = await queryRunner.manager.findOne(Role, {
-        name: 'Customer',
+        name: RoleName.CUSTOMER,
       });
       const userRole = await queryRunner.manager
         .create(UserRole, {
@@ -72,6 +76,8 @@ export class AuthService {
     };
     const accessToken = await this.jwtService.sign(payload);
 
+    delete user.salt;
+    delete user.password;
     return { accessToken, user };
   }
 }
