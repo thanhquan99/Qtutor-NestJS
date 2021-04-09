@@ -1,3 +1,4 @@
+import { UserRoleView } from './../user-role/userRoleView.entity';
 import { CreateUserDto } from './dto/createUser.dto';
 import { User } from './user.entity';
 import { RegisterUserDto } from './dto/registerUser.dto';
@@ -7,6 +8,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { getConnection } from 'typeorm';
 import { Role } from 'src/roles/role.entity';
 import { UserRole } from 'src/user-role/userRole.entity';
+import { getManager, getRepository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
@@ -55,7 +57,8 @@ export class UsersService {
     return user;
   }
 
-  async getManyUsers() {
-    return this.userRepository.findOne(1);
+  async getUsers() {
+    const manager = getManager();
+    return await manager.find(UserRoleView);
   }
 }
