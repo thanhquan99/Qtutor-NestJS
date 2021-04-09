@@ -25,7 +25,7 @@ export class UsersController {
   }
 
   @Get()
-  getManyUsers() {
-    return this.userService.getManyUsers();
+  getUsers() {
+    return this.userService.getUsers();
   }
 }
