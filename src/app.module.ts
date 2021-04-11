@@ -16,6 +16,7 @@ import { RolesModule } from './roles/roles.module';
 import { UserRoleModule } from './user-role/user-role.module';
 import { AppConfigModule } from './app-config/app-config.module';
 import { PermissionsModule } from './permissions/permissions.module';
+import { RolePermissionModule } from './role-permission/role-permission.module';
 import * as connectionOptions from './ormconfig';
 
 @Module({
@@ -37,6 +38,7 @@ import * as connectionOptions from './ormconfig';
     UserRoleModule,
     AppConfigModule,
     PermissionsModule,
+    RolePermissionModule,
   ],
 })
 export class AppModule {}

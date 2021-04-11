@@ -20,4 +20,5 @@ const connectionOptions: ConnectionOptions = {
   },
 };
 
+console.log(DATABASE_URL);
 export = connectionOptions;
