@@ -19,6 +19,7 @@ export class RolePermissionService extends TypeOrmCrudService<RolePermission> {
 
     const role = await manager.findOne(Role, roleId);
     const permission = await manager.findOne(Permission, permissionId);
+
     if (!role) {
       throw new BadRequestException('Role is not exist');
     }
@@ -26,11 +27,16 @@ export class RolePermissionService extends TypeOrmCrudService<RolePermission> {
       throw new BadRequestException('Permission is not exist');
     }
 
-    const rolePermission = await manager.query(
-      `SELECT * FROM role_permission WHERE "roleId" = ${roleId} AND "permissionId" = ${permissionId} FETCH FIRST ROW ONLY`,
-    );
-    console.log(rolePermission);
-    if (rolePermission.length) {
+    const rolePermission = await manager
+      .createQueryBuilder(RolePermission, 'role_permission')
+      .where('"roleId" = :roleId and "permissionId" = :permissionId', {
+        roleId,
+        permissionId,
+      })
+      .select()
+      .getOne();
+
+    if (rolePermission) {
       throw new BadRequestException('RolePermission is already exist');
     }
 

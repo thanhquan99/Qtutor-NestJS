@@ -18,6 +18,8 @@ import { AppConfigModule } from './app-config/app-config.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { RolePermissionModule } from './role-permission/role-permission.module';
 import * as connectionOptions from './ormconfig';
+import { APP_GUARD } from '@nestjs/core';
+import { PermissionGuard } from './guards/permissions.guard';
 
 @Module({
   imports: [
@@ -39,6 +41,12 @@ import * as connectionOptions from './ormconfig';
     AppConfigModule,
     PermissionsModule,
     RolePermissionModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: PermissionGuard,
+    },
   ],
 })
 export class AppModule {}
