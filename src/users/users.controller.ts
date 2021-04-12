@@ -20,6 +20,7 @@ export class UsersController {
   constructor(private userService: UsersService) {}
 
   @Post()
+  @Permissions(PermissionAction.CREATE_USER)
   @UsePipes(ValidationPipe)
   createUser(@Body() createUserDto: CreateUserDto) {
     return this.userService.createUser(createUserDto);
