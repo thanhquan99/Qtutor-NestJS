@@ -1,37 +1,24 @@
-import { Actor } from './../actors/actor.entity';
 import { UpdateMovieDto } from './dto/updateMovieDto';
 import { CreateMovieDto } from './dto/createMovieDto';
 import { MoviesService } from './movies.service';
-import { Country, Movie } from './movie.entity';
+import { Movie } from './movie.entity';
 import {
   Controller,
   Param,
   ParseIntPipe,
-  Post,
-  UploadedFile,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import {
-  Crud,
-  CrudController,
-  CrudRequest,
-  Override,
-  ParsedBody,
-  ParsedRequest,
-} from '@nestjsx/crud';
-import {
-  FileFieldsInterceptor,
-  FileInterceptor,
-  FilesInterceptor,
-} from '@nestjs/platform-express';
+import { Crud, CrudController, Override, ParsedBody } from '@nestjsx/crud';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { storage } from 'config/storage.config';
 import { Express } from 'express';
 import { AuthGuard } from '@nestjs/passport';
-import { MoviesModule } from './movies.module';
+import { Permissions } from 'src/guards/permissions.decorator';
+import { PermissionAction } from 'src/permissions/permission.entity';
 
 @Crud({
   model: {
@@ -47,6 +34,7 @@ export class MoviesController implements CrudController<Movie> {
 
   @Override('createOneBase')
   @UseGuards(AuthGuard())
+  @Permissions(PermissionAction.CREATE_MOVIE)
   @UsePipes(ValidationPipe)
   @UseInterceptors(
     FileFieldsInterceptor(
@@ -66,6 +54,7 @@ export class MoviesController implements CrudController<Movie> {
 
   @Override('updateOneBase')
   @UseGuards(AuthGuard())
+  @Permissions(PermissionAction.UPDATE_MOVIE)
   @UsePipes(ValidationPipe)
   @UseInterceptors(
     FileFieldsInterceptor(
