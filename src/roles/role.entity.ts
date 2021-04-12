@@ -1,3 +1,4 @@
+import { RolePermission } from './../role-permission/role-permission.entity';
 import { UserRole } from './../user-role/userRole.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import {
@@ -26,4 +27,9 @@ export class Role extends BaseEntity {
 
   @OneToMany(() => UserRole, (userRole) => userRole.role)
   userRoles: UserRole[];
+
+  @OneToMany(() => RolePermission, (rolePermission) => rolePermission.role, {
+    onDelete: 'CASCADE',
+  })
+  rolePermissions: RolePermission[];
 }

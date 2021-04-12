@@ -1,8 +1,8 @@
+import { PermissionAction } from './../permissions/permission.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateUserDto } from './dto/createUser.dto';
-import { User } from './user.entity';
 import { UsersService } from './users.service';
-import { RegisterUserDto } from './dto/registerUser.dto';
+
 import {
   Body,
   Controller,
@@ -12,6 +12,7 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
+import { Permissions } from 'src/guards/permissions.decorator';
 
 @UseGuards(AuthGuard())
 @Controller('users')
@@ -25,6 +26,7 @@ export class UsersController {
   }
 
   @Get()
+  @Permissions(PermissionAction.GET_USER)
   getUsers() {
     return this.userService.getUsers();
   }
