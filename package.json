@@ -95,6 +95,7 @@
     "testEnvironment": "node"
   },
   "engines": {
-    "node": "15.9.0"
+    "node": "15.9.0",
+    "npm": "7.5.3"
   }
 }
