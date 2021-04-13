@@ -14,10 +14,10 @@ const connectionOptions: ConnectionOptions = {
   entities: [__dirname + '/../**/*.entity.js'],
   ssl: dbConfig.ssl,
   synchronize: dbConfig.synchronize,
-  migrations: [join(__dirname, 'migrations/*{.ts,.js}')],
-  cli: {
-    migrationsDir: 'src/migrations',
-  },
+  // migrations: [join(__dirname, 'migrations/*{.ts,.js}')],
+  // cli: {
+  //   migrationsDir: 'src/migrations',
+  // },
 };
 
 console.log(DATABASE_URL);

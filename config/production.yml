@@ -1,2 +1,2 @@
-db:
-  synchronize: false
+# db:
+#   synchronize: false
