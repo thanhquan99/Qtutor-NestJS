@@ -23,6 +23,10 @@ export class PermissionGuard implements CanActivate {
       headers: { authorization: token },
     } = request;
 
+    if (!token) {
+      return false;
+    }
+
     const user: JwtPayload = jwt_decode(token);
     const { roleName } = user;
 
