@@ -24,36 +24,27 @@ export class UsersService {
     }
 
     let user;
-    const connection = getConnection();
-    const queryRunner = connection.createQueryRunner();
-    await queryRunner.connect();
-
-    await queryRunner.startTransaction();
-
     try {
-      // execute some operations on this transaction:
-      user = queryRunner.manager.create(User, createUserDto);
-      await user.hashPassword();
-      await user.save();
-      const role = await queryRunner.manager.findOne(Role, {
-        name: roleName,
+      await getManager().transaction(async (entityManager) => {
+        const user = entityManager.create(User, createUserDto);
+        await user.hashPassword();
+        await entityManager.save(user);
+
+        const role = await entityManager.findOne(Role, {
+          name: roleName,
+        });
+
+        await entityManager
+          .create(UserRole, {
+            user,
+            role,
+          })
+          .save();
       });
-      await queryRunner.manager
-        .create(UserRole, {
-          user,
-          role,
-        })
-        .save();
-      // commit transaction now:
-      await queryRunner.commitTransaction();
     } catch (err) {
-      // since we have errors let's rollback changes we made
-      await queryRunner.rollbackTransaction();
       throw new BadRequestException(`Failed due to ${err}`);
-    } finally {
-      // you need to release query runner which is manually created:
-      await queryRunner.release();
     }
+
     return user;
   }
 
