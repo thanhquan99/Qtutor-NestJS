@@ -1,7 +1,6 @@
 import { DirectorsService } from './directors.service';
 import { Director } from './director.entity';
 import {
-  CreateManyDto,
   Crud,
   CrudController,
   CrudRequest,
@@ -15,6 +14,15 @@ import { AuthGuard } from '@nestjs/passport';
 @Crud({
   model: {
     type: Director,
+  },
+  routes: {
+    only: [
+      'getManyBase',
+      'getOneBase',
+      'createOneBase',
+      'updateOneBase',
+      'deleteOneBase',
+    ],
   },
 })
 @Controller('directors')
@@ -44,15 +52,6 @@ export class DirectorsController implements CrudController<Director> {
     return this.base.createOneBase(req, dto);
   }
 
-  @Override('createManyBase')
-  @UseGuards(AuthGuard())
-  createDirectors(
-    @ParsedRequest() req: CrudRequest,
-    @ParsedBody() dto: CreateManyDto<Director>,
-  ) {
-    return this.base.createManyBase(req, dto);
-  }
-
   @Override('updateOneBase')
   @UseGuards(AuthGuard())
   updateDirector(
@@ -60,15 +59,6 @@ export class DirectorsController implements CrudController<Director> {
     @ParsedBody() dto: Director,
   ) {
     return this.base.updateOneBase(req, dto);
-  }
-
-  @Override('replaceOneBase')
-  @UseGuards(AuthGuard())
-  replaceDirector(
-    @ParsedRequest() req: CrudRequest,
-    @ParsedBody() dto: Director,
-  ) {
-    return this.base.replaceOneBase(req, dto);
   }
 
   @Override('deleteOneBase')

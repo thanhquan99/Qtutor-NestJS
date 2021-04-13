@@ -2,7 +2,6 @@ import { GenresService } from './genres.service';
 import { Genre } from './genre.entity';
 import { Controller, UseGuards } from '@nestjs/common';
 import {
-  CreateManyDto,
   Crud,
   CrudController,
   CrudRequest,
@@ -15,6 +14,15 @@ import { AuthGuard } from '@nestjs/passport';
 @Crud({
   model: {
     type: Genre,
+  },
+  routes: {
+    only: [
+      'getManyBase',
+      'getOneBase',
+      'createOneBase',
+      'updateOneBase',
+      'deleteOneBase',
+    ],
   },
 })
 @Controller('genres')
@@ -41,25 +49,10 @@ export class GenresController implements CrudController<Genre> {
     return this.service.createGenre(dto);
   }
 
-  @Override('createManyBase')
-  @UseGuards(AuthGuard())
-  createGenres(
-    @ParsedRequest() req: CrudRequest,
-    @ParsedBody() dto: CreateManyDto<Genre>,
-  ) {
-    return this.base.createManyBase(req, dto);
-  }
-
   @Override('updateOneBase')
   @UseGuards(AuthGuard())
   updateGenre(@ParsedRequest() req: CrudRequest, @ParsedBody() dto: Genre) {
     return this.base.updateOneBase(req, dto);
-  }
-
-  @Override('replaceOneBase')
-  @UseGuards(AuthGuard())
-  replaceGenre(@ParsedRequest() req: CrudRequest, @ParsedBody() dto: Genre) {
-    return this.base.replaceOneBase(req, dto);
   }
 
   @Override('deleteOneBase')

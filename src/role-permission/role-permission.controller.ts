@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
-  CreateManyDto,
   Crud,
   CrudController,
   CrudRequest,
@@ -23,6 +22,15 @@ import {
 @Crud({
   model: {
     type: RolePermission,
+  },
+  routes: {
+    only: [
+      'getManyBase',
+      'getOneBase',
+      'createOneBase',
+      'updateOneBase',
+      'deleteOneBase',
+    ],
   },
 })
 @Controller('role-permission')
@@ -50,28 +58,12 @@ export class RolePermissionController
     return this.service.createRolePermission(dto);
   }
 
-  @Override('createManyBase')
-  createRolePermissions(
-    @ParsedRequest() req: CrudRequest,
-    @ParsedBody() dto: CreateManyDto<RolePermission>,
-  ) {
-    return this.base.createManyBase(req, dto);
-  }
-
   @Override('updateOneBase')
   updateRolePermission(
     @ParsedRequest() req: CrudRequest,
     @ParsedBody() dto: RolePermission,
   ) {
     return this.base.updateOneBase(req, dto);
-  }
-
-  @Override('replaceOneBase')
-  replaceRolePermission(
-    @ParsedRequest() req: CrudRequest,
-    @ParsedBody() dto: RolePermission,
-  ) {
-    return this.base.replaceOneBase(req, dto);
   }
 
   @Override('deleteOneBase')

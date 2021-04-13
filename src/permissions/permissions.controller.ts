@@ -17,6 +17,15 @@ import { AuthGuard } from '@nestjs/passport';
   model: {
     type: Permission,
   },
+  routes: {
+    only: [
+      'getManyBase',
+      'getOneBase',
+      'createOneBase',
+      'updateOneBase',
+      'deleteOneBase',
+    ],
+  },
 })
 @Controller('permissions')
 export class PermissionsController implements CrudController<Permission> {
@@ -44,28 +53,12 @@ export class PermissionsController implements CrudController<Permission> {
     return this.service.createPermission(dto);
   }
 
-  @Override('createManyBase')
-  createPermissions(
-    @ParsedRequest() req: CrudRequest,
-    @ParsedBody() dto: CreateManyDto<Permission>,
-  ) {
-    return this.base.createManyBase(req, dto);
-  }
-
   @Override('updateOneBase')
   updatePermission(
     @ParsedRequest() req: CrudRequest,
     @ParsedBody() dto: Permission,
   ) {
     return this.base.updateOneBase(req, dto);
-  }
-
-  @Override('replaceOneBase')
-  replacePermission(
-    @ParsedRequest() req: CrudRequest,
-    @ParsedBody() dto: Permission,
-  ) {
-    return this.base.replaceOneBase(req, dto);
   }
 
   @Override('deleteOneBase')

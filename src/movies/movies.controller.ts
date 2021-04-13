@@ -24,6 +24,15 @@ import { PermissionAction } from 'src/permissions/permission.entity';
   model: {
     type: Movie,
   },
+  routes: {
+    only: [
+      'getManyBase',
+      'getOneBase',
+      'createOneBase',
+      'updateOneBase',
+      'deleteOneBase',
+    ],
+  },
 })
 @Controller('movies')
 export class MoviesController implements CrudController<Movie> {

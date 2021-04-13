@@ -7,6 +7,15 @@ import { TheatersService } from './theaters.service';
   model: {
     type: Theater,
   },
+  routes: {
+    only: [
+      'getManyBase',
+      'getOneBase',
+      'createOneBase',
+      'updateOneBase',
+      'deleteOneBase',
+    ],
+  },
 })
 @Controller('theaters')
 export class TheatersController implements CrudController<Theater> {
