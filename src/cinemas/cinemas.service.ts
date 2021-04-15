@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateTheaterDto } from 'src/theaters/dto/create-theater.dto';
+import { getManager } from 'typeorm';
 
 @Injectable()
 export class CinemasService {
@@ -82,27 +83,28 @@ export class CinemasService {
   async createOwnTheater(
     id: number,
     createTheaterDto: CreateTheaterDto,
-  ): Promise<Theater> {
+  ): Promise<Cinema> {
     const { theaterNumber } = createTheaterDto;
-    const check = await this.cinemaRepository
-      .createQueryBuilder('cinema')
-      .where('cinema.id = :id and theater.theaterNumber = :theaterNumber', {
+    const manager = getManager();
+
+    const checkTheater = await manager
+      .createQueryBuilder(Theater, 'theater')
+      .where('"cinemaId" = :id and "theaterNumber" = :theaterNumber', {
         id,
         theaterNumber,
       })
-      .leftJoinAndSelect('cinema.theaters', 'theater')
       .getOne();
-    if (check) {
+    if (checkTheater) {
       throw new BadRequestException(
         `Theater Number ${theaterNumber} is already exist in this cinema`,
       );
     }
+
     const cinema = await this.cinemaRepository.findOne({
       where: { id },
     });
     const theater = Theater.create(createTheaterDto);
-    theater.cinema = cinema;
-    await theater.save();
-    return theater;
+    cinema.theaters.push(theater);
+    return cinema.save();
   }
 }

@@ -28,7 +28,6 @@ export class RolePermission extends BaseEntity {
 
   @ManyToOne(() => Permission, (permission) => permission.rolePermissions, {
     onDelete: 'CASCADE',
-    eager: true,
   })
   @JoinTable()
   permission: Permission;

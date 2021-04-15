@@ -20,6 +20,8 @@ export class Cinema extends BaseEntity {
 
   @OneToMany(() => Theater, (theater) => theater.cinema, {
     cascade: true,
+    onDelete: 'CASCADE',
+    eager: true,
   })
   @JoinTable()
   theaters: Theater[];

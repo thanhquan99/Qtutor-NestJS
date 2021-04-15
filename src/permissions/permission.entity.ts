@@ -34,9 +34,9 @@ export enum PermissionAction {
   CREATE_SEAT = 'Create seat',
   UPDATE_SEAT = 'Update seat',
   DELETE_SEAT = 'Delete seat',
-  CREATE_TICKET = 'Create ticket',
-  UPDATE_TICKET = 'Update ticket',
-  DELETE_TICKET = 'Delete ticket',
+  CREATE_SHOWTIME = 'Create showtime',
+  UPDATE_SHOWTIME = 'Update showtime',
+  DELETE_SHOWTIME = 'Delete showtime',
 }
 
 @Entity()
@@ -44,8 +44,8 @@ export class Permission extends BaseEntity {
   @PrimaryGeneratedColumn() id: number;
 
   @ApiProperty({ example: 'Create user' })
-  @Column({ unique: true, type: 'enum', enum: PermissionAction })
-  action: PermissionAction;
+  @Column({ unique: true })
+  action: string;
 
   @OneToMany(
     () => RolePermission,

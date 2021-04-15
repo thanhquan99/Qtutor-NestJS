@@ -14,6 +14,7 @@ import { JwtPayload } from 'src/service/jwt/jwt-payload.interface';
 import { getConnection, getManager } from 'typeorm';
 import { Role } from 'src/roles/role.entity';
 import { UserRole } from 'src/user-role/userRole.entity';
+import { UserRoleView } from 'src/user-role/userRoleView.entity';
 
 @Injectable()
 export class AuthService {
@@ -66,9 +67,13 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    const { role } = await getManager().findOne(UserRoleView, {
+      email: user.email,
+    });
+
     const payload: JwtPayload = {
       email: user.email,
-      roleName: user.userRole?.role?.name,
+      roleName: role.name,
     };
     const accessToken = await this.jwtService.sign(payload);
 

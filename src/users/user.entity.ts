@@ -34,7 +34,6 @@ export class User extends BaseEntity {
   age: number;
 
   @OneToOne(() => UserRole, (userRole) => userRole.user, {
-    eager: true,
     cascade: true,
   })
   userRole: UserRole;

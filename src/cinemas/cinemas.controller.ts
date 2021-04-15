@@ -1,3 +1,4 @@
+import { PermissionAction } from 'src/permissions/permission.entity';
 import { Theater } from './../theaters/theater.entity';
 import { CreateTheaterDto } from './../theaters/dto/create-theater.dto';
 import { UpdateCinemaDto } from './dto/update-cinema-dto';
@@ -15,13 +16,12 @@ import {
   Patch,
   Post,
   Query,
-  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/auth/get-user.decorator';
 import { User } from 'src/users/user.entity';
+import { Permissions } from 'src/guards/permissions.decorator';
 
 @Controller('cinemas')
 export class CinemasController {
@@ -40,7 +40,7 @@ export class CinemasController {
   }
 
   @Post()
-  @UseGuards(AuthGuard())
+  @Permissions(PermissionAction.CREATE_CINEMA)
   @UsePipes(ValidationPipe)
   createCinema(
     @Body() createCinemaDto: CreateCinemaDto,
@@ -51,11 +51,13 @@ export class CinemasController {
   }
 
   @Delete('/:id')
+  @Permissions(PermissionAction.DELETE_CINEMA)
   deleteCinemaById(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.cinemaService.deleteCinemaById(id);
   }
 
   @Patch('/:id')
+  @Permissions(PermissionAction.UPDATE_CINEMA)
   @UsePipes(ValidationPipe)
   updateCinema(
     @Param('id', ParseIntPipe) id: number,
@@ -70,10 +72,12 @@ export class CinemasController {
   }
 
   @Post('/:id/theaters')
+  @Permissions(PermissionAction.CREATE_THEATER)
+  @UsePipes(ValidationPipe)
   createOwnTheater(
     @Param('id', ParseIntPipe) id: number,
     @Body() createTheaterDto: CreateTheaterDto,
-  ): Promise<Theater> {
+  ): Promise<Cinema> {
     return this.cinemaService.createOwnTheater(id, createTheaterDto);
   }
 }

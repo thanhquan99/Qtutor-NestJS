@@ -23,7 +23,6 @@ export class UserRole extends BaseEntity {
   user: User;
 
   @ManyToOne(() => Role, (role) => role.userRoles, {
-    eager: true,
     cascade: true,
     nullable: false,
     onDelete: 'CASCADE',

@@ -10,6 +10,8 @@ import {
   ParsedRequest,
 } from '@nestjsx/crud';
 import { AuthGuard } from '@nestjs/passport';
+import { Permissions } from 'src/guards/permissions.decorator';
+import { PermissionAction } from 'src/permissions/permission.entity';
 
 @Crud({
   model: {
@@ -43,20 +45,20 @@ export class ActorsController implements CrudController<Actor> {
     return this.base.getOneBase(req);
   }
 
-  @UseGuards(AuthGuard())
+  @Permissions(PermissionAction.CREATE_ACTOR)
   @Override('createOneBase')
   createActor(@ParsedRequest() req: CrudRequest, @ParsedBody() dto: Actor) {
     return this.base.createOneBase(req, dto);
   }
 
+  @Permissions(PermissionAction.UPDATE_ACTOR)
   @Override('updateOneBase')
-  @UseGuards(AuthGuard())
   updateActor(@ParsedRequest() req: CrudRequest, @ParsedBody() dto: Actor) {
     return this.base.updateOneBase(req, dto);
   }
 
+  @Permissions(PermissionAction.DELETE_ACTOR)
   @Override('deleteOneBase')
-  @UseGuards(AuthGuard())
   deleteActor(@ParsedRequest() req: CrudRequest) {
     return this.base.deleteOneBase(req);
   }
