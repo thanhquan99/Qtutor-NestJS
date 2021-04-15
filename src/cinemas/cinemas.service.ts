@@ -27,32 +27,22 @@ export class CinemasService {
   }
 
   async getCinemaById(id: number): Promise<Cinema> {
-    const cinemaFound = await this.cinemaRepository.findOne({
+    const cinema = await this.cinemaRepository.findOne({
       where: { id },
     });
 
-    if (!cinemaFound) {
+    if (!cinema) {
       throw new NotFoundException(`Cinema with ${id} not found`);
     }
 
-    return cinemaFound;
+    return cinema;
   }
 
   async getCinemas(filterDto: CinemasFilterDto): Promise<Cinema[]> {
-    const { search } = filterDto;
-    const query = this.cinemaRepository.createQueryBuilder('cinema');
-
-    if (search) {
-      query.andWhere(
-        'cinema.name LIKE :search OR cinema.address LIKE :search',
-        {
-          search: `%${search}%`,
-        },
-      );
-    }
-
-    const cinemas = await query.getMany();
-    return cinemas;
+    return this.cinemaRepository
+      .createQueryBuilder('cinema')
+      .leftJoinAndSelect('cinema.theaters', 'theater')
+      .getMany();
   }
 
   async deleteCinemaById(id: number): Promise<void> {
