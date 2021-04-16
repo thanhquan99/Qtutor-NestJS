@@ -1,10 +1,12 @@
 import { Country } from './../movie.entity';
 import {
+  IsArray,
   IsDateString,
   IsEnum,
   IsNotEmpty,
   IsNumber,
   IsObject,
+  IsOptional,
   IsString,
 } from 'class-validator';
 
@@ -30,4 +32,16 @@ export class CreateMovieDto {
   @IsNotEmpty()
   @IsDateString()
   releaseDate: Date;
+
+  @IsOptional()
+  @IsArray()
+  actorIds: [number];
+
+  @IsOptional()
+  @IsArray()
+  directorIds: [number];
+
+  @IsOptional()
+  @IsArray()
+  genreIds: [number];
 }

@@ -1,5 +1,11 @@
 import { Country } from './../movie.entity';
-import { IsDateString, IsEnum, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsDateString,
+  IsEnum,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class UpdateMovieDto {
   @IsOptional()
@@ -21,4 +27,16 @@ export class UpdateMovieDto {
   @IsOptional()
   @IsDateString()
   releaseDate: Date;
+
+  @IsOptional()
+  @IsArray()
+  actorIds: [number];
+
+  @IsOptional()
+  @IsArray()
+  directorIds: [number];
+
+  @IsOptional()
+  @IsArray()
+  genreIds: [number];
 }

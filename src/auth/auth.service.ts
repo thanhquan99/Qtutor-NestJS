@@ -29,11 +29,6 @@ export class AuthService {
       throw new BadRequestException('Email is already exist');
     }
 
-    const queryRunner = getConnection().createQueryRunner();
-    await queryRunner.connect();
-
-    await queryRunner.startTransaction();
-
     try {
       await getManager().transaction(async (entityManager) => {
         const user = entityManager.create(User, registerUserDto);
