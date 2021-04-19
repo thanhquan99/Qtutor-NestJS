@@ -27,9 +27,7 @@ export class CinemasService {
   }
 
   async getCinemaById(id: number): Promise<Cinema> {
-    const cinema = await this.cinemaRepository.findOne({
-      where: { id },
-    });
+    const cinema = await this.cinemaRepository.findOne({ id });
 
     if (!cinema) {
       throw new NotFoundException(`Cinema with ${id} not found`);

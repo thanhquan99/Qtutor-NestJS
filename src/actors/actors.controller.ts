@@ -1,65 +1,49 @@
+import { CreateActorDto } from './dto/createActor.dto';
 import { ActorsService } from './actors.service';
 import { Actor } from './actor.entity';
-import { Controller, UseGuards } from '@nestjs/common';
 import {
-  Crud,
-  CrudController,
-  CrudRequest,
-  Override,
-  ParsedBody,
-  ParsedRequest,
-} from '@nestjsx/crud';
-import { AuthGuard } from '@nestjs/passport';
-import { Permissions } from 'src/guards/permissions.decorator';
+  Body,
+  Controller,
+  Post,
+  ValidationPipe,
+  UsePipes,
+  Patch,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
+
+import { BaseControllerCRUD } from 'src/base/base-controller-CRUD';
 import { PermissionAction } from 'src/permissions/permission.entity';
+import { Permissions } from 'src/guards/permissions.decorator';
 
-@Crud({
-  model: {
-    type: Actor,
-  },
-  routes: {
-    only: [
-      'getManyBase',
-      'getOneBase',
-      'createOneBase',
-      'updateOneBase',
-      'deleteOneBase',
-    ],
-  },
-})
 @Controller('actors')
-export class ActorsController implements CrudController<Actor> {
-  constructor(public service: ActorsService) {}
-
-  get base(): CrudController<Actor> {
-    return this;
+export class ActorsController extends BaseControllerCRUD<Actor> {
+  constructor(service: ActorsService) {
+    super(service);
   }
 
-  @Override('getManyBase')
-  getActors(@ParsedRequest() req: CrudRequest) {
-    return this.base.getManyBase(req);
-  }
-
-  @Override('getOneBase')
-  getActor(@ParsedRequest() req: CrudRequest) {
-    return this.base.getOneBase(req);
-  }
-
+  @Post()
   @Permissions(PermissionAction.CREATE_ACTOR)
-  @Override('createOneBase')
-  createActor(@ParsedRequest() req: CrudRequest, @ParsedBody() dto: Actor) {
-    return this.base.createOneBase(req, dto);
+  @UsePipes(ValidationPipe)
+  createOne(@Body() createActorDto: CreateActorDto): Promise<Actor> {
+    return this.service.createOne(createActorDto);
   }
 
+  @Patch('/:id')
   @Permissions(PermissionAction.UPDATE_ACTOR)
-  @Override('updateOneBase')
-  updateActor(@ParsedRequest() req: CrudRequest, @ParsedBody() dto: Actor) {
-    return this.base.updateOneBase(req, dto);
+  @UsePipes(ValidationPipe)
+  updateOne(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() createActorDto: CreateActorDto,
+  ): Promise<Actor> {
+    return this.service.updateOne(id, createActorDto);
   }
 
+  @Patch('/:id')
   @Permissions(PermissionAction.DELETE_ACTOR)
-  @Override('deleteOneBase')
-  deleteActor(@ParsedRequest() req: CrudRequest) {
-    return this.base.deleteOneBase(req);
+  deleteOne(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<{ message: string }> {
+    return this.service.deleteOne(id);
   }
 }
