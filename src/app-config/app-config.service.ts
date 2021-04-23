@@ -1,3 +1,4 @@
+import { SeatType } from './../seats/seat.entity';
 import { Country } from './../movies/movie.entity';
 import { Injectable } from '@nestjs/common';
 
@@ -6,6 +7,7 @@ export class AppConfigService {
   getAppConfig() {
     return {
       Country,
+      SeatType,
     };
   }
 }
