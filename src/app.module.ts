@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { typeOrmConfig } from './config/typeorm.config';
-import { CinemasModule } from './cinemas/cinemas.module';
 import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
@@ -21,6 +19,7 @@ import * as connectionOptions from './ormconfig';
 import { APP_GUARD } from '@nestjs/core';
 import { PermissionGuard } from './guards/permissions.guard';
 import { SeatsModule } from './seats/seats.module';
+import { CinemasModule } from './cinemas/cinemas.module';
 
 @Module({
   imports: [

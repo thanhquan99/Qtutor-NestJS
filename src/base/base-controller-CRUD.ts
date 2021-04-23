@@ -24,6 +24,9 @@ export abstract class BaseControllerCRUD<T> {
   getMany(
     @Query(ValidationPipe) query: QueryParams,
   ): Promise<{ results: T[]; total: number }> {
+    if (query?.filter) {
+      query.filter = JSON.parse(query.filter);
+    }
     return this.service.getMany(query);
   }
 

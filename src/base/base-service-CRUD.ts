@@ -54,15 +54,14 @@ export abstract class BaseServiceCRUD<T> {
     return { message: 'delete success' };
   }
 
-  async queryBuilder(builder, query: QueryParams, modelName) {
+  async queryBuilder(builder, query, modelName) {
     const { limit, filter, offset, orderBy } = query;
 
     if (filter) {
-      const filterByFields = JSON.parse(filter);
-      console.log(filterByFields);
-      for (const field in filterByFields) {
-        const operator = Object.keys(filterByFields[field])[0];
-        const value = filterByFields[field][operator];
+      console.log(filter);
+      for (const field in filter) {
+        const operator = Object.keys(filter[field])[0];
+        const value = filter[field][operator];
         switch (operator) {
           case 'equal':
             builder.andWhere(`"${modelName}"."${field}" = '${value}'`);

@@ -1,69 +1,50 @@
+import { UpdateDirectorDto } from './dto/update-director.dto';
+import { PermissionAction } from './../permissions/permission.entity';
+import { Permissions } from 'src/guards/permissions.decorator';
+import { CreateActorDto } from './../actors/dto/createActor.dto';
+import { BaseControllerCRUD } from 'src/base/base-controller-CRUD';
 import { DirectorsService } from './directors.service';
 import { Director } from './director.entity';
 import {
-  Crud,
-  CrudController,
-  CrudRequest,
-  Override,
-  ParsedBody,
-  ParsedRequest,
-} from '@nestjsx/crud';
-import { Controller, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+  Body,
+  Controller,
+  Delete,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 
-@Crud({
-  model: {
-    type: Director,
-  },
-  routes: {
-    only: [
-      'getManyBase',
-      'getOneBase',
-      'createOneBase',
-      'updateOneBase',
-      'deleteOneBase',
-    ],
-  },
-})
 @Controller('directors')
-export class DirectorsController implements CrudController<Director> {
-  constructor(public service: DirectorsService) {}
-
-  get base(): CrudController<Director> {
-    return this;
+export class DirectorsController extends BaseControllerCRUD<Director> {
+  constructor(public service: DirectorsService) {
+    super(service);
   }
 
-  @Override('getManyBase')
-  getDirectors(@ParsedRequest() req: CrudRequest) {
-    return this.base.getManyBase(req);
+  @Post()
+  @UsePipes(ValidationPipe)
+  @Permissions(PermissionAction.CREATE_DIRECTOR)
+  createOne(@Body() createDto: CreateActorDto): Promise<Director> {
+    return this.service.createOne(createDto);
   }
 
-  @Override('getOneBase')
-  getDirector(@ParsedRequest() req: CrudRequest) {
-    return this.base.getOneBase(req);
+  @Patch('/:id')
+  @UsePipes(ValidationPipe)
+  @Permissions(PermissionAction.UPDATE_DIRECTOR)
+  updateOne(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateDto: UpdateDirectorDto,
+  ): Promise<Director> {
+    return this.service.updateOne(id, updateDto);
   }
 
-  @UseGuards(AuthGuard())
-  @Override('createOneBase')
-  createDirector(
-    @ParsedRequest() req: CrudRequest,
-    @ParsedBody() dto: Director,
-  ) {
-    return this.base.createOneBase(req, dto);
-  }
-
-  @Override('updateOneBase')
-  @UseGuards(AuthGuard())
-  updateDirector(
-    @ParsedRequest() req: CrudRequest,
-    @ParsedBody() dto: Director,
-  ) {
-    return this.base.updateOneBase(req, dto);
-  }
-
-  @Override('deleteOneBase')
-  @UseGuards(AuthGuard())
-  deleteDirector(@ParsedRequest() req: CrudRequest) {
-    return this.base.deleteOneBase(req);
+  @Delete('/:id')
+  @Permissions(PermissionAction.DELETE_DIRECTOR)
+  deleteOne(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<void | { message: string }> {
+    return this.service.deleteOne(id);
   }
 }
