@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { QueryParams } from 'src/base/dto/query-params.dto';
 
 @Injectable()
@@ -15,7 +19,11 @@ export abstract class BaseServiceCRUD<T> {
 
   async getMany(query: QueryParams): Promise<{ results: T[]; total: number }> {
     const builder = this.repository.createQueryBuilder(this.modelName);
-    return this.queryBuilder(builder, query, this.modelName);
+    try {
+      return await this.queryBuilder(builder, query, this.modelName);
+    } catch (error) {
+      throw new BadRequestException(`Failed due to ${error}`);
+    }
   }
 
   async getOne(id: number): Promise<T> {

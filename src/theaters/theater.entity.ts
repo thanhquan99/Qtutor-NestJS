@@ -1,3 +1,4 @@
+import { Seat } from './../seats/seat.entity';
 import { Cinema } from './../cinemas/cinema.entity';
 import { ApiProperty } from '@nestjsx/crud/lib/crud';
 import {
@@ -7,6 +8,7 @@ import {
   ManyToOne,
   BaseEntity,
   Unique,
+  OneToMany,
 } from 'typeorm';
 
 @Unique(['theaterNumber', 'cinema'])
@@ -22,4 +24,10 @@ export class Theater extends BaseEntity {
     onDelete: 'CASCADE',
   })
   cinema: Cinema;
+
+  @OneToMany(() => Seat, (seat) => seat.theater, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  seats: Seat[];
 }
