@@ -1,21 +1,23 @@
+import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
+import { QueryParams } from 'src/base/dto/query-params.dto';
 import { UserRoleView } from './../user-role/userRoleView.entity';
 import { CreateUserDto } from './dto/createUser.dto';
 import { User } from './user.entity';
-import { RegisterUserDto } from './dto/registerUser.dto';
 import { UserRepository } from './user.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { getConnection } from 'typeorm';
 import { Role } from 'src/roles/role.entity';
 import { UserRole } from 'src/user-role/userRole.entity';
-import { getManager, getRepository } from 'typeorm';
+import { getManager } from 'typeorm';
 
 @Injectable()
-export class UsersService {
+export class UsersService extends BaseServiceCRUD<User> {
   constructor(
     @InjectRepository(UserRepository)
     private userRepository: UserRepository,
-  ) {}
+  ) {
+    super(userRepository, User, 'user');
+  }
 
   async createUser(createUserDto: CreateUserDto) {
     const { email, roleName } = createUserDto;
@@ -48,8 +50,10 @@ export class UsersService {
     return user;
   }
 
-  async getUsers() {
-    const manager = getManager();
-    return await manager.find(UserRoleView);
+  async getUsers(query: QueryParams) {
+    const builder = getManager()
+      .getRepository(UserRoleView)
+      .createQueryBuilder('user_role_view');
+    return await this.queryBuilder(builder, query, 'user_role_view');
   }
 }

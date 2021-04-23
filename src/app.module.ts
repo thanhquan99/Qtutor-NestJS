@@ -20,6 +20,7 @@ import { RolePermissionModule } from './role-permission/role-permission.module';
 import * as connectionOptions from './ormconfig';
 import { APP_GUARD } from '@nestjs/core';
 import { PermissionGuard } from './guards/permissions.guard';
+import { SeatsModule } from './seats/seats.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { PermissionGuard } from './guards/permissions.guard';
     AppConfigModule,
     PermissionsModule,
     RolePermissionModule,
+    SeatsModule,
   ],
   providers: [
     {
