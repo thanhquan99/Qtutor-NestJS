@@ -11,7 +11,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from 'src/service/jwt/jwt-payload.interface';
-import { getConnection, getManager } from 'typeorm';
+import { getManager } from 'typeorm';
 import { Role } from 'src/roles/role.entity';
 import { UserRole } from 'src/user-role/userRole.entity';
 import { UserRoleView } from 'src/user-role/userRoleView.entity';
@@ -74,6 +74,7 @@ export class AuthService {
 
     delete user.salt;
     delete user.password;
-    return { accessToken, user };
+
+    return { accessToken, user, roleName: role.name };
   }
 }

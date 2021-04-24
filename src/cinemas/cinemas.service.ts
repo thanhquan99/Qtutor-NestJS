@@ -1,68 +1,19 @@
+import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
 import { Theater } from './../theaters/theater.entity';
-import { UpdateCinemaDto } from './dto/update-cinema-dto';
-import { CinemasFilterDto } from './dto/get-cinemas-filter.dto';
 import { Cinema } from './cinema.entity';
-import { CreateCinemaDto } from './dto/create-cinema.dto';
-import { CinemaRepository } from './cinema.repository';
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateTheaterDto } from 'src/theaters/dto/create-theater.dto';
 import { getManager } from 'typeorm';
 
 @Injectable()
-export class CinemasService {
-  constructor(
-    @InjectRepository(CinemaRepository)
-    private cinemaRepository: CinemaRepository,
-  ) {}
-
-  async createCinema(createCinemaDto: CreateCinemaDto): Promise<Cinema> {
-    const cinema = Cinema.create(createCinemaDto);
-    await cinema.save();
-    return cinema;
-  }
-
-  async getCinemaById(id: number): Promise<Cinema> {
-    const cinema = await this.cinemaRepository.findOne({ id });
-
-    if (!cinema) {
-      throw new NotFoundException(`Cinema with ${id} not found`);
-    }
-
-    return cinema;
-  }
-
-  async getCinemas(filterDto: CinemasFilterDto): Promise<Cinema[]> {
-    return this.cinemaRepository
-      .createQueryBuilder('cinema')
-      .leftJoinAndSelect('cinema.theaters', 'theater')
-      .getMany();
-  }
-
-  async deleteCinemaById(id: number): Promise<void> {
-    const result = await this.cinemaRepository.delete({
-      id,
-    });
-
-    if (!result.affected) {
-      throw new NotFoundException(`Cinema with ID ${id} not found`);
-    }
-  }
-
-  async updateCinema(
-    id: number,
-    updateCinemaDto: UpdateCinemaDto,
-  ): Promise<Cinema> {
-    return await this.cinemaRepository.save({ id, ...updateCinemaDto });
+export class CinemaService extends BaseServiceCRUD<Cinema> {
+  constructor(@InjectRepository(Cinema) repo) {
+    super(repo, Cinema, 'cinema');
   }
 
   async getOwnTheaters(id: number) {
-    return await this.cinemaRepository
-      .createQueryBuilder('cinema')
+    return await Cinema.createQueryBuilder('cinema')
       .where('cinema.id = :id', { id })
       .leftJoinAndSelect('cinema.theaters', 'theater')
       .getOne();
@@ -88,7 +39,7 @@ export class CinemasService {
       );
     }
 
-    const cinema = await this.cinemaRepository.findOne({
+    const cinema = await Cinema.findOne({
       where: { id },
     });
     const theater = Theater.create(createTheaterDto);
