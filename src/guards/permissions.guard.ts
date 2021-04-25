@@ -32,7 +32,13 @@ export class PermissionGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
-    const user: JwtPayload = jwt_decode(token);
+    let user: JwtPayload;
+    try {
+      user = jwt_decode(token);
+    } catch (error) {
+      throw new UnauthorizedException();
+    }
+
     const { roleName } = user;
 
     const manager = getManager();
