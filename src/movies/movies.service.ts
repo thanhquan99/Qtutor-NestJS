@@ -1,12 +1,13 @@
+import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
 import { Director } from './../directors/director.entity';
 import { Genre } from './../genres/genre.entity';
 import { Actor } from './../actors/actor.entity';
 import { UpdateMovieDto } from './dto/updateMovieDto';
 import { Movie } from './movie.entity';
-import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,13 +15,25 @@ import { CreateMovieDto } from './dto/createMovieDto';
 import { getManager } from 'typeorm';
 
 @Injectable()
-export class MoviesService extends TypeOrmCrudService<Movie> {
+export class MoviesService extends BaseServiceCRUD<Movie> {
   constructor(@InjectRepository(Movie) repo) {
-    super(repo);
+    super(repo, Movie, 'movie');
   }
 
   makeImageUrl(fileName: string): string {
     return `${process.env.DOMAIN}/img/${fileName}`;
+  }
+
+  async getMany(query) {
+    const builder = getManager()
+      .createQueryBuilder(Movie, 'movie')
+      .leftJoinAndSelect('movie.genres', 'genre')
+      .leftJoinAndSelect('movie.actors', 'actor')
+      .leftJoinAndSelect('movie.directors', 'director');
+
+    return await this.queryBuilder(builder, query, 'movie').catch((err) => {
+      throw new BadRequestException(`Query failed due to ${err}`);
+    });
   }
 
   async createMovie(
@@ -87,7 +100,7 @@ export class MoviesService extends TypeOrmCrudService<Movie> {
     updateMovieDto: UpdateMovieDto,
     files: Express.Multer.File,
   ): Promise<Movie> {
-    const movie = await this.repo.findOne({ where: { id } });
+    const movie = await Movie.findOne({ where: { id } });
     if (!movie) {
       throw new NotFoundException('Could not found this movie');
     }
@@ -128,8 +141,8 @@ export class MoviesService extends TypeOrmCrudService<Movie> {
     delete updateMovieDto.genreIds;
     delete updateMovieDto.directorIds;
 
-    try {
-      await getManager().transaction(async (entityManager) => {
+    await getManager()
+      .transaction(async (entityManager) => {
         movie.image = image;
         if (actorIds) {
           const actors = await entityManager
@@ -160,10 +173,12 @@ export class MoviesService extends TypeOrmCrudService<Movie> {
           ...updateMovieDto,
           image,
         });
+      })
+      .catch((err) => {
+        throw new InternalServerErrorException(
+          `Update movie failed due to ${err}`,
+        );
       });
-    } catch (err) {
-      throw new BadRequestException(`Failed due to ${err}`);
-    }
-    return this.repo.findOne(id);
+    return movie;
   }
 }

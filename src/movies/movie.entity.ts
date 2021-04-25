@@ -8,9 +8,7 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
-  OneToMany,
   PrimaryGeneratedColumn,
-  RelationId,
 } from 'typeorm';
 export enum Country {
   VN = 'VietNam',
@@ -49,7 +47,6 @@ export class Movie extends BaseEntity {
   image: { mainUrl: string; thumbnailUrl: string };
 
   @ManyToMany(() => Actor, (actor) => actor.movies, {
-    eager: true,
     cascade: true,
     onDelete: 'CASCADE',
   })
@@ -57,7 +54,6 @@ export class Movie extends BaseEntity {
   actors: Actor[];
 
   @ManyToMany(() => Director, (director) => director.movies, {
-    eager: true,
     cascade: true,
     onDelete: 'CASCADE',
   })
@@ -65,7 +61,6 @@ export class Movie extends BaseEntity {
   directors: Director[];
 
   @ManyToMany(() => Genre, (genre) => genre.movies, {
-    eager: true,
     cascade: true,
     onDelete: 'CASCADE',
   })

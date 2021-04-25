@@ -19,11 +19,12 @@ export abstract class BaseServiceCRUD<T> {
 
   async getMany(query: QueryParams): Promise<{ results: T[]; total: number }> {
     const builder = this.repository.createQueryBuilder(this.modelName);
-    try {
-      return await this.queryBuilder(builder, query, this.modelName);
-    } catch (error) {
-      throw new BadRequestException(`Failed due to ${error}`);
-    }
+
+    return await this.queryBuilder(builder, query, this.modelName).catch(
+      (err) => {
+        throw new BadRequestException(`Query failed due to ${err}`);
+      },
+    );
   }
 
   async getOne(id: number): Promise<T> {

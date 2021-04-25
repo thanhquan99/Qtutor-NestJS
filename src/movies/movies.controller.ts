@@ -1,48 +1,34 @@
+import { BaseControllerCRUD } from 'src/base/base-controller-CRUD';
 import { UpdateMovieDto } from './dto/updateMovieDto';
 import { CreateMovieDto } from './dto/createMovieDto';
 import { MoviesService } from './movies.service';
 import { Movie } from './movie.entity';
 import {
+  Body,
   Controller,
+  Delete,
   Param,
   ParseIntPipe,
+  Patch,
+  Post,
   UploadedFiles,
-  UseGuards,
   UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { Crud, CrudController, Override, ParsedBody } from '@nestjsx/crud';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { storage } from 'config/storage.config';
 import { Express } from 'express';
-import { AuthGuard } from '@nestjs/passport';
 import { Permissions } from 'src/guards/permissions.decorator';
 import { PermissionAction } from 'src/permissions/permission.entity';
 
-@Crud({
-  model: {
-    type: Movie,
-  },
-  routes: {
-    only: [
-      'getManyBase',
-      'getOneBase',
-      'createOneBase',
-      'updateOneBase',
-      'deleteOneBase',
-    ],
-  },
-})
 @Controller('movies')
-export class MoviesController implements CrudController<Movie> {
-  constructor(public service: MoviesService) {}
-  get base(): CrudController<Movie> {
-    return this;
+export class MoviesController extends BaseControllerCRUD<Movie> {
+  constructor(public service: MoviesService) {
+    super(service);
   }
 
-  @Override('createOneBase')
-  @UseGuards(AuthGuard())
+  @Post()
   @Permissions(PermissionAction.CREATE_MOVIE)
   @UsePipes(ValidationPipe)
   @UseInterceptors(
@@ -55,14 +41,13 @@ export class MoviesController implements CrudController<Movie> {
     ),
   )
   async createMovie(
-    @ParsedBody() createMovieDto: CreateMovieDto,
+    @Body() createMovieDto: CreateMovieDto,
     @UploadedFiles() files: Express.Multer.File,
   ): Promise<Movie> {
     return this.service.createMovie(createMovieDto, files);
   }
 
-  @Override('updateOneBase')
-  @UseGuards(AuthGuard())
+  @Patch('/:id')
   @Permissions(PermissionAction.UPDATE_MOVIE)
   @UsePipes(ValidationPipe)
   @UseInterceptors(
@@ -76,9 +61,17 @@ export class MoviesController implements CrudController<Movie> {
   )
   updateMovie(
     @Param('id', ParseIntPipe) id: number,
-    @ParsedBody() updateMovieDto: UpdateMovieDto,
+    @Body() updateMovieDto: UpdateMovieDto,
     @UploadedFiles() files: Express.Multer.File,
   ): Promise<Movie> {
     return this.service.updateMovie(id, updateMovieDto, files);
+  }
+
+  @Delete('/:id')
+  @Permissions(PermissionAction.DELETE_MOVIE)
+  deleteOne(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<void | { message: string }> {
+    return this.service.deleteOne(id);
   }
 }
