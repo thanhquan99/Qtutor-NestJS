@@ -1,63 +1,48 @@
+import { UpdateGenreDto } from './dto/update-genre.dto';
+import { PermissionAction } from './../permissions/permission.entity';
+import { CreateGenreDto } from './dto/create-genre.dto';
+import { BaseControllerCRUD } from 'src/base/base-controller-CRUD';
 import { GenresService } from './genres.service';
 import { Genre } from './genre.entity';
-import { Controller, UseGuards } from '@nestjs/common';
 import {
-  Crud,
-  CrudController,
-  CrudRequest,
-  Override,
-  ParsedBody,
-  ParsedRequest,
-} from '@nestjsx/crud';
-import { AuthGuard } from '@nestjs/passport';
+  Body,
+  Controller,
+  Delete,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
+import { Permissions } from 'src/guards/permissions.decorator';
 
-@Crud({
-  model: {
-    type: Genre,
-  },
-  routes: {
-    only: [
-      'getManyBase',
-      'getOneBase',
-      'createOneBase',
-      'updateOneBase',
-      'deleteOneBase',
-    ],
-  },
-})
 @Controller('genres')
-export class GenresController implements CrudController<Genre> {
-  constructor(public service: GenresService) {}
-
-  get base(): CrudController<Genre> {
-    return this;
+export class GenresController extends BaseControllerCRUD<Genre> {
+  constructor(public service: GenresService) {
+    super(service);
   }
 
-  @Override('getManyBase')
-  getGenres(@ParsedRequest() req: CrudRequest) {
-    return this.base.getManyBase(req);
+  @Post()
+  @Permissions(PermissionAction.CREATE_GENRE)
+  @UsePipes(ValidationPipe)
+  createOne(@Body() createDto: CreateGenreDto) {
+    return this.service.createOne(createDto);
   }
 
-  @Override('getOneBase')
-  getGenre(@ParsedRequest() req: CrudRequest) {
-    return this.base.getOneBase(req);
+  @Patch('/:id')
+  @UsePipes(ValidationPipe)
+  @Permissions(PermissionAction.UPDATE_GENRE)
+  updateOne(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateDto: UpdateGenreDto,
+  ) {
+    return this.service.updateOne(id, updateDto);
   }
 
-  @UseGuards(AuthGuard())
-  @Override('createOneBase')
-  createGenre(@ParsedRequest() req: CrudRequest, @ParsedBody() dto: Genre) {
-    return this.service.createGenre(dto);
-  }
-
-  @Override('updateOneBase')
-  @UseGuards(AuthGuard())
-  updateGenre(@ParsedRequest() req: CrudRequest, @ParsedBody() dto: Genre) {
-    return this.base.updateOneBase(req, dto);
-  }
-
-  @Override('deleteOneBase')
-  @UseGuards(AuthGuard())
-  deleteDirector(@ParsedRequest() req: CrudRequest) {
-    return this.base.deleteOneBase(req);
+  @Delete('/:id')
+  @Permissions(PermissionAction.DELETE_GENRE)
+  deleteDirector(@Param('id', ParseIntPipe) id: number) {
+    return this.service.deleteOne(id);
   }
 }
