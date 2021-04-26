@@ -1,5 +1,4 @@
 import { diskStorage } from 'multer';
-import { extname } from 'path';
 
 export const storage = diskStorage({
   destination: './public/img',
