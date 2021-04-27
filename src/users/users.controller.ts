@@ -35,7 +35,7 @@ export class UsersController extends BaseControllerCRUD<User> {
   @Get()
   @UsePipes(ValidationPipe)
   @Permissions(PermissionAction.GET_USER)
-  getUsers(@Query() query: QueryParams) {
-    return this.service.getUsers(query);
+  getMany(@Query() query: QueryParams) {
+    return this.service.getMany(query);
   }
 }

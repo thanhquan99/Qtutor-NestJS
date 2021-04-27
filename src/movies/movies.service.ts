@@ -24,18 +24,6 @@ export class MoviesService extends BaseServiceCRUD<Movie> {
     return `${process.env.DOMAIN}/img/${fileName}`;
   }
 
-  async getMany(query) {
-    const builder = getManager()
-      .createQueryBuilder(Movie, 'movie')
-      .leftJoinAndSelect('movie.genres', 'genre')
-      .leftJoinAndSelect('movie.actors', 'actor')
-      .leftJoinAndSelect('movie.directors', 'director');
-
-    return await this.queryBuilder(builder, query, 'movie').catch((err) => {
-      throw new BadRequestException(`Query failed due to ${err}`);
-    });
-  }
-
   async createMovie(
     createMovieDto: CreateMovieDto,
     files: Express.Multer.File,

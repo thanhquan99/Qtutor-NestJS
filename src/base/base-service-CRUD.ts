@@ -3,7 +3,17 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { QueryParams } from 'src/base/dto/query-params.dto';
+import {
+  getManager,
+  ILike,
+  Equal,
+  MoreThan,
+  MoreThanOrEqual,
+  Not,
+  LessThan,
+  LessThanOrEqual,
+  Any,
+} from 'typeorm';
 
 @Injectable()
 export abstract class BaseServiceCRUD<T> {
@@ -17,14 +27,10 @@ export abstract class BaseServiceCRUD<T> {
     this.modelName = modelName;
   }
 
-  async getMany(query: QueryParams): Promise<{ results: T[]; total: number }> {
-    const builder = this.repository.createQueryBuilder(this.modelName);
-
-    return await this.queryBuilder(builder, query, this.modelName).catch(
-      (err) => {
-        throw new BadRequestException(`Query failed due to ${err}`);
-      },
-    );
+  async getMany(query): Promise<{ results: any; total: number }> {
+    return await this.queryBuilder(query).catch((err) => {
+      throw new BadRequestException(`Query failed due to ${err}`);
+    });
   }
 
   async getOne(id: number): Promise<T> {
@@ -55,9 +61,12 @@ export abstract class BaseServiceCRUD<T> {
     return { message: 'delete success' };
   }
 
-  async queryBuilder(builder, query, modelName) {
-    const { limit, filter, offset, orderBy } = query;
+  async queryBuilder(query) {
+    const { perPage = 10, filter, page = 1, orderBy = {}, relations } = query;
+    const filterByFields = {};
+    let relationsWith = [];
 
+    console.log(query);
     if (filter) {
       console.log(filter);
       for (const field in filter) {
@@ -65,32 +74,28 @@ export abstract class BaseServiceCRUD<T> {
         const value = filter[field][operator];
         switch (operator) {
           case 'equal':
-            builder.andWhere(`"${modelName}"."${field}" = '${value}'`);
+            filterByFields[field] = Equal(value);
             break;
           case 'notequal':
-            builder.andWhere(`"${modelName}"."${field}" != '${value}'`);
+            filterByFields[field] = Not(value);
             break;
           case 'gt':
-            builder.andWhere(`"${modelName}"."${field}" > '${value}'`);
+            filterByFields[field] = MoreThan(value);
             break;
           case 'gte':
-            builder.andWhere(`"${modelName}"."${field}" >= '${value}'`);
+            filterByFields[field] = MoreThanOrEqual(value);
             break;
           case 'lt':
-            builder.andWhere(`"${modelName}"."${field}" < '${value}'`);
+            filterByFields[field] = LessThan(value);
             break;
           case 'lte':
-            builder.andWhere(`"${modelName}"."${field}" <= '${value}'`);
+            filterByFields[field] = LessThanOrEqual(value);
             break;
           case 'in':
-            builder.andWhere(
-              `"${modelName}"."${field}" = ANY('{${value.map(
-                (e) => `${e}`,
-              )}}')`,
-            );
+            filterByFields[field] = Any(value);
             break;
           case 'like':
-            builder.andWhere(`"${modelName}"."${field}" LIKE '%${value}%'`);
+            filterByFields[field] = ILike(`%${value}%`);
             break;
           default:
             break;
@@ -98,38 +103,21 @@ export abstract class BaseServiceCRUD<T> {
       }
     }
 
-    const total = await builder.getCount();
-
-    if (limit) {
-      builder.limit(limit);
+    if (relations) {
+      relationsWith = relations.split(',');
     }
 
-    if (offset) {
-      builder.offset(offset);
-    }
-
-    if (orderBy) {
-      const orderByFields = orderBy.split(',');
-
-      for (let field of orderByFields) {
-        let orderDirection;
-
-        if (field[0] === '-') {
-          field = field.slice(1);
-          orderDirection = 'DESC';
-        } else {
-          orderDirection = 'ASC';
-        }
-
-        builder.orderBy(`${this.modelName}.${field}`, orderDirection);
-      }
-    }
-
-    const results = await builder.getMany();
+    const [results, total] = await getManager().findAndCount(this.entity, {
+      relations: relationsWith,
+      where: filterByFields,
+      order: orderBy,
+      take: perPage,
+      skip: (page - 1) * perPage,
+    });
 
     return {
-      total,
       results,
+      total,
     };
   }
 }
