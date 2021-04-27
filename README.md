@@ -45,6 +45,8 @@ npx typeorm migration:create -n fileName -d src/migrations
 
 ## Query
 filter = {"releaseDate":{"gte": "2020-03-01"}, "name":{"equal": "Quan"}, "email": {"like": "quan@gmail.com"}, "name":{"in": ["Quan", "Sang"]}}
-orderBy = 'name,-age,email'
+orderBy = {"id": "ASC", "name":"DESC"}
 page = 1
 perPage = 10
+relations = 'actors,genres,directors'
+relations = 'userRole,userRole.role'

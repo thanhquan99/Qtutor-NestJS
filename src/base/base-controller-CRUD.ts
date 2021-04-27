@@ -27,6 +27,10 @@ export abstract class BaseControllerCRUD<T> {
     if (query?.filter) {
       query.filter = JSON.parse(query.filter);
     }
+    if (query?.orderBy) {
+      query.orderBy = JSON.parse(query.orderBy);
+    }
+
     return this.service.getMany(query);
   }
 

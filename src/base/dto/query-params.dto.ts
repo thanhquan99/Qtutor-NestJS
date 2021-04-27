@@ -1,14 +1,6 @@
-import { IsNumberString, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsNumberString, IsOptional, IsString } from 'class-validator';
 
 export class QueryParams {
-  @IsOptional()
-  @IsNumberString()
-  limit: number;
-
-  @IsOptional()
-  @IsNumberString()
-  offset: number;
-
   @IsOptional()
   @IsString()
   orderBy: string;
@@ -16,4 +8,16 @@ export class QueryParams {
   @IsOptional()
   @IsString()
   filter: string;
+
+  @IsOptional()
+  @IsNumberString()
+  page: number;
+
+  @IsOptional()
+  @IsNumberString()
+  perPage: number;
+
+  @IsOptional()
+  @IsString()
+  relations: string;
 }

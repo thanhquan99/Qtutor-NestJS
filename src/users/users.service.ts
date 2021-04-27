@@ -49,11 +49,4 @@ export class UsersService extends BaseServiceCRUD<User> {
 
     return user;
   }
-
-  async getUsers(query: QueryParams) {
-    const builder = getManager()
-      .getRepository(UserRoleView)
-      .createQueryBuilder('user_role_view');
-    return await this.queryBuilder(builder, query, 'user_role_view');
-  }
 }
