@@ -1,7 +1,7 @@
 import {
   Injectable,
   NotFoundException,
-  BadRequestException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import {
   getManager,
@@ -28,9 +28,30 @@ export abstract class BaseServiceCRUD<T> {
   }
 
   async getMany(query): Promise<{ results: any; total: number }> {
-    return await this.queryBuilder(query).catch((err) => {
-      throw new BadRequestException(`Query failed due to ${err}`);
-    });
+    const {
+      relationsWith,
+      filterByFields,
+      perPage,
+      page,
+      orderBy,
+    } = await this.modifyQuery(query);
+
+    const [results, total] = await getManager()
+      .findAndCount(this.entity, {
+        relations: relationsWith,
+        where: filterByFields,
+        order: orderBy,
+        take: perPage,
+        skip: (page - 1) * perPage,
+      })
+      .catch((err) => {
+        throw new InternalServerErrorException(`Failed due to ${err}`);
+      });
+
+    return {
+      results,
+      total,
+    };
   }
 
   async getOne(id: number): Promise<T> {
@@ -61,14 +82,12 @@ export abstract class BaseServiceCRUD<T> {
     return { message: 'delete success' };
   }
 
-  async queryBuilder(query) {
-    const { perPage = 10, filter, page = 1, orderBy = {}, relations } = query;
+  async modifyQuery(query) {
+    const { filter, relations, perPage = 10, page = 1, orderBy = {} } = query;
     const filterByFields = {};
     let relationsWith = [];
 
-    console.log(query);
     if (filter) {
-      console.log(filter);
       for (const field in filter) {
         const operator = Object.keys(filter[field])[0];
         const value = filter[field][operator];
@@ -107,17 +126,6 @@ export abstract class BaseServiceCRUD<T> {
       relationsWith = relations.split(',');
     }
 
-    const [results, total] = await getManager().findAndCount(this.entity, {
-      relations: relationsWith,
-      where: filterByFields,
-      order: orderBy,
-      take: perPage,
-      skip: (page - 1) * perPage,
-    });
-
-    return {
-      results,
-      total,
-    };
+    return { filterByFields, relationsWith, perPage, page, orderBy };
   }
 }
