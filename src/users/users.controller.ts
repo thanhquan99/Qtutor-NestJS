@@ -36,6 +36,13 @@ export class UsersController extends BaseControllerCRUD<User> {
   @UsePipes(ValidationPipe)
   @Permissions(PermissionAction.GET_USER)
   getMany(@Query() query: QueryParams) {
+    if (query?.filter) {
+      query.filter = JSON.parse(query.filter);
+    }
+    if (query?.orderBy) {
+      query.orderBy = JSON.parse(query.orderBy);
+    }
+
     return this.service.getMany(query);
   }
 }
