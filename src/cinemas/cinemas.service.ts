@@ -1,9 +1,13 @@
+import { Room } from './../rooms/room.entity';
+import { CreateRoomDto } from './../rooms/dto/create-room.dto';
 import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
-import { Theater } from './../theaters/theater.entity';
 import { Cinema } from './cinema.entity';
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateTheaterDto } from 'src/theaters/dto/create-theater.dto';
 import { getManager } from 'typeorm';
 
 @Injectable()
@@ -12,38 +16,47 @@ export class CinemaService extends BaseServiceCRUD<Cinema> {
     super(repo, Cinema, 'cinema');
   }
 
-  async getOwnTheaters(id: number) {
-    return await Cinema.createQueryBuilder('cinema')
+  async getOwnRooms(id: number) {
+    const cinema = await Cinema.createQueryBuilder('cinema')
       .where('cinema.id = :id', { id })
-      .leftJoinAndSelect('cinema.theaters', 'theater')
+      .leftJoinAndSelect('cinema.rooms', 'room')
       .getOne();
+    if (!cinema) {
+      throw new NotFoundException('Cinema not found');
+    }
+    return cinema;
   }
 
-  async createOwnTheater(
+  async createOwnRoom(
     id: number,
-    createTheaterDto: CreateTheaterDto,
+    createTheaterDto: CreateRoomDto,
   ): Promise<Cinema> {
-    const { theaterNumber } = createTheaterDto;
+    const { roomNumber } = createTheaterDto;
+    const cinema = await Cinema.findOne({
+      where: { id },
+      relations: ['rooms'],
+    });
+
+    if (!cinema) {
+      throw new NotFoundException('Cinema not found');
+    }
     const manager = getManager();
 
-    const checkTheater = await manager
-      .createQueryBuilder(Theater, 'theater')
-      .where('"cinemaId" = :id and "theaterNumber" = :theaterNumber', {
+    const checkRoom = await manager
+      .createQueryBuilder(Room, 'room')
+      .where('"cinemaId" = :id and "roomNumber" = :roomNumber', {
         id,
-        theaterNumber,
+        roomNumber,
       })
       .getOne();
-    if (checkTheater) {
+    if (checkRoom) {
       throw new BadRequestException(
-        `Theater Number ${theaterNumber} is already exist in this cinema`,
+        `Room Number ${roomNumber} is already exist in this cinema`,
       );
     }
 
-    const cinema = await Cinema.findOne({
-      where: { id },
-    });
-    const theater = Theater.create(createTheaterDto);
-    cinema.theaters.push(theater);
+    const room = Room.create(createTheaterDto);
+    cinema.rooms.push(room);
     return cinema.save();
   }
 }

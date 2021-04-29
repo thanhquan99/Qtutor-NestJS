@@ -1,6 +1,6 @@
+import { CreateRoomDto } from './../rooms/dto/create-room.dto';
 import { BaseControllerCRUD } from 'src/base/base-controller-CRUD';
 import { PermissionAction } from 'src/permissions/permission.entity';
-import { CreateTheaterDto } from './../theaters/dto/create-theater.dto';
 import { UpdateCinemaDto } from './dto/update-cinema-dto';
 import { CinemaService } from './cinemas.service';
 import { CreateCinemaDto } from './dto/create-cinema.dto';
@@ -50,18 +50,18 @@ export class CinemasController extends BaseControllerCRUD<Cinema> {
     return this.service.updateOne(id, updateCinemaDto);
   }
 
-  @Get('/:id/theaters')
-  getOwnTheaters(@Param('id', ParseIntPipe) id: number) {
-    return this.service.getOwnTheaters(id);
+  @Get('/:id/rooms')
+  getOwnRooms(@Param('id', ParseIntPipe) id: number) {
+    return this.service.getOwnRooms(id);
   }
 
-  @Post('/:id/theaters')
+  @Post('/:id/rooms')
   @Permissions(PermissionAction.CREATE_THEATER)
   @UsePipes(ValidationPipe)
-  createOwnTheater(
+  createOwnRoom(
     @Param('id', ParseIntPipe) id: number,
-    @Body() createTheaterDto: CreateTheaterDto,
+    @Body() createRoomDto: CreateRoomDto,
   ): Promise<Cinema> {
-    return this.service.createOwnTheater(id, createTheaterDto);
+    return this.service.createOwnRoom(id, createRoomDto);
   }
 }

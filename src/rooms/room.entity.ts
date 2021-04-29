@@ -9,23 +9,25 @@ import {
   BaseEntity,
   Unique,
   OneToMany,
+  JoinColumn,
 } from 'typeorm';
 
-@Unique(['theaterNumber', 'cinema'])
+@Unique(['roomNumber', 'cinema'])
 @Entity()
-export class Theater extends BaseEntity {
+export class Room extends BaseEntity {
   @PrimaryGeneratedColumn() id: number;
 
   @ApiProperty({ example: 1 })
   @Column()
-  theaterNumber: number;
+  roomNumber: number;
 
-  @ManyToOne(() => Cinema, (cinema) => cinema.theaters, {
+  @ManyToOne(() => Cinema, (cinema) => cinema.rooms, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn()
   cinema: Cinema;
 
-  @OneToMany(() => Seat, (seat) => seat.theater, {
+  @OneToMany(() => Seat, (seat) => seat.room, {
     cascade: true,
     onDelete: 'CASCADE',
   })

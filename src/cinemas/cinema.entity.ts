@@ -1,9 +1,8 @@
-import { Theater } from './../theaters/theater.entity';
+import { Room } from './../rooms/room.entity';
 import {
   BaseEntity,
   Column,
   Entity,
-  JoinTable,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -18,11 +17,9 @@ export class Cinema extends BaseEntity {
   @Column()
   address: string;
 
-  @OneToMany(() => Theater, (theater) => theater.cinema, {
+  @OneToMany(() => Room, (room) => room.cinema, {
     cascade: true,
     onDelete: 'CASCADE',
-    eager: true,
   })
-  @JoinTable()
-  theaters: Theater[];
+  rooms: Room[];
 }
