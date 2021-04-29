@@ -1,4 +1,4 @@
-import { Theater } from './../theaters/theater.entity';
+import { Room } from './../rooms/room.entity';
 import {
   BaseEntity,
   Column,
@@ -15,7 +15,7 @@ export enum SeatType {
 }
 
 @Entity()
-@Unique(['row', 'column', 'theater'])
+@Unique(['row', 'column', 'room'])
 export class Seat extends BaseEntity {
   @PrimaryGeneratedColumn() id: number;
 
@@ -25,11 +25,11 @@ export class Seat extends BaseEntity {
   @Column()
   column: number;
 
-  @Column({ type: 'enum', enum: SeatType })
-  type: SeatType;
+  @Column()
+  type: string;
 
-  @ManyToOne(() => Theater, (theater) => theater.seats, {
+  @ManyToOne(() => Room, (room) => room.seats, {
     onDelete: 'CASCADE',
   })
-  theater: Theater;
+  room: Room;
 }
