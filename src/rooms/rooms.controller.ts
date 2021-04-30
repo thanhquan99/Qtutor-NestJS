@@ -1,3 +1,4 @@
+import { CreateSeatDto } from './../seats/dto/create-seat.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { PermissionAction } from './../permissions/permission.entity';
@@ -8,6 +9,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   ParseIntPipe,
   Patch,
@@ -46,5 +48,20 @@ export class RoomsController extends BaseControllerCRUD<Room> {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<void | { message: string }> {
     return this.service.deleteOne(id);
+  }
+
+  @Get('/:id/seats')
+  getOwnSeats(@Param('id', ParseIntPipe) id: number): Promise<Room> {
+    return this.service.getOwnSeats(id);
+  }
+
+  @Post('/:id/seats')
+  @UsePipes(ValidationPipe)
+  @Permissions(PermissionAction.CREATE_SEAT)
+  createOwnSeats(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() createSeatDto: CreateSeatDto,
+  ): Promise<Room> {
+    return this.service.createOwnSeats(id, createSeatDto);
   }
 }
