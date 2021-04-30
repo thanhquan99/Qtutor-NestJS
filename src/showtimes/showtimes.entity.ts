@@ -1,31 +1,29 @@
-// import { UserRole } from './../user-role/userRole.entity';
+import { Movie } from './../movies/movie.entity';
 import {
-  AfterInsert,
   BaseEntity,
-  BeforeInsert,
   Column,
   Entity,
   JoinColumn,
-  OneToOne,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import * as bcrypt from 'bcrypt';
 @Entity()
 export class Showtime extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: true})
+  @Column()
   startTime: Date;
 
-  @Column({ nullable: true})
-  endTime: Date;
-
   @Column()
-  duration: number;  
+  endTime: Date;
 
   @Column()
   advertiseTime: number;
 
-  //movie id
+  @ManyToOne(() => Movie, (movie) => movie.showtimes, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  movie: Movie;
 }

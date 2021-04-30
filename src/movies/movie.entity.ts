@@ -1,3 +1,4 @@
+import { Showtime } from './../showtimes/showtimes.entity';
 import { Genre } from './../genres/genre.entity';
 import { Director } from './../directors/director.entity';
 import { Actor } from './../actors/actor.entity';
@@ -8,6 +9,7 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 export enum Country {
@@ -46,6 +48,10 @@ export class Movie extends BaseEntity {
   @Column({ type: 'simple-json', nullable: true })
   image: { mainUrl: string; thumbnailUrl: string };
 
+  @ApiProperty({ example: '90' })
+  @Column()
+  duration: number;
+
   @ManyToMany(() => Actor, (actor) => actor.movies, {
     cascade: true,
     onDelete: 'CASCADE',
@@ -66,4 +72,10 @@ export class Movie extends BaseEntity {
   })
   @JoinTable()
   genres: Genre[];
+
+  @OneToMany(() => Showtime, (showtime) => showtime.movie, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  showtimes: Showtime[];
 }

@@ -5,7 +5,7 @@ import {
   BaseEntity,
   Column,
   Entity,
-  JoinTable,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
@@ -23,12 +23,12 @@ export class RolePermission extends BaseEntity {
   @ManyToOne(() => Role, (role) => role.rolePermissions, {
     onDelete: 'CASCADE',
   })
-  @JoinTable()
+  @JoinColumn()
   role: Role;
 
   @ManyToOne(() => Permission, (permission) => permission.rolePermissions, {
     onDelete: 'CASCADE',
   })
-  @JoinTable()
+  @JoinColumn()
   permission: Permission;
 }

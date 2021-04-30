@@ -1,15 +1,4 @@
-// import { Country } from './../movie.entity';
-import {
-  IsArray,
-    IsDate,
-  IsDateString,
-  IsEnum,
-  IsNotEmpty,
-  IsNumber,
-  IsObject,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsDate, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateShowtimeDto {
   @IsNotEmpty()
@@ -21,11 +10,14 @@ export class CreateShowtimeDto {
   startTime: Date;
 
   @IsNotEmpty()
-  @IsDate()
-  advertiseTime: Date;
+  @IsNumber()
+  advertiseTime: number;
 
   @IsNotEmpty()
   @IsNumber()
-  duration: number;
+  roomId: number;
 
+  @IsNotEmpty()
+  @IsDate()
+  date: Date;
 }

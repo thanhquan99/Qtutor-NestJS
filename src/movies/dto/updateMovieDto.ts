@@ -3,6 +3,7 @@ import {
   IsArray,
   IsDateString,
   IsEnum,
+  IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
@@ -27,6 +28,10 @@ export class UpdateMovieDto {
   @IsOptional()
   @IsDateString()
   releaseDate: Date;
+
+  @IsOptional()
+  @IsNumber()
+  duration: number;
 
   @IsOptional()
   @IsArray()

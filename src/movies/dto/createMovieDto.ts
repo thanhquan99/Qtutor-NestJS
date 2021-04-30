@@ -33,6 +33,10 @@ export class CreateMovieDto {
   @IsDateString()
   releaseDate: Date;
 
+  @IsNotEmpty()
+  @IsNumber()
+  duration: number;
+
   @IsOptional()
   @IsArray()
   actorIds: [number];
