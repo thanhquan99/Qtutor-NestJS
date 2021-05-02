@@ -1,3 +1,4 @@
+import { ShowtimesModule } from './showtimes/showtimes.module';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
@@ -20,6 +21,8 @@ import { PermissionGuard } from './guards/permissions.guard';
 import { SeatsModule } from './seats/seats.module';
 import { CinemasModule } from './cinemas/cinemas.module';
 import { RoomsModule } from './rooms/rooms.module';
+import { TicketsModule } from './tickets/tickets.module';
+import { TicketTypesModule } from './ticket-types/ticket-types.module';
 
 @Module({
   imports: [
@@ -42,6 +45,9 @@ import { RoomsModule } from './rooms/rooms.module';
     RolePermissionModule,
     SeatsModule,
     RoomsModule,
+    ShowtimesModule,
+    TicketsModule,
+    TicketTypesModule,
   ],
   providers: [
     {

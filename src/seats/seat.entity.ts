@@ -1,9 +1,12 @@
+import { Ticket } from './../tickets/ticket.entity';
 import { Room } from './../rooms/room.entity';
 import {
   BaseEntity,
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
@@ -31,5 +34,11 @@ export class Seat extends BaseEntity {
   @ManyToOne(() => Room, (room) => room.seats, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn()
   room: Room;
+
+  @OneToMany(() => Ticket, (ticket) => ticket.seat, {
+    onDelete: 'CASCADE',
+  })
+  tickets: Ticket[];
 }
