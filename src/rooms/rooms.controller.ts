@@ -64,4 +64,9 @@ export class RoomsController extends BaseControllerCRUD<Room> {
   ): Promise<Room> {
     return this.service.createOwnSeats(id, createSeatDto);
   }
+
+  @Get('/:id/showtimes')
+  getOwnShowtimes(@Param('id', ParseIntPipe) id: number): Promise<Room> {
+    return this.service.getOwnShowtimes(id);
+  }
 }

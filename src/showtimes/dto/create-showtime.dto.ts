@@ -1,13 +1,21 @@
-import { IsDate, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsDateString, IsNotEmpty, IsNumber, Max, Min } from 'class-validator';
 
 export class CreateShowtimeDto {
   @IsNotEmpty()
-  @IsString()
-  name: string;
+  @IsDateString()
+  date: Date;
 
   @IsNotEmpty()
-  @IsDate()
-  startTime: Date;
+  @IsNumber()
+  @Min(0)
+  @Max(23)
+  hour: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  @Min(0)
+  @Max(59)
+  minute: number;
 
   @IsNotEmpty()
   @IsNumber()
@@ -18,6 +26,6 @@ export class CreateShowtimeDto {
   roomId: number;
 
   @IsNotEmpty()
-  @IsDate()
-  date: Date;
+  @IsNumber()
+  movieId: number;
 }

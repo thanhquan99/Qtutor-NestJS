@@ -1,3 +1,4 @@
+import { Ticket } from './../tickets/ticket.entity';
 import { Movie } from './../movies/movie.entity';
 import {
   BaseEntity,
@@ -5,6 +6,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 @Entity()
@@ -12,10 +14,10 @@ export class Showtime extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'timestamptz' })
   startTime: Date;
 
-  @Column()
+  @Column({ type: 'timestamptz' })
   endTime: Date;
 
   @Column()
@@ -26,4 +28,9 @@ export class Showtime extends BaseEntity {
   })
   @JoinColumn()
   movie: Movie;
+
+  @OneToMany(() => Ticket, (ticket) => ticket.showtime, {
+    onDelete: 'CASCADE',
+  })
+  tickets: Ticket[];
 }

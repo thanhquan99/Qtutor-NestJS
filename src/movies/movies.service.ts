@@ -169,4 +169,15 @@ export class MoviesService extends BaseServiceCRUD<Movie> {
       });
     return movie;
   }
+
+  async getOwnShowtimes(id: number): Promise<Movie> {
+    const movie = await Movie.findOne({
+      where: { id },
+      relations: ['showtimes'],
+    });
+    if (!movie) {
+      throw new NotFoundException('Room not found');
+    }
+    return movie;
+  }
 }

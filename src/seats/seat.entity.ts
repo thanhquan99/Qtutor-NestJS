@@ -39,6 +39,7 @@ export class Seat extends BaseEntity {
 
   @OneToMany(() => Ticket, (ticket) => ticket.seat, {
     onDelete: 'CASCADE',
+    cascade: true,
   })
   tickets: Ticket[];
 }

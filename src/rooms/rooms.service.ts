@@ -1,3 +1,5 @@
+import { Showtime } from './../showtimes/showtimes.entity';
+import { Ticket } from './../tickets/ticket.entity';
 import { Seat } from './../seats/seat.entity';
 import { CreateSeatDto } from './../seats/dto/create-seat.dto';
 import { Room } from './room.entity';
@@ -35,7 +37,6 @@ export class RoomsService extends BaseServiceCRUD<Room> {
       where: { id },
       relations: ['seats'],
     });
-
     if (!room) {
       throw new NotFoundException('Room not found');
     }
@@ -66,7 +67,27 @@ export class RoomsService extends BaseServiceCRUD<Room> {
         });
       });
     }
-
     return room;
+  }
+
+  async getOwnShowtimes(id: number) {
+    const room = await Room.findOne({
+      where: { id },
+    });
+    if (!room) {
+      throw new NotFoundException('Room not found');
+    }
+
+    const seat = await Seat.findOne({
+      where: { room },
+    });
+    const tickets = await Ticket.find({
+      relations: ['showtime'],
+      where: { seat },
+      select: ['id'],
+    });
+    const showtimes = tickets.map((ticket) => ticket.showtime);
+
+    return { room, showtimes };
   }
 }
