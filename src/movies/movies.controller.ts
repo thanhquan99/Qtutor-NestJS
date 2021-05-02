@@ -7,6 +7,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   ParseIntPipe,
   Patch,
@@ -73,5 +74,10 @@ export class MoviesController extends BaseControllerCRUD<Movie> {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<void | { message: string }> {
     return this.service.deleteOne(id);
+  }
+
+  @Get('/:id/showtimes')
+  getOwnShowtimes(@Param('id', ParseIntPipe) id: number): Promise<Movie> {
+    return this.service.getOwnShowtimes(id);
   }
 }
