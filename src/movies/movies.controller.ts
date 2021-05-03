@@ -1,3 +1,5 @@
+import { Showtime } from './../showtimes/showtimes.entity';
+import { QueryShowtimes } from './../rooms/dto/query-showtimes.dto';
 import { BaseControllerCRUD } from 'src/base/base-controller-CRUD';
 import { UpdateMovieDto } from './dto/updateMovieDto';
 import { CreateMovieDto } from './dto/createMovieDto';
@@ -12,6 +14,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UploadedFiles,
   UseInterceptors,
   UsePipes,
@@ -77,7 +80,10 @@ export class MoviesController extends BaseControllerCRUD<Movie> {
   }
 
   @Get('/:id/showtimes')
-  getOwnShowtimes(@Param('id', ParseIntPipe) id: number): Promise<Movie> {
-    return this.service.getOwnShowtimes(id);
+  getOwnShowtimes(
+    @Param('id', ParseIntPipe) id: number,
+    @Query(ValidationPipe) query: QueryShowtimes,
+  ): Promise<{ movie: Movie; showtimes: Showtime[] }> {
+    return this.service.getOwnShowtimes(id, query);
   }
 }

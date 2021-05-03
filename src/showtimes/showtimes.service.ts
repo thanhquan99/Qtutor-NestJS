@@ -1,3 +1,4 @@
+import { Seat } from './../seats/seat.entity';
 import {
   TicketType,
   TicketTypeName,
@@ -7,6 +8,7 @@ import { Room } from './../rooms/room.entity';
 import { Movie } from './../movies/movie.entity';
 import { CreateShowtimeDto } from './dto/create-showtime.dto';
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -14,7 +16,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
 import { Showtime } from './showtimes.entity';
-import { getManager } from 'typeorm';
+import { Between, getManager } from 'typeorm';
 
 @Injectable()
 export class ShowtimesService extends BaseServiceCRUD<Showtime> {
@@ -49,6 +51,28 @@ export class ShowtimesService extends BaseServiceCRUD<Showtime> {
     const endTime = new Date(
       startTime.getTime() + 1000 * 60 * (advertiseTime + movie.duration),
     );
+
+    const seat = await Seat.findOne({
+      where: { room },
+    });
+
+    const checkTicket = await Ticket.findOne({
+      join: {
+        alias: 'ticket',
+        innerJoin: { showtime: 'ticket.showtime', seat: 'ticket.seat' },
+      },
+      where: (qb) => {
+        qb.andWhere(`seat.id = ${seat.id}`).andWhere(
+          `((showtime.startTime < '${startTime.toISOString()}' AND '${startTime.toISOString()}' < showtime.endTime)
+          OR (showtime.startTime < '${endTime.toISOString()}' AND '${endTime.toISOString()}' < showtime.endTime)
+          OR ('${startTime.toISOString()}' < showtime.startTime AND showtime.startTime < '${endTime.toISOString()}'))`,
+        );
+      },
+      select: ['id'],
+    });
+    if (checkTicket) {
+      throw new BadRequestException('Invalid time');
+    }
 
     return await getManager()
       .transaction(async (entityManager) => {

@@ -1,3 +1,5 @@
+import { Showtime } from './../showtimes/showtimes.entity';
+import { QueryShowtimes } from './../rooms/dto/query-showtimes.dto';
 import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
 import { Director } from './../directors/director.entity';
 import { Genre } from './../genres/genre.entity';
@@ -12,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateMovieDto } from './dto/createMovieDto';
-import { getManager } from 'typeorm';
+import { getManager, Any, Between } from 'typeorm';
 
 @Injectable()
 export class MoviesService extends BaseServiceCRUD<Movie> {
@@ -170,14 +172,36 @@ export class MoviesService extends BaseServiceCRUD<Movie> {
     return movie;
   }
 
-  async getOwnShowtimes(id: number): Promise<Movie> {
+  async getOwnShowtimes(
+    id: number,
+    query: QueryShowtimes,
+  ): Promise<{ movie: Movie; showtimes: Showtime[] }> {
     const movie = await Movie.findOne({
       where: { id },
       relations: ['showtimes'],
     });
     if (!movie) {
-      throw new NotFoundException('Room not found');
+      throw new NotFoundException('Movie not found');
     }
-    return movie;
+
+    const showtimeIds = movie.showtimes.map((showtime) => showtime.id);
+    const filters = { id: Any(showtimeIds) };
+    if (query.date) {
+      const startTime = new Date(`${query.date} 0:0 UTC`);
+      const endTime = new Date(`${query.date} 23:59 UTC`);
+      filters['startTime'] = Between(
+        startTime.toISOString(),
+        endTime.toISOString(),
+      );
+    }
+    const showtimes = await Showtime.find({
+      where: filters,
+      order: {
+        startTime: 'ASC',
+      },
+    });
+
+    delete movie.showtimes;
+    return { movie, showtimes };
   }
 }

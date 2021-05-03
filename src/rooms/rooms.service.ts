@@ -1,3 +1,4 @@
+import { QueryShowtimes } from './dto/query-showtimes.dto';
 import { Showtime } from './../showtimes/showtimes.entity';
 import { Ticket } from './../tickets/ticket.entity';
 import { Seat } from './../seats/seat.entity';
@@ -11,7 +12,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getManager } from 'typeorm';
+import { Any, getManager, Between } from 'typeorm';
 
 @Injectable()
 export class RoomsService extends BaseServiceCRUD<Room> {
@@ -70,7 +71,7 @@ export class RoomsService extends BaseServiceCRUD<Room> {
     return room;
   }
 
-  async getOwnShowtimes(id: number) {
+  async getOwnShowtimes(id: number, query: QueryShowtimes) {
     const room = await Room.findOne({
       where: { id },
     });
@@ -86,7 +87,23 @@ export class RoomsService extends BaseServiceCRUD<Room> {
       where: { seat },
       select: ['id'],
     });
-    const showtimes = tickets.map((ticket) => ticket.showtime);
+
+    const showtimeIds = tickets.map((ticket) => ticket.showtime.id);
+    const filters = { id: Any(showtimeIds) };
+    if (query.date) {
+      const startTime = new Date(`${query.date} 0:0 UTC`);
+      const endTime = new Date(`${query.date} 23:59 UTC`);
+      filters['startTime'] = Between(
+        startTime.toISOString(),
+        endTime.toISOString(),
+      );
+    }
+    const showtimes = await Showtime.find({
+      where: filters,
+      order: {
+        startTime: 'ASC',
+      },
+    });
 
     return { room, showtimes };
   }
