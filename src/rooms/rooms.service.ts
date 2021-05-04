@@ -100,6 +100,7 @@ export class RoomsService extends BaseServiceCRUD<Room> {
     }
     const showtimes = await Showtime.find({
       where: filters,
+      relations: ['movie'],
       order: {
         startTime: 'ASC',
       },
