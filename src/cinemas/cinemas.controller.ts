@@ -1,3 +1,4 @@
+import { QueryShowtimes } from './../rooms/dto/query-showtimes.dto';
 import { CreateRoomDto } from './../rooms/dto/create-room.dto';
 import { BaseControllerCRUD } from 'src/base/base-controller-CRUD';
 import { PermissionAction } from 'src/permissions/permission.entity';
@@ -14,6 +15,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -63,5 +65,13 @@ export class CinemasController extends BaseControllerCRUD<Cinema> {
     @Body() createRoomDto: CreateRoomDto,
   ): Promise<Cinema> {
     return this.service.createOwnRoom(id, createRoomDto);
+  }
+
+  @Get('/:id/showtimes')
+  getOwnShowtimes(
+    @Param('id', ParseIntPipe) id: number,
+    @Query(ValidationPipe) query: QueryShowtimes,
+  ) {
+    return this.service.getOwnShowtimes(id, query);
   }
 }

@@ -1,3 +1,7 @@
+import { Movie } from './../movies/movie.entity';
+import { Ticket } from './../tickets/ticket.entity';
+import { Seat } from './../seats/seat.entity';
+import { QueryShowtimes } from './../rooms/dto/query-showtimes.dto';
 import { Room } from './../rooms/room.entity';
 import { CreateRoomDto } from './../rooms/dto/create-room.dto';
 import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
@@ -58,5 +62,58 @@ export class CinemaService extends BaseServiceCRUD<Cinema> {
     const room = Room.create(createTheaterDto);
     cinema.rooms.push(room);
     return cinema.save();
+  }
+
+  async getOwnShowtimes(id: number, query: QueryShowtimes) {
+    const cinema = await Cinema.findOne(id);
+    if (!cinema) {
+      throw new NotFoundException('Cinema not found');
+    }
+
+    const rooms = await Room.find({ where: { cinema }, select: ['id'] });
+
+    const seats: Seat[] = [];
+    for (const room of rooms) {
+      const seat = await Seat.findOne({
+        where: { room },
+        relations: ['tickets'],
+        select: ['id'],
+      });
+      if (seat) {
+        seats.push(seat);
+      }
+    }
+
+    const tickets: Ticket[] = [];
+    for (const seat of seats) {
+      const results = await Ticket.find({
+        where: { seat },
+        relations: ['showtime'],
+        select: ['id'],
+      });
+      if (results?.length) {
+        tickets.push(...results);
+      }
+    }
+
+    const showtimeIds = tickets.map((ticket) => ticket.showtime.id);
+    const movieBuilder = Movie.createQueryBuilder('movie')
+      .leftJoinAndSelect('movie.showtimes', 'showtime')
+      .where('showtime.id = ANY(:showtimeIds)', { showtimeIds })
+      .orderBy('showtime.startTime');
+    if (query.date) {
+      const startTime = new Date(`${query.date} 0:0 UTC`);
+      const endTime = new Date(`${query.date} 23:59 UTC`);
+      movieBuilder.andWhere(
+        'showtime.startTime BETWEEN :startTime and :endTime',
+        {
+          startTime,
+          endTime,
+        },
+      );
+    }
+    const movies = await movieBuilder.getMany();
+
+    return { cinema, movies };
   }
 }

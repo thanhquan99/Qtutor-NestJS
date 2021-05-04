@@ -55,6 +55,9 @@ export class ShowtimesService extends BaseServiceCRUD<Showtime> {
     const seat = await Seat.findOne({
       where: { room },
     });
+    if (!seat) {
+      throw new BadRequestException(`This room don't have any seats`);
+    }
 
     const checkTicket = await Ticket.findOne({
       join: {
@@ -63,9 +66,9 @@ export class ShowtimesService extends BaseServiceCRUD<Showtime> {
       },
       where: (qb) => {
         qb.andWhere(`seat.id = ${seat.id}`).andWhere(
-          `((showtime.startTime < '${startTime.toISOString()}' AND '${startTime.toISOString()}' < showtime.endTime)
-          OR (showtime.startTime < '${endTime.toISOString()}' AND '${endTime.toISOString()}' < showtime.endTime)
-          OR ('${startTime.toISOString()}' < showtime.startTime AND showtime.startTime < '${endTime.toISOString()}'))`,
+          `((showtime.startTime <= '${startTime.toISOString()}' AND '${startTime.toISOString()}' <= showtime.endTime)
+          OR (showtime.startTime <= '${endTime.toISOString()}' AND '${endTime.toISOString()}' <= showtime.endTime)
+          OR ('${startTime.toISOString()}' <= showtime.startTime AND showtime.startTime <= '${endTime.toISOString()}'))`,
         );
       },
       select: ['id'],
