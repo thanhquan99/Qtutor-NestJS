@@ -1,4 +1,5 @@
-import { Body, Controller, Post, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { BaseControllerCRUD } from 'src/base/base-controller-CRUD';
 import { Permissions } from 'src/guards/permissions.decorator';
 import { PermissionAction } from 'src/permissions/permission.entity';
@@ -13,7 +14,7 @@ export class RatingsController extends BaseControllerCRUD<Rating> {
     }
 
     @Post()
-    @Permissions(PermissionAction.CREATE_RATING)
+    @UseGuards(AuthGuard())
     @UsePipes(ValidationPipe)
     createOne(@Body() createDto: CreateRatingDto): Promise<Rating> {
       return this.service.createOne(createDto);
