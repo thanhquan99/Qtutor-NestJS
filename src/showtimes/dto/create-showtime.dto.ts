@@ -1,31 +1,31 @@
-// import { Country } from './../movie.entity';
-import {
-  IsArray,
-    IsDate,
-  IsDateString,
-  IsEnum,
-  IsNotEmpty,
-  IsNumber,
-  IsObject,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsDateString, IsNotEmpty, IsNumber, Max, Min } from 'class-validator';
 
 export class CreateShowtimeDto {
   @IsNotEmpty()
-  @IsString()
-  name: string;
-
-  @IsNotEmpty()
-  @IsDate()
-  startTime: Date;
-
-  @IsNotEmpty()
-  @IsDate()
-  advertiseTime: Date;
+  @IsDateString()
+  date: Date;
 
   @IsNotEmpty()
   @IsNumber()
-  duration: number;
+  @Min(0)
+  @Max(23)
+  hour: number;
 
+  @IsNotEmpty()
+  @IsNumber()
+  @Min(0)
+  @Max(59)
+  minute: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  advertiseTime: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  roomId: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  movieId: number;
 }

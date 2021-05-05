@@ -1,3 +1,4 @@
+import { UpdateActorDto } from './dto/updateActor.dto';
 import { CreateActorDto } from './dto/createActor.dto';
 import { ActorsService } from './actors.service';
 import { Actor } from './actor.entity';
@@ -34,7 +35,7 @@ export class ActorsController extends BaseControllerCRUD<Actor> {
   @UsePipes(ValidationPipe)
   updateOne(
     @Param('id', ParseIntPipe) id: number,
-    @Body() createActorDto: CreateActorDto,
+    @Body() createActorDto: UpdateActorDto,
   ): Promise<Actor> {
     return this.service.updateOne(id, createActorDto);
   }

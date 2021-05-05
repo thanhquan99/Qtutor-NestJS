@@ -1,3 +1,4 @@
+import { Showtime } from './../showtimes/showtimes.entity';
 import { Genre } from './../genres/genre.entity';
 import { Director } from './../directors/director.entity';
 import { Actor } from './../actors/actor.entity';
@@ -10,10 +11,9 @@ import {
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
-  RelationId,
 } from 'typeorm';
 export enum Country {
-  VN = 'VietNam',
+  VN = 'Vietnam',
   AM = 'American',
 }
 
@@ -27,8 +27,8 @@ export class Movie extends BaseEntity {
   name: string;
 
   @ApiProperty({ example: 'VietNam' })
-  @Column({ type: 'enum', enum: Country })
-  country: Country;
+  @Column()
+  country: string;
 
   @ApiProperty({ example: 'string' })
   @Column()
@@ -48,8 +48,11 @@ export class Movie extends BaseEntity {
   @Column({ type: 'simple-json', nullable: true })
   image: { mainUrl: string; thumbnailUrl: string };
 
+  @ApiProperty({ example: '90' })
+  @Column()
+  duration: number;
+
   @ManyToMany(() => Actor, (actor) => actor.movies, {
-    eager: true,
     cascade: true,
     onDelete: 'CASCADE',
   })
@@ -57,7 +60,6 @@ export class Movie extends BaseEntity {
   actors: Actor[];
 
   @ManyToMany(() => Director, (director) => director.movies, {
-    eager: true,
     cascade: true,
     onDelete: 'CASCADE',
   })
@@ -65,10 +67,15 @@ export class Movie extends BaseEntity {
   directors: Director[];
 
   @ManyToMany(() => Genre, (genre) => genre.movies, {
-    eager: true,
     cascade: true,
     onDelete: 'CASCADE',
   })
   @JoinTable()
   genres: Genre[];
+
+  @OneToMany(() => Showtime, (showtime) => showtime.movie, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  showtimes: Showtime[];
 }

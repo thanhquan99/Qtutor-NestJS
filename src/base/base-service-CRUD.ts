@@ -1,5 +1,19 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { QueryParams } from 'src/base/dto/query-params.dto';
+import {
+  Injectable,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import {
+  getManager,
+  ILike,
+  Equal,
+  MoreThan,
+  MoreThanOrEqual,
+  Not,
+  LessThan,
+  LessThanOrEqual,
+  Any,
+} from 'typeorm';
 
 @Injectable()
 export abstract class BaseServiceCRUD<T> {
@@ -13,9 +27,31 @@ export abstract class BaseServiceCRUD<T> {
     this.modelName = modelName;
   }
 
-  async getMany(query: QueryParams): Promise<{ results: T[]; total: number }> {
-    const builder = this.repository.createQueryBuilder(this.modelName);
-    return this.queryBuilder(builder, query, this.modelName);
+  async getMany(query): Promise<{ results: any; total: number }> {
+    const {
+      relationsWith,
+      filterByFields,
+      perPage,
+      page,
+      orderBy,
+    } = await this.modifyQuery(query);
+
+    const [results, total] = await getManager()
+      .findAndCount(this.entity, {
+        relations: relationsWith,
+        where: filterByFields,
+        order: orderBy,
+        take: perPage,
+        skip: (page - 1) * perPage,
+      })
+      .catch((err) => {
+        throw new InternalServerErrorException(`Failed due to ${err}`);
+      });
+
+    return {
+      results,
+      total,
+    };
   }
 
   async getOne(id: number): Promise<T> {
@@ -46,43 +82,39 @@ export abstract class BaseServiceCRUD<T> {
     return { message: 'delete success' };
   }
 
-  async queryBuilder(builder, query: QueryParams, modelName) {
-    const { limit, filter, offset, orderBy } = query;
+  async modifyQuery(query) {
+    const { filter, relations, perPage = 10, page = 1, orderBy = {} } = query;
+    const filterByFields = {};
+    let relationsWith = [];
 
     if (filter) {
-      const filterByFields = JSON.parse(filter);
-      console.log(filterByFields);
-      for (const field in filterByFields) {
-        const operator = Object.keys(filterByFields[field])[0];
-        const value = filterByFields[field][operator];
+      for (const field in filter) {
+        const operator = Object.keys(filter[field])[0];
+        const value = filter[field][operator];
         switch (operator) {
           case 'equal':
-            builder.andWhere(`"${modelName}"."${field}" = '${value}'`);
+            filterByFields[field] = Equal(value);
             break;
           case 'notequal':
-            builder.andWhere(`"${modelName}"."${field}" != '${value}'`);
+            filterByFields[field] = Not(value);
             break;
           case 'gt':
-            builder.andWhere(`"${modelName}"."${field}" > '${value}'`);
+            filterByFields[field] = MoreThan(value);
             break;
           case 'gte':
-            builder.andWhere(`"${modelName}"."${field}" >= '${value}'`);
+            filterByFields[field] = MoreThanOrEqual(value);
             break;
           case 'lt':
-            builder.andWhere(`"${modelName}"."${field}" < '${value}'`);
+            filterByFields[field] = LessThan(value);
             break;
           case 'lte':
-            builder.andWhere(`"${modelName}"."${field}" <= '${value}'`);
+            filterByFields[field] = LessThanOrEqual(value);
             break;
           case 'in':
-            builder.andWhere(
-              `"${modelName}"."${field}" = ANY('{${value.map(
-                (e) => `${e}`,
-              )}}')`,
-            );
+            filterByFields[field] = Any(value);
             break;
           case 'like':
-            builder.andWhere(`"${modelName}"."${field}" LIKE '%${value}%'`);
+            filterByFields[field] = ILike(`%${value}%`);
             break;
           default:
             break;
@@ -90,38 +122,10 @@ export abstract class BaseServiceCRUD<T> {
       }
     }
 
-    const total = await builder.getCount();
-
-    if (limit) {
-      builder.limit(limit);
+    if (relations) {
+      relationsWith = relations.split(',');
     }
 
-    if (offset) {
-      builder.offset(offset);
-    }
-
-    if (orderBy) {
-      const orderByFields = orderBy.split(',');
-
-      for (let field of orderByFields) {
-        let orderDirection;
-
-        if (field[0] === '-') {
-          field = field.slice(1);
-          orderDirection = 'DESC';
-        } else {
-          orderDirection = 'ASC';
-        }
-
-        builder.orderBy(`${this.modelName}.${field}`, orderDirection);
-      }
-    }
-
-    const results = await builder.getMany();
-
-    return {
-      total,
-      results,
-    };
+    return { filterByFields, relationsWith, perPage, page, orderBy };
   }
 }

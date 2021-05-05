@@ -1,98 +1,119 @@
-import { Theater } from './../theaters/theater.entity';
-import { UpdateCinemaDto } from './dto/update-cinema-dto';
-import { CinemasFilterDto } from './dto/get-cinemas-filter.dto';
+import { Movie } from './../movies/movie.entity';
+import { Ticket } from './../tickets/ticket.entity';
+import { Seat } from './../seats/seat.entity';
+import { QueryShowtimes } from './../rooms/dto/query-showtimes.dto';
+import { Room } from './../rooms/room.entity';
+import { CreateRoomDto } from './../rooms/dto/create-room.dto';
+import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
 import { Cinema } from './cinema.entity';
-import { CreateCinemaDto } from './dto/create-cinema.dto';
-import { CinemaRepository } from './cinema.repository';
 import {
   Injectable,
-  NotFoundException,
   BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateTheaterDto } from 'src/theaters/dto/create-theater.dto';
 import { getManager } from 'typeorm';
 
 @Injectable()
-export class CinemasService {
-  constructor(
-    @InjectRepository(CinemaRepository)
-    private cinemaRepository: CinemaRepository,
-  ) {}
-
-  async createCinema(createCinemaDto: CreateCinemaDto): Promise<Cinema> {
-    const cinema = Cinema.create(createCinemaDto);
-    await cinema.save();
-    return cinema;
+export class CinemaService extends BaseServiceCRUD<Cinema> {
+  constructor(@InjectRepository(Cinema) repo) {
+    super(repo, Cinema, 'cinema');
   }
 
-  async getCinemaById(id: number): Promise<Cinema> {
-    const cinema = await this.cinemaRepository.findOne({ id });
-
+  async getOwnRooms(id: number) {
+    const cinema = await Cinema.createQueryBuilder('cinema')
+      .where('cinema.id = :id', { id })
+      .leftJoinAndSelect('cinema.rooms', 'room')
+      .getOne();
     if (!cinema) {
-      throw new NotFoundException(`Cinema with ${id} not found`);
+      throw new NotFoundException('Cinema not found');
     }
-
     return cinema;
   }
 
-  async getCinemas(filterDto: CinemasFilterDto): Promise<Cinema[]> {
-    return this.cinemaRepository
-      .createQueryBuilder('cinema')
-      .leftJoinAndSelect('cinema.theaters', 'theater')
-      .getMany();
-  }
-
-  async deleteCinemaById(id: number): Promise<void> {
-    const result = await this.cinemaRepository.delete({
-      id,
+  async createOwnRoom(
+    id: number,
+    createTheaterDto: CreateRoomDto,
+  ): Promise<Cinema> {
+    const { roomNumber } = createTheaterDto;
+    const cinema = await Cinema.findOne({
+      where: { id },
+      relations: ['rooms'],
     });
 
-    if (!result.affected) {
-      throw new NotFoundException(`Cinema with ID ${id} not found`);
+    if (!cinema) {
+      throw new NotFoundException('Cinema not found');
     }
-  }
-
-  async updateCinema(
-    id: number,
-    updateCinemaDto: UpdateCinemaDto,
-  ): Promise<Cinema> {
-    return await this.cinemaRepository.save({ id, ...updateCinemaDto });
-  }
-
-  async getOwnTheaters(id: number) {
-    return await this.cinemaRepository
-      .createQueryBuilder('cinema')
-      .where('cinema.id = :id', { id })
-      .leftJoinAndSelect('cinema.theaters', 'theater')
-      .getOne();
-  }
-
-  async createOwnTheater(
-    id: number,
-    createTheaterDto: CreateTheaterDto,
-  ): Promise<Cinema> {
-    const { theaterNumber } = createTheaterDto;
     const manager = getManager();
 
-    const checkTheater = await manager
-      .createQueryBuilder(Theater, 'theater')
-      .where('"cinemaId" = :id and "theaterNumber" = :theaterNumber', {
+    const checkRoom = await manager
+      .createQueryBuilder(Room, 'room')
+      .where('"cinemaId" = :id and "roomNumber" = :roomNumber', {
         id,
-        theaterNumber,
+        roomNumber,
       })
       .getOne();
-    if (checkTheater) {
+    if (checkRoom) {
       throw new BadRequestException(
-        `Theater Number ${theaterNumber} is already exist in this cinema`,
+        `Room Number ${roomNumber} is already exist in this cinema`,
       );
     }
 
-    const cinema = await this.cinemaRepository.findOne({
-      where: { id },
-    });
-    const theater = Theater.create(createTheaterDto);
-    cinema.theaters.push(theater);
+    const room = Room.create(createTheaterDto);
+    cinema.rooms.push(room);
     return cinema.save();
+  }
+
+  async getOwnShowtimes(id: number, query: QueryShowtimes) {
+    const cinema = await Cinema.findOne(id);
+    if (!cinema) {
+      throw new NotFoundException('Cinema not found');
+    }
+
+    const rooms = await Room.find({ where: { cinema }, select: ['id'] });
+
+    const seats: Seat[] = [];
+    for (const room of rooms) {
+      const seat = await Seat.findOne({
+        where: { room },
+        relations: ['tickets'],
+        select: ['id'],
+      });
+      if (seat) {
+        seats.push(seat);
+      }
+    }
+
+    const tickets: Ticket[] = [];
+    for (const seat of seats) {
+      const results = await Ticket.find({
+        where: { seat },
+        relations: ['showtime'],
+        select: ['id'],
+      });
+      if (results?.length) {
+        tickets.push(...results);
+      }
+    }
+
+    const showtimeIds = tickets.map((ticket) => ticket.showtime.id);
+    const movieBuilder = Movie.createQueryBuilder('movie')
+      .leftJoinAndSelect('movie.showtimes', 'showtime')
+      .where('showtime.id = ANY(:showtimeIds)', { showtimeIds })
+      .orderBy('showtime.startTime');
+    if (query.date) {
+      const startTime = new Date(`${query.date} 0:0 UTC`);
+      const endTime = new Date(`${query.date} 23:59 UTC`);
+      movieBuilder.andWhere(
+        'showtime.startTime BETWEEN :startTime and :endTime',
+        {
+          startTime,
+          endTime,
+        },
+      );
+    }
+    const movies = await movieBuilder.getMany();
+
+    return { cinema, movies };
   }
 }

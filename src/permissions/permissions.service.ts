@@ -1,18 +1,19 @@
+import { CreatePermissionDto } from './dto/create-permission.dto';
+import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
 import { Permission } from './permission.entity';
-import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
-export class PermissionsService extends TypeOrmCrudService<Permission> {
+export class PermissionsService extends BaseServiceCRUD<Permission> {
   constructor(@InjectRepository(Permission) repo) {
-    super(repo);
+    super(repo, Permission, 'permission');
   }
 
-  async createPermission(dto: Permission) {
+  async createPermission(dto: CreatePermissionDto) {
     const { action } = dto;
 
-    if (await this.repo.findOne({ action })) {
+    if (await Permission.findOne({ action })) {
       throw new BadRequestException('Permission is already exist');
     }
 

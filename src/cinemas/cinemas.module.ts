@@ -1,13 +1,13 @@
+import { CinemaService } from './cinemas.service';
 import { AuthModule } from './../auth/auth.module';
-import { CinemaRepository } from './cinema.repository';
+import { Cinema } from './cinema.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
 import { CinemasController } from './cinemas.controller';
-import { CinemasService } from './cinemas.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([CinemaRepository]), AuthModule],
+  imports: [TypeOrmModule.forFeature([Cinema]), AuthModule],
   controllers: [CinemasController],
-  providers: [CinemasService],
+  providers: [CinemaService],
 })
 export class CinemasModule {}

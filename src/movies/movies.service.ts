@@ -1,23 +1,25 @@
+import { Showtime } from './../showtimes/showtimes.entity';
+import { QueryShowtimes } from './../rooms/dto/query-showtimes.dto';
+import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
 import { Director } from './../directors/director.entity';
 import { Genre } from './../genres/genre.entity';
 import { Actor } from './../actors/actor.entity';
 import { UpdateMovieDto } from './dto/updateMovieDto';
 import { Movie } from './movie.entity';
-import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateMovieDto } from './dto/createMovieDto';
-import { getManager } from 'typeorm';
-import * as fs from 'fs';
+import { getManager, Any, Between } from 'typeorm';
 
 @Injectable()
-export class MoviesService extends TypeOrmCrudService<Movie> {
+export class MoviesService extends BaseServiceCRUD<Movie> {
   constructor(@InjectRepository(Movie) repo) {
-    super(repo);
+    super(repo, Movie, 'movie');
   }
 
   makeImageUrl(fileName: string): string {
@@ -51,36 +53,27 @@ export class MoviesService extends TypeOrmCrudService<Movie> {
       movie = await getManager().transaction(async (entityManager) => {
         const movie = entityManager.create(Movie, { ...createMovieDto, image });
         if (actorIds) {
-          movie.actors = [];
-          for (const actorId of actorIds) {
-            const actor = await entityManager.findOne(Actor, actorId);
-            if (!actor) {
-              throw new NotFoundException('Actor not found');
-            }
-            movie.actors.push(actor);
-          }
+          const actors = await entityManager
+            .createQueryBuilder(Actor, 'actor')
+            .where('id = ANY(:actorIds)', { actorIds })
+            .getMany();
+          movie.actors = actors;
         }
 
         if (genreIds) {
-          movie.genres = [];
-          for (const genreId of genreIds) {
-            const genre = await entityManager.findOne(Genre, genreId);
-            if (!genre) {
-              throw new NotFoundException('Genre not found');
-            }
-            movie.genres.push(genre);
-          }
+          const genres = await entityManager
+            .createQueryBuilder(Genre, 'genre')
+            .where('id = ANY(:genreIds)', { genreIds })
+            .getMany();
+          movie.genres = genres;
         }
 
         if (directorIds) {
-          movie.directors = [];
-          for (const directorId of directorIds) {
-            const director = await entityManager.findOne(Director, directorId);
-            if (!director) {
-              throw new NotFoundException('Director not found');
-            }
-            movie.directors.push(director);
-          }
+          const directors = await entityManager
+            .createQueryBuilder(Director, 'director')
+            .where('id = ANY(:directorIds)', { directorIds })
+            .getMany();
+          movie.directors = directors;
         }
 
         return await entityManager.save(movie);
@@ -97,7 +90,7 @@ export class MoviesService extends TypeOrmCrudService<Movie> {
     updateMovieDto: UpdateMovieDto,
     files: Express.Multer.File,
   ): Promise<Movie> {
-    const movie = await this.repo.findOne({ where: { id } });
+    const movie = await Movie.findOne({ where: { id } });
     if (!movie) {
       throw new NotFoundException('Could not found this movie');
     }
@@ -138,50 +131,77 @@ export class MoviesService extends TypeOrmCrudService<Movie> {
     delete updateMovieDto.genreIds;
     delete updateMovieDto.directorIds;
 
-    try {
-      await getManager().transaction(async (entityManager) => {
+    await getManager()
+      .transaction(async (entityManager) => {
         movie.image = image;
         if (actorIds) {
-          movie.actors = [];
-          for (const actorId of actorIds) {
-            const actor = await entityManager.findOne(Actor, actorId);
-            if (!actor) {
-              throw new NotFoundException('Actor not found');
-            }
-            movie.actors.push(actor);
-          }
+          const actors = await entityManager
+            .createQueryBuilder(Actor, 'actor')
+            .where('id = ANY(:actorIds)', { actorIds })
+            .getMany();
+          movie.actors = actors;
         }
 
         if (genreIds) {
-          movie.genres = [];
-          for (const genreId of genreIds) {
-            const genre = await entityManager.findOne(Genre, genreId);
-            if (!genre) {
-              throw new NotFoundException('Genre not found');
-            }
-            movie.genres.push(genre);
-          }
+          const genres = await entityManager
+            .createQueryBuilder(Genre, 'genre')
+            .where('id = ANY(:genreIds)', { genreIds })
+            .getMany();
+          movie.genres = genres;
         }
 
         if (directorIds) {
-          movie.directors = [];
-          for (const directorId of directorIds) {
-            const director = await entityManager.findOne(Director, directorId);
-            if (!director) {
-              throw new NotFoundException('Director not found');
-            }
-            movie.directors.push(director);
-          }
+          const directors = await entityManager
+            .createQueryBuilder(Director, 'director')
+            .where('id = ANY(:directorIds)', { directorIds })
+            .getMany();
+          movie.directors = directors;
         }
+
         await entityManager.save(movie);
         await entityManager.update(Movie, id, {
           ...updateMovieDto,
           image,
         });
+      })
+      .catch((err) => {
+        throw new InternalServerErrorException(
+          `Update movie failed due to ${err}`,
+        );
       });
-    } catch (err) {
-      throw new BadRequestException(`Failed due to ${err}`);
+    return movie;
+  }
+
+  async getOwnShowtimes(
+    id: number,
+    query: QueryShowtimes,
+  ): Promise<{ movie: Movie; showtimes: Showtime[] }> {
+    const movie = await Movie.findOne({
+      where: { id },
+      relations: ['showtimes'],
+    });
+    if (!movie) {
+      throw new NotFoundException('Movie not found');
     }
-    return this.repo.findOne(id);
+
+    const showtimeIds = movie.showtimes.map((showtime) => showtime.id);
+    const filters = { id: Any(showtimeIds) };
+    if (query.date) {
+      const startTime = new Date(`${query.date} 0:0 UTC`);
+      const endTime = new Date(`${query.date} 23:59 UTC`);
+      filters['startTime'] = Between(
+        startTime.toISOString(),
+        endTime.toISOString(),
+      );
+    }
+    const showtimes = await Showtime.find({
+      where: filters,
+      order: {
+        startTime: 'ASC',
+      },
+    });
+
+    delete movie.showtimes;
+    return { movie, showtimes };
   }
 }

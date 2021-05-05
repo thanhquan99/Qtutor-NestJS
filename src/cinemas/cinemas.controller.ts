@@ -1,9 +1,9 @@
+import { QueryShowtimes } from './../rooms/dto/query-showtimes.dto';
+import { CreateRoomDto } from './../rooms/dto/create-room.dto';
+import { BaseControllerCRUD } from 'src/base/base-controller-CRUD';
 import { PermissionAction } from 'src/permissions/permission.entity';
-import { Theater } from './../theaters/theater.entity';
-import { CreateTheaterDto } from './../theaters/dto/create-theater.dto';
 import { UpdateCinemaDto } from './dto/update-cinema-dto';
-import { CinemasFilterDto } from './dto/get-cinemas-filter.dto';
-import { CinemasService } from './cinemas.service';
+import { CinemaService } from './cinemas.service';
 import { CreateCinemaDto } from './dto/create-cinema.dto';
 import { Cinema } from './cinema.entity';
 import {
@@ -19,65 +19,59 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { GetUser } from 'src/auth/get-user.decorator';
-import { User } from 'src/users/user.entity';
 import { Permissions } from 'src/guards/permissions.decorator';
 
 @Controller('cinemas')
-export class CinemasController {
-  constructor(private cinemaService: CinemasService) {}
-
-  @Get('/:id')
-  getCinema(@Param('id', ParseIntPipe) id: number): Promise<Cinema> {
-    return this.cinemaService.getCinemaById(id);
-  }
-
-  @Get()
-  getCinemas(
-    @Query(ValidationPipe) filterDto: CinemasFilterDto,
-  ): Promise<Cinema[]> {
-    return this.cinemaService.getCinemas(filterDto);
+export class CinemasController extends BaseControllerCRUD<Cinema> {
+  constructor(service: CinemaService) {
+    super(service);
   }
 
   @Post()
   @Permissions(PermissionAction.CREATE_CINEMA)
   @UsePipes(ValidationPipe)
-  createCinema(
-    @Body() createCinemaDto: CreateCinemaDto,
-    @GetUser() user: User,
-  ): Promise<Cinema> {
-    console.log(user);
-    return this.cinemaService.createCinema(createCinemaDto);
+  createOne(@Body() createCinemaDto: CreateCinemaDto): Promise<Cinema> {
+    return this.service.createOne(createCinemaDto);
   }
 
   @Delete('/:id')
   @Permissions(PermissionAction.DELETE_CINEMA)
-  deleteCinemaById(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.cinemaService.deleteCinemaById(id);
+  deleteOne(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<void | { message: string }> {
+    return this.service.deleteOne(id);
   }
 
   @Patch('/:id')
   @Permissions(PermissionAction.UPDATE_CINEMA)
   @UsePipes(ValidationPipe)
-  updateCinema(
+  updateOne(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateCinemaDto: UpdateCinemaDto,
   ): Promise<Cinema> {
-    return this.cinemaService.updateCinema(id, updateCinemaDto);
+    return this.service.updateOne(id, updateCinemaDto);
   }
 
-  @Get('/:id/theaters')
-  getOwnTheaters(@Param('id', ParseIntPipe) id: number) {
-    return this.cinemaService.getOwnTheaters(id);
+  @Get('/:id/rooms')
+  getOwnRooms(@Param('id', ParseIntPipe) id: number) {
+    return this.service.getOwnRooms(id);
   }
 
-  @Post('/:id/theaters')
+  @Post('/:id/rooms')
   @Permissions(PermissionAction.CREATE_THEATER)
   @UsePipes(ValidationPipe)
-  createOwnTheater(
+  createOwnRoom(
     @Param('id', ParseIntPipe) id: number,
-    @Body() createTheaterDto: CreateTheaterDto,
+    @Body() createRoomDto: CreateRoomDto,
   ): Promise<Cinema> {
-    return this.cinemaService.createOwnTheater(id, createTheaterDto);
+    return this.service.createOwnRoom(id, createRoomDto);
+  }
+
+  @Get('/:id/showtimes')
+  getOwnShowtimes(
+    @Param('id', ParseIntPipe) id: number,
+    @Query(ValidationPipe) query: QueryShowtimes,
+  ) {
+    return this.service.getOwnShowtimes(id, query);
   }
 }

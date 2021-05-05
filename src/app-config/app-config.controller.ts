@@ -1,7 +1,7 @@
 import { AppConfigService } from './app-config.service';
 import { Controller, Get } from '@nestjs/common';
 
-@Controller('appConfig')
+@Controller('app-config')
 export class AppConfigController {
   constructor(private appConfigService: AppConfigService) {}
 

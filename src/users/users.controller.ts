@@ -1,3 +1,6 @@
+import { User } from 'src/users/user.entity';
+import { BaseControllerCRUD } from 'src/base/base-controller-CRUD';
+import { QueryParams } from '../base/dto/query-params.dto';
 import { PermissionAction } from './../permissions/permission.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateUserDto } from './dto/createUser.dto';
@@ -8,6 +11,7 @@ import {
   Controller,
   Get,
   Post,
+  Query,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -16,19 +20,29 @@ import { Permissions } from 'src/guards/permissions.decorator';
 
 @UseGuards(AuthGuard())
 @Controller('users')
-export class UsersController {
-  constructor(private userService: UsersService) {}
+export class UsersController extends BaseControllerCRUD<User> {
+  constructor(service: UsersService) {
+    super(service);
+  }
 
   @Post()
   @Permissions(PermissionAction.CREATE_USER)
   @UsePipes(ValidationPipe)
-  createUser(@Body() createUserDto: CreateUserDto) {
-    return this.userService.createUser(createUserDto);
+  createOne(@Body() createUserDto: CreateUserDto) {
+    return this.service.createOne(createUserDto);
   }
 
   @Get()
+  @UsePipes(ValidationPipe)
   @Permissions(PermissionAction.GET_USER)
-  getUsers() {
-    return this.userService.getUsers();
+  getMany(@Query() query: QueryParams) {
+    if (query?.filter) {
+      query.filter = JSON.parse(query.filter);
+    }
+    if (query?.orderBy) {
+      query.orderBy = JSON.parse(query.orderBy);
+    }
+
+    return this.service.getMany(query);
   }
 }

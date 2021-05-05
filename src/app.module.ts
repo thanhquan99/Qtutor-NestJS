@@ -1,11 +1,9 @@
+import { ShowtimesModule } from './showtimes/showtimes.module';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { typeOrmConfig } from './config/typeorm.config';
-import { CinemasModule } from './cinemas/cinemas.module';
 import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
-import { TheatersModule } from './theaters/theaters.module';
 import { MoviesModule } from './movies/movies.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
@@ -20,6 +18,11 @@ import { RolePermissionModule } from './role-permission/role-permission.module';
 import * as connectionOptions from './ormconfig';
 import { APP_GUARD } from '@nestjs/core';
 import { PermissionGuard } from './guards/permissions.guard';
+import { SeatsModule } from './seats/seats.module';
+import { CinemasModule } from './cinemas/cinemas.module';
+import { RoomsModule } from './rooms/rooms.module';
+import { TicketsModule } from './tickets/tickets.module';
+import { TicketTypesModule } from './ticket-types/ticket-types.module';
 
 @Module({
   imports: [
@@ -31,7 +34,6 @@ import { PermissionGuard } from './guards/permissions.guard';
     CinemasModule,
     UsersModule,
     AuthModule,
-    TheatersModule,
     MoviesModule,
     ActorsModule,
     DirectorsModule,
@@ -41,6 +43,11 @@ import { PermissionGuard } from './guards/permissions.guard';
     AppConfigModule,
     PermissionsModule,
     RolePermissionModule,
+    SeatsModule,
+    RoomsModule,
+    ShowtimesModule,
+    TicketsModule,
+    TicketTypesModule,
   ],
   providers: [
     {

@@ -8,6 +8,6 @@ import { ShowtimesService } from './showtimes.service';
 @Module({
   imports: [TypeOrmModule.forFeature([Showtime]), AuthModule],
   controllers: [ShowtimesController],
-  providers: [ShowtimesService]
+  providers: [ShowtimesService],
 })
 export class ShowtimesModule {}
