@@ -179,7 +179,10 @@ export class MoviesService extends BaseServiceCRUD<Movie> {
         );
       });
 
-    return Movie.findOne(id);
+    return Movie.findOne({
+      where: { id },
+      relations: ['actors', 'genres', 'directors'],
+    });
   }
 
   async getOwnShowtimes(
