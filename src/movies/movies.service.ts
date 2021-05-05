@@ -43,7 +43,12 @@ export class MoviesService extends BaseServiceCRUD<Movie> {
       image['thumbnailUrl'] = thumbnailUrl;
     }
 
-    const { actorIds, genreIds, directorIds } = createMovieDto;
+    const actorIds =
+      createMovieDto.actorIds?.split(',').map((id) => +id) || undefined;
+    const genreIds =
+      createMovieDto.genreIds?.split(',').map((id) => +id) || undefined;
+    const directorIds =
+      createMovieDto.directorIds?.split(',').map((id) => +id) || undefined;
     delete createMovieDto.actorIds;
     delete createMovieDto.genreIds;
     delete createMovieDto.directorIds;
@@ -126,7 +131,12 @@ export class MoviesService extends BaseServiceCRUD<Movie> {
       return;
     })();
 
-    const { actorIds, genreIds, directorIds } = updateMovieDto;
+    const actorIds =
+      updateMovieDto.actorIds?.split(',').map((id) => +id) || undefined;
+    const genreIds =
+      updateMovieDto.genreIds?.split(',').map((id) => +id) || undefined;
+    const directorIds =
+      updateMovieDto.directorIds?.split(',').map((id) => +id) || undefined;
     delete updateMovieDto.actorIds;
     delete updateMovieDto.genreIds;
     delete updateMovieDto.directorIds;
