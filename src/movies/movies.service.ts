@@ -133,7 +133,6 @@ export class MoviesService extends BaseServiceCRUD<Movie> {
 
     await getManager()
       .transaction(async (entityManager) => {
-        movie.image = image;
         if (actorIds) {
           const actors = await entityManager
             .createQueryBuilder(Actor, 'actor')
@@ -169,7 +168,8 @@ export class MoviesService extends BaseServiceCRUD<Movie> {
           `Update movie failed due to ${err}`,
         );
       });
-    return movie;
+
+    return Movie.findOne(id);
   }
 
   async getOwnShowtimes(
