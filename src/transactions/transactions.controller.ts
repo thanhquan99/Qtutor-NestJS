@@ -1,4 +1,5 @@
-import { Body, Controller, Post, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { BaseControllerCRUD } from 'src/base/base-controller-CRUD';
 import { Permissions } from 'src/guards/permissions.decorator';
 import { PermissionAction } from 'src/permissions/permission.entity';
@@ -13,9 +14,32 @@ export class TransactionsController extends BaseControllerCRUD<Transaction>{
     }
 
     @Post()
-    @Permissions(PermissionAction.CREATE_TRANSACTION)
+    @UseGuards(AuthGuard())
     @UsePipes(ValidationPipe)
     createOne(@Body() createDto: CreateTransactionDto): Promise<Transaction> {
       return this.service.createOne(createDto);
+    }
+
+    @Get()
+    @UseGuards(AuthGuard())
+    @UsePipes(ValidationPipe)
+    getTransaction() {
+      return this.service.getTransaction();
+    }
+
+    @Delete('/:id')
+    @Permissions(PermissionAction.DELETE_CINEMA)
+    deleteCinemaById(@Param('id', ParseIntPipe) id: number): Promise<void> {
+      return this..deleteCinemaById(id);
+    }
+  
+    @Patch('/:id')
+    @Permissions(PermissionAction.UPDATE_CINEMA)
+    @UsePipes(ValidationPipe)
+    updateCinema(
+      @Param('id', ParseIntPipe) id: number,
+      @Body() updateCinemaDto: UpdateCinemaDto,
+    ): Promise<Cinema> {
+      return this.cinemaService.updateCinema(id, updateCinemaDto);
     }
 }
