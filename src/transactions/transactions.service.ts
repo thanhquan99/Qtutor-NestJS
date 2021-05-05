@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
 import { Entity, TransactionRepository } from 'typeorm';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
-import { TransactionRepository } from './transaction.repository';
 import { Transaction } from './transactions.entity';
 
 @Injectable()
@@ -21,6 +20,6 @@ export class TransactionsService extends BaseServiceCRUD<Transaction> {
       }
       async updateTransactionById(id: number, transaction_time:Date, service:string){
         const transaction = Transaction.findByIds([id]);
-        transaction;
+        ;
       }
 }
