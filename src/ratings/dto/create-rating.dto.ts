@@ -15,4 +15,12 @@ import {
     @IsNotEmpty()
     @IsString()
     comment: string;
+
+    @IsNotEmpty()
+    @IsNumber()
+    movieId: number;
+
+    @IsNotEmpty()
+    @IsNumber()
+    userId: number;
   }

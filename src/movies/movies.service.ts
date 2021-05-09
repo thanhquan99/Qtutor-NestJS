@@ -204,4 +204,13 @@ export class MoviesService extends BaseServiceCRUD<Movie> {
     delete movie.showtimes;
     return { movie, showtimes };
   }
+
+  async getRatingsByMovie(id:number){
+    return Movie.find({
+      where : {
+        id, 
+      },
+      relations: ['ratings']
+    }) 
+  }
 }
