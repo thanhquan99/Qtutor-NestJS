@@ -106,4 +106,21 @@ export class ShowtimesService extends BaseServiceCRUD<Showtime> {
         throw new InternalServerErrorException(`Failed due to ${err}`);
       });
   }
+
+  async getTicketsByShowtime(id: number) {
+    const showtime = await Showtime.createQueryBuilder('showtime')
+      .leftJoinAndSelect('showtime.tickets', 'ticket')
+      .leftJoinAndSelect('ticket.seat', 'seat')
+      .leftJoinAndSelect('showtime.movie', 'movie')
+      .where('showtime.id = :id', { id })
+      .getOne();
+
+    const room = await Room.createQueryBuilder('room')
+      .leftJoin('room.seats', 'seat')
+      .leftJoin('seat.tickets', 'ticket')
+      .where('ticket.showtimeId = :id', { id })
+      .getOne();
+
+    return { ...showtime, room };
+  }
 }
