@@ -25,7 +25,7 @@ export class TransactionsService extends BaseServiceCRUD<Transaction> {
         ;
       }
       async createOne(createTransactionDto: CreateTransactionDto){
-        const {transactionTime, service, ticketId, userId} = createTransactionDto;
+        const {transaction_time, service, ticketId, userId} = createTransactionDto;
         const ticket = await Ticket.findOne(ticketId);
         if (!ticket){
             throw new NotFoundException("Ticket not found!");
@@ -34,7 +34,7 @@ export class TransactionsService extends BaseServiceCRUD<Transaction> {
         if (!user){
             throw new NotFoundException("User not found!");
         }
-        const transaction = Transaction.create({transactionTime, service, ticketId, userId});
+        const transaction = Transaction.create({transaction_time, service, ticket, user});
         return transaction.save();
     }
 }

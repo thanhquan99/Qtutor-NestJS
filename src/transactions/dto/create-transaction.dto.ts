@@ -15,7 +15,7 @@ import {
 
     @IsNotEmpty()
     @IsDate()
-    transactionTime: Date;
+    transaction_time: Date;
 
     @IsNotEmpty()
     @IsString()
