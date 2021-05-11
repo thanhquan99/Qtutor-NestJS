@@ -42,4 +42,5 @@ export class Seat extends BaseEntity {
     cascade: true,
   })
   tickets: Ticket[];
+  
 }

@@ -47,4 +47,5 @@ export class SeatsController extends BaseControllerCRUD<Seat> {
   ): Promise<void | { message: string }> {
     return this.service.deleteOne(id);
   }
+  
 }

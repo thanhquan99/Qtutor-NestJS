@@ -6,10 +6,13 @@ import {
     Column,
     Entity,
     JoinColumn,
+    ManyToOne,
     OneToOne,
     PrimaryGeneratedColumn,
   } from 'typeorm';
   import * as bcrypt from 'bcrypt';
+import { User } from 'src/users/user.entity';
+import { Ticket } from 'src/tickets/ticket.entity';
   @Entity()
   export class Transaction extends BaseEntity {
     @PrimaryGeneratedColumn()
@@ -20,4 +23,17 @@ import {
   
     @Column({ nullable: true})
     service: string;
+
+    @ManyToOne(() => User, (user) => user.transactions, {
+      onDelete: 'CASCADE',
+    })
+    @JoinColumn()
+    user: User;
+
+    @OneToOne(() => Ticket, (ticket) => ticket.transaction, {
+      nullable: false,
+      onDelete: 'CASCADE',
+    })
+    @JoinColumn() // specify inverse side as a second parameter
+    ticket: Ticket;
   }

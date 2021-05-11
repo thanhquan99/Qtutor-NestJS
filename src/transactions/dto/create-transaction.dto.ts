@@ -21,4 +21,11 @@ import {
     @IsString()
     service: string;
 
+    @IsNotEmpty()
+    @IsNumber()
+    ticketId: number;
+
+    @IsNotEmpty()
+    @IsNumber()
+    userId: number;
   }

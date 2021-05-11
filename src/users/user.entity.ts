@@ -9,9 +9,11 @@ import {
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
+
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Rating } from 'src/ratings/ratings.entity';
+import { Transaction } from 'src/transactions/transactions.entity';
 @Entity()
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -56,4 +58,9 @@ export class User extends BaseEntity {
     this.password = await bcrypt.hash(this.password, this.salt);
   }
 
+  @OneToMany(() => Transaction, (transaction) => transaction.user, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  transactions: Transaction[];
 }
