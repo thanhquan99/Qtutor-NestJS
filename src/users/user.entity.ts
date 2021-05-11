@@ -6,6 +6,7 @@ import {
   Column,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -33,10 +34,10 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   age: number;
 
-  @OneToOne(() => UserRole, (userRole) => userRole.user, {
-    cascade: true,
+  @OneToMany(() => UserRole, (userRole) => userRole.user, {
+    onDelete: 'CASCADE',
   })
-  userRole: UserRole;
+  userRoles: UserRole[];
 
   async validatePassword(password: string): Promise<boolean> {
     const hash = await bcrypt.hash(password, this.salt);
@@ -47,5 +48,4 @@ export class User extends BaseEntity {
     this.salt = await bcrypt.genSalt();
     this.password = await bcrypt.hash(this.password, this.salt);
   }
-
 }
