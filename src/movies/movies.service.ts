@@ -26,6 +26,17 @@ export class MoviesService extends BaseServiceCRUD<Movie> {
     return `${process.env.DOMAIN}/img/${fileName}`;
   }
 
+  async getOne(id: number): Promise<Movie> {
+    const movie = await Movie.findOne({
+      where: { id },
+      relations: ['genres', 'actors', 'directors'],
+    });
+    if (!movie) {
+      throw new NotFoundException('Movie not found');
+    }
+    return movie;
+  }
+
   async createMovie(
     createMovieDto: CreateMovieDto,
     files: Express.Multer.File,
