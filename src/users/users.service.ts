@@ -1,6 +1,5 @@
+import { UpdateUserDto } from './dto/update-user.dto';
 import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
-import { QueryParams } from 'src/base/dto/query-params.dto';
-import { UserRoleView } from './../user-role/userRoleView.entity';
 import { CreateUserDto } from './dto/createUser.dto';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
@@ -25,9 +24,8 @@ export class UsersService extends BaseServiceCRUD<User> {
       throw new BadRequestException('Email is already exist');
     }
 
-    let user;
-    try {
-      await getManager().transaction(async (entityManager) => {
+    return await getManager()
+      .transaction(async (entityManager) => {
         const user = entityManager.create(User, createUserDto);
         await user.hashPassword();
         await entityManager.save(user);
@@ -42,11 +40,23 @@ export class UsersService extends BaseServiceCRUD<User> {
             role,
           })
           .save();
+        delete user.password;
+        delete user.salt;
+        return user;
+      })
+      .catch((err) => {
+        console.log('Failed due to ', err);
       });
-    } catch (err) {
-      throw new BadRequestException(`Failed due to ${err}`);
-    }
+  }
+
+  getMe(user: User): User {
+    delete user.password;
+    delete user.salt;
 
     return user;
+  }
+
+  async updateMe(user: User, updateDto: UpdateUserDto): Promise<User> {
+    return User.getRepository().save({ id: user.id, ...updateDto });
   }
 }
