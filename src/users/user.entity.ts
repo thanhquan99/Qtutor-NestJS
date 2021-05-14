@@ -37,10 +37,10 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   age: number;
 
-  @OneToOne(() => UserRole, (userRole) => userRole.user, {
-    cascade: true,
+  @OneToMany(() => UserRole, (userRole) => userRole.user, {
+    onDelete: 'CASCADE',
   })
-  userRole: UserRole;
+  userRoles: UserRole[];
 
   @OneToMany(() => Rating, (rating) => rating.user, {
     cascade: true,

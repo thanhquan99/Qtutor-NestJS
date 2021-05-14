@@ -1,5 +1,5 @@
+import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from 'src/users/user.entity';
-import { BaseControllerCRUD } from 'src/base/base-controller-CRUD';
 import { QueryParams } from '../base/dto/query-params.dto';
 import { PermissionAction } from './../permissions/permission.entity';
 import { AuthGuard } from '@nestjs/passport';
@@ -9,7 +9,11 @@ import { UsersService } from './users.service';
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
+  ParseIntPipe,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -17,23 +21,34 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { Permissions } from 'src/guards/permissions.decorator';
+import { GetUser } from 'src/auth/get-user.decorator';
 
 @UseGuards(AuthGuard())
+@UsePipes(ValidationPipe)
 @Controller('users')
-export class UsersController extends BaseControllerCRUD<User> {
-  constructor(service: UsersService) {
-    super(service);
+export class UsersController {
+  constructor(private readonly service: UsersService) {}
+
+  @Get('/me')
+  getMe(@GetUser() user: User): User {
+    return this.service.getMe(user);
+  }
+
+  @Patch('/me')
+  updateMe(
+    @GetUser() user: User,
+    @Body() updateDto: UpdateUserDto,
+  ): Promise<User> {
+    return this.service.updateMe(user, updateDto);
   }
 
   @Post()
   @Permissions(PermissionAction.CREATE_USER)
-  @UsePipes(ValidationPipe)
   createOne(@Body() createUserDto: CreateUserDto) {
     return this.service.createOne(createUserDto);
   }
 
   @Get()
-  @UsePipes(ValidationPipe)
   @Permissions(PermissionAction.GET_USER)
   getMany(@Query() query: QueryParams) {
     if (query?.filter) {
@@ -42,7 +57,20 @@ export class UsersController extends BaseControllerCRUD<User> {
     if (query?.orderBy) {
       query.orderBy = JSON.parse(query.orderBy);
     }
-
     return this.service.getMany(query);
+  }
+
+  @Get('/:id')
+  @Permissions(PermissionAction.GET_USER)
+  getOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
+    return this.service.getOne(id);
+  }
+
+  @Delete('/:id')
+  @Permissions(PermissionAction.DELETE_USER)
+  deleteOne(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<void | { message: string }> {
+    return this.service.deleteOne(id);
   }
 }

@@ -3,11 +3,9 @@ import { User } from './../users/user.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   BaseEntity,
-  Column,
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -15,7 +13,7 @@ import {
 export class UserRole extends BaseEntity {
   @PrimaryGeneratedColumn() id: number;
 
-  @OneToOne(() => User, (user) => user.userRole, {
+  @ManyToOne(() => User, (user) => user.userRoles, {
     nullable: false,
     onDelete: 'CASCADE',
   })
@@ -23,7 +21,6 @@ export class UserRole extends BaseEntity {
   user: User;
 
   @ManyToOne(() => Role, (role) => role.userRoles, {
-    cascade: true,
     nullable: false,
     onDelete: 'CASCADE',
   })

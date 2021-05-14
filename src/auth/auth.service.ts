@@ -36,16 +36,13 @@ export class AuthService {
         await entityManager.save(user);
 
         const role = await entityManager.findOne(Role, {
-          id: 12,
           name: RoleName.CUSTOMER,
         });
-
-        await entityManager
-          .create(UserRole, {
-            user,
-            role,
-          })
-          .save();
+        const userRole = entityManager.create(UserRole, {
+          user,
+          role,
+        });
+        await entityManager.save(userRole);
       });
     } catch (err) {
       throw new BadRequestException(`Failed due to ${err}`);

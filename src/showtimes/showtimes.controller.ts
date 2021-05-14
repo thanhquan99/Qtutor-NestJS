@@ -1,12 +1,15 @@
+import { AuthGuard } from '@nestjs/passport';
 import { UpdateShowtimeDto } from './dto/update-showtime.dto';
 import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   ParseIntPipe,
   Patch,
   Post,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -46,5 +49,10 @@ export class ShowtimesController extends BaseControllerCRUD<Showtime> {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<void | { message: string }> {
     return this.service.deleteOne(id);
+  }
+
+  @Get('/:id/tickets')
+  getTicketsByShowtime(@Param('id', ParseIntPipe) id: number) {
+    return this.service.getTicketsByShowtime(id);
   }
 }
