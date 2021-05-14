@@ -1,12 +1,24 @@
 import { IsNotEmpty, IsNumber, Min, IsString } from 'class-validator';
+import { Seat } from 'src/seats/seat.entity';
 
-export class CreateTicketTypeDto {
+export class ITicket {
   @IsNotEmpty()
-  @IsString()
-  name: string;
+  @IsNumber()
+  seatId: number;
 
   @IsNotEmpty()
   @IsNumber()
-  @Min(0)
-  price: number;
+  movieShowtimeId: number;
+
+  @IsNotEmpty()
+  @IsString()
+  status: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  typeId: number;
+}
+
+export class CreateTicketDto {
+  tickets : [ITicket];
 }

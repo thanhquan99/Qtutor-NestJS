@@ -7,9 +7,11 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
+import { Transaction } from 'src/transactions/transactions.entity';
 
 export enum TicketStatus {
   AVAILABLE = 'Available',
@@ -44,4 +46,11 @@ export class Ticket extends BaseEntity {
   })
   @JoinColumn()
   ticketType: TicketType;
+
+  @OneToOne(() => Transaction, (transaction) => transaction.ticket, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn() // specify inverse side as a second parameter
+  transaction: Transaction;
 }

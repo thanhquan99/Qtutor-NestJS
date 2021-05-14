@@ -23,6 +23,8 @@ import { CinemasModule } from './cinemas/cinemas.module';
 import { RoomsModule } from './rooms/rooms.module';
 import { TicketsModule } from './tickets/tickets.module';
 import { TicketTypesModule } from './ticket-types/ticket-types.module';
+import { RatingsModule } from './ratings/ratings.module';
+import { TransactionsModule } from './transactions/transactions.module';
 
 @Module({
   imports: [
@@ -48,6 +50,8 @@ import { TicketTypesModule } from './ticket-types/ticket-types.module';
     ShowtimesModule,
     TicketsModule,
     TicketTypesModule,
+    RatingsModule,
+    TransactionsModule
   ],
   providers: [
     {

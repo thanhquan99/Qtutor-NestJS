@@ -18,16 +18,20 @@ import {
 } from '@nestjs/common';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { GetUser } from 'src/auth/get-user.decorator';
+import { User } from 'src/users/user.entity';
 
 @Controller('tickets')
-export class TicketsController extends BaseControllerCRUD<Ticket> {
-  constructor(service: TicketsService) {
-    super(service);
+export class TicketsController {
+  constructor(private readonly service: TicketsService) {
+
   }
 
   @Post()
-  createOne(@Body() createDto: CreateTicketDto): Promise<Ticket> {
-    throw new NotFoundException('Not found');
+  @UseGuards(AuthGuard())
+  @UsePipes(ValidationPipe)
+  createOne(@Body() createDto: CreateTicketDto, @GetUser() user : User): Promise<Ticket> {
+    return this.service.bookTickets(createDto.tickets, user);
   }
 
   @Patch('/:id')

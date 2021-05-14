@@ -12,10 +12,12 @@ import {
   Delete,
   UsePipes,
   ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { BaseControllerCRUD } from 'src/base/base-controller-CRUD';
 import { TicketTypesService } from './ticket-types.service';
 import { Permissions } from 'src/guards/permissions.decorator';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('ticket-types')
 export class TicketTypesController extends BaseControllerCRUD<TicketType> {
@@ -24,7 +26,7 @@ export class TicketTypesController extends BaseControllerCRUD<TicketType> {
   }
 
   @Post()
-  @Permissions(PermissionAction.CREATE_SHOWTIME)
+  @UseGuards(AuthGuard())
   @UsePipes(ValidationPipe)
   createOne(@Body() createDto: CreateTicketTypeDto): Promise<TicketType> {
     return this.service.createOne(createDto);

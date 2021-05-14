@@ -12,6 +12,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Rating } from 'src/ratings/ratings.entity';
 export enum Country {
   VN = 'Vietnam',
   AM = 'American',
@@ -78,4 +79,10 @@ export class Movie extends BaseEntity {
     onDelete: 'CASCADE',
   })
   showtimes: Showtime[];
+
+  @OneToMany(() => Rating, (rating) => rating.movie, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  ratings: Rating[];
 }

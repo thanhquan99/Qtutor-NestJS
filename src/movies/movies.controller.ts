@@ -86,4 +86,11 @@ export class MoviesController extends BaseControllerCRUD<Movie> {
   ): Promise<{ movie: Movie; showtimes: Showtime[] }> {
     return this.service.getOwnShowtimes(id, query);
   }
+
+  @Get('/:id/ratings')
+  getRatingsByMovie(
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.service.getRatingsByMovie(id);
+  }
 }

@@ -1,23 +1,23 @@
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class CreateTicketDto {
+export class ITicket {
+  @IsNotEmpty()
+  @IsNumber()
+  id: number;  
+
   @IsNotEmpty()
   @IsNumber()
   seatId: number;
 
   @IsNotEmpty()
-  @IsNumber()
-  showtimeId: number;
+  @IsString()
+  status: string;
 
   @IsNotEmpty()
   @IsNumber()
-  status: number;
+  typeId: number;
+}
 
-  @IsNotEmpty()
-  @IsNumber()
-  roomId: number;
-
-  @IsNotEmpty()
-  @IsNumber()
-  movieId: number;
+export class CreateTicketDto {
+  tickets : [ITicket];
 }
