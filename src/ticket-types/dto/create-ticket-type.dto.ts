@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber, Min, IsString } from 'class-validator';
 
-export class CreateTicketTypeDto {
+export class ITicket {
   @IsNotEmpty()
   @IsString()
   name: string;
@@ -9,4 +9,8 @@ export class CreateTicketTypeDto {
   @IsNumber()
   @Min(0)
   price: number;
+}
+
+export class CreateTicketDto {
+  tickets : [ITicket];
 }
