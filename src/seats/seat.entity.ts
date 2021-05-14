@@ -14,8 +14,15 @@ import {
 export enum SeatType {
   NORMAL = 'Normal',
   COUPLE = 'Couple',
-  VIP = 'Vip',
+  VIP = 'VIP',
 }
+
+export enum SeatTypePrice {
+  Normal = 0,
+  Couple = 5000,
+  VIP = 10000,
+}
+
 
 @Entity()
 @Unique(['row', 'column', 'room'])

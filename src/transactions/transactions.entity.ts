@@ -24,6 +24,9 @@ import { Ticket } from 'src/tickets/ticket.entity';
     @Column({ nullable: true})
     service: string;
 
+    @Column({nullable : true})
+    price: number;
+
     @ManyToOne(() => User, (user) => user.transactions, {
       onDelete: 'CASCADE',
     })
