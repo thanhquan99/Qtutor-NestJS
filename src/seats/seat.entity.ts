@@ -17,12 +17,11 @@ export enum SeatType {
   VIP = 'VIP',
 }
 
-export enum SeatTypePrice {
+export enum SEAT_TYPE_PRICE {
   Normal = 0,
   Couple = 5000,
   VIP = 10000,
 }
-
 
 @Entity()
 @Unique(['row', 'column', 'room'])
@@ -49,5 +48,4 @@ export class Seat extends BaseEntity {
     cascade: true,
   })
   tickets: Ticket[];
-  
 }

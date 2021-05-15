@@ -6,21 +6,31 @@ import {
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
+  Unique,
 } from 'typeorm';
 import { User } from 'src/users/user.entity';
 import { Ticket } from 'src/tickets/ticket.entity';
+
+export enum TRANSACTION_SERVICE {
+  Available = 'Cancel',
+  Booked = 'Book',
+  Sold = 'Buy',
+  Hold = 'Draft',
+}
+
 @Entity()
+@Unique(['ticket', 'service', 'user'])
 export class Transaction extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: true })
+  @Column()
   transaction_time: Date;
 
-  @Column({ nullable: true })
+  @Column()
   service: string;
 
-  @Column({ nullable: true })
+  @Column()
   price: number;
 
   @ManyToOne(() => User, (user) => user.transactions, {
@@ -29,7 +39,7 @@ export class Transaction extends BaseEntity {
   @JoinColumn()
   user: User;
 
-  @OneToOne(() => Ticket, (ticket) => ticket.transaction, {
+  @ManyToOne(() => Ticket, (ticket) => ticket.transactions, {
     onDelete: 'CASCADE',
   })
   @JoinColumn()

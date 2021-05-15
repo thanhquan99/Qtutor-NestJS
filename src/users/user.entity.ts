@@ -1,3 +1,4 @@
+import { Ticket } from 'src/tickets/ticket.entity';
 import { UserRole } from './../user-role/userRole.entity';
 import {
   BaseEntity,
@@ -48,6 +49,12 @@ export class User extends BaseEntity {
     onDelete: 'CASCADE',
   })
   transactions: Transaction[];
+
+  @OneToMany(() => Ticket, (ticket) => ticket.holder, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  holdTickets: Ticket[];
 
   async validatePassword(password: string): Promise<boolean> {
     const hash = await bcrypt.hash(password, this.salt);

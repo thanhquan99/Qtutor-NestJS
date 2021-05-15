@@ -4,8 +4,6 @@ import { Ticket } from './ticket.entity';
 import {
   Body,
   Controller,
-  Delete,
-  NotFoundException,
   Param,
   ParseIntPipe,
   Patch,
@@ -18,6 +16,7 @@ import { CreateTicketDto } from './dto/create-ticket.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/auth/get-user.decorator';
 import { User } from 'src/users/user.entity';
+import { Transaction } from 'src/transactions/transactions.entity';
 
 @Controller('tickets')
 export class TicketsController {
@@ -26,8 +25,8 @@ export class TicketsController {
   @Post()
   @UseGuards(AuthGuard())
   @UsePipes(ValidationPipe)
-  createOne(@Body() createDto: CreateTicketDto, @GetUser() user: User) {
-    return this.service.bookTickets(createDto.tickets, user);
+  bookTickets(@Body() createDto: CreateTicketDto, @GetUser() user: User) {
+    return this.service.bookTickets(createDto.tickets, createDto.status, user);
   }
 
   @Patch('/:id')
@@ -38,12 +37,5 @@ export class TicketsController {
     @Body() updateDto: UpdateTicketDto,
   ): Promise<Ticket> {
     return this.service.updateOne(id, updateDto);
-  }
-
-  @Delete('/:id')
-  deleteOne(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<void | { message: string }> {
-    throw new NotFoundException('Not found');
   }
 }

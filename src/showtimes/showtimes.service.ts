@@ -3,7 +3,7 @@ import {
   TicketType,
   TicketTypeName,
 } from './../ticket-types/ticket-type.entity';
-import { Ticket, TicketStatus } from './../tickets/ticket.entity';
+import { Ticket, TICKET_STATUS } from './../tickets/ticket.entity';
 import { Room } from './../rooms/room.entity';
 import { Movie } from './../movies/movie.entity';
 import { CreateShowtimeDto } from './dto/create-showtime.dto';
@@ -94,7 +94,7 @@ export class ShowtimesService extends BaseServiceCRUD<Showtime> {
           return Ticket.create({
             seat,
             showtime,
-            status: TicketStatus.AVAILABLE,
+            status: TICKET_STATUS.AVAILABLE,
             ticketType,
           });
         });
