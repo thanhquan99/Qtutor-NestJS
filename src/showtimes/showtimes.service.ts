@@ -1,7 +1,7 @@
 import { Seat } from './../seats/seat.entity';
 import {
   TicketType,
-  TicketTypeName,
+  TICKET_TYPE_NAME,
 } from './../ticket-types/ticket-type.entity';
 import { Ticket, TICKET_STATUS } from './../tickets/ticket.entity';
 import { Room } from './../rooms/room.entity';
@@ -16,7 +16,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
 import { Showtime } from './showtimes.entity';
-import { Between, getManager } from 'typeorm';
+import { getManager } from 'typeorm';
 
 @Injectable()
 export class ShowtimesService extends BaseServiceCRUD<Showtime> {
@@ -88,7 +88,7 @@ export class ShowtimesService extends BaseServiceCRUD<Showtime> {
         await entityManager.save(showtime);
 
         const ticketType = await TicketType.findOne({
-          where: { name: TicketTypeName.NORMAL },
+          where: { name: TICKET_TYPE_NAME.NORMAL },
         });
         const tickets = room.seats.map((seat) => {
           return Ticket.create({
