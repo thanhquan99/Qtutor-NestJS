@@ -39,7 +39,7 @@ export class UsersController {
     @GetUser() user: User,
     @Body() updateDto: UpdateUserDto,
   ): Promise<User> {
-    return this.service.updateMe(user, updateDto);
+    return this.service.updateMe(user.id, updateDto);
   }
 
   @Post()

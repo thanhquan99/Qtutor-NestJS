@@ -1,15 +1,10 @@
 import { UserRole } from './../user-role/userRole.entity';
 import {
-  AfterInsert,
   BaseEntity,
-  BeforeInsert,
   Column,
   Entity,
-  JoinColumn,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
-
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Rating } from 'src/ratings/ratings.entity';
@@ -48,6 +43,12 @@ export class User extends BaseEntity {
   })
   ratings: Rating[];
 
+  @OneToMany(() => Transaction, (transaction) => transaction.user, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  transactions: Transaction[];
+
   async validatePassword(password: string): Promise<boolean> {
     const hash = await bcrypt.hash(password, this.salt);
     return hash === this.password;
@@ -58,9 +59,7 @@ export class User extends BaseEntity {
     this.password = await bcrypt.hash(this.password, this.salt);
   }
 
-  @OneToMany(() => Transaction, (transaction) => transaction.user, {
-    cascade: true,
-    onDelete: 'CASCADE',
-  })
-  transactions: Transaction[];
+  async updatePassword() {
+    this.password = await bcrypt.hash(this.password, this.salt);
+  }
 }

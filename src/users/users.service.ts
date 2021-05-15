@@ -8,6 +8,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Role } from 'src/roles/role.entity';
 import { UserRole } from 'src/user-role/userRole.entity';
 import { getManager } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService extends BaseServiceCRUD<User> {
@@ -56,7 +57,18 @@ export class UsersService extends BaseServiceCRUD<User> {
     return user;
   }
 
-  async updateMe(user: User, updateDto: UpdateUserDto): Promise<User> {
-    return User.getRepository().save({ id: user.id, ...updateDto });
+  async updateMe(id: number, updateDto: UpdateUserDto): Promise<User> {
+    const user = await User.findOne(id);
+    for (const property in updateDto) {
+      user[property] = updateDto[property];
+    }
+    if (updateDto.password) {
+      await user.updatePassword();
+    }
+    await user.save();
+
+    delete user.password;
+    delete user.salt;
+    return user;
   }
 }
