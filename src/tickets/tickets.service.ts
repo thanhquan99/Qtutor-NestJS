@@ -13,6 +13,7 @@ import { User } from 'src/users/user.entity';
 import { Transaction } from 'src/transactions/transactions.entity';
 import { SEAT_TYPE_PRICE } from 'src/seats/seat.entity';
 import { EntityManager, getManager } from 'typeorm';
+import e from 'express';
 
 @Injectable()
 export class TicketsService extends BaseServiceCRUD<Ticket> {
@@ -62,7 +63,9 @@ export class TicketsService extends BaseServiceCRUD<Ticket> {
         user,
       },
     });
-    await entityManager.delete(Transaction, transaction.id);
+    if (transaction) {
+      await entityManager.delete(Transaction, transaction.id);  
+    };
   }
 
   async bookTickets(ticketsData: ITicket[], status: string, user: User) {
@@ -92,45 +95,89 @@ export class TicketsService extends BaseServiceCRUD<Ticket> {
               throw new BadRequestException(`This ticket already is ${status}`);
             }
 
+            let transaction : Transaction;
             if (ticket.status === TICKET_STATUS.BOOKED) {
               if (status === TICKET_STATUS.AVAILABLE) {
-                this.updateTicket(entityManager, ticket, ticketData, status);
-                this.deleteTransaction(
+                await this.updateTicket(entityManager, ticket, ticketData, status);
+                await this.deleteTransaction(
+                  entityManager,
+                  ticket,
+                  TRANSACTION_SERVICE.Available,
+                  user,
+                );
+                
+                transaction = await this.createTransaction(entityManager, ticket, user);
+                ticket.holder = null;
+                await entityManager.save(Ticket, ticket);
+              }
+              if (status === TICKET_STATUS.HOLD) {
+                throw new BadRequestException('This ticket is already booked');
+              }
+              if (status === TICKET_STATUS.SOLD) {
+                await this.updateTicket(entityManager, ticket, ticketData, status);
+                await this.deleteTransaction(
+                  entityManager,
+                  ticket,
+                  TRANSACTION_SERVICE.Sold,
+                  user,
+                );
+                transaction = await this.createTransaction(entityManager, ticket, user);
+              }
+            }
+
+            if (ticket.status === TICKET_STATUS.HOLD) {
+              if (status === TICKET_STATUS.AVAILABLE) {
+                await this.updateTicket(entityManager, ticket, ticketData, status);
+                await this.deleteTransaction(
                   entityManager,
                   ticket,
                   TRANSACTION_SERVICE.Available,
                   user,
                 );
                 this.createTransaction(entityManager, ticket, user);
-              }
-              if (status === TICKET_STATUS.HOLD) {
-              }
-              if (status === TICKET_STATUS.SOLD) {
-              }
-            }
-
-            if (ticket.status === TICKET_STATUS.HOLD) {
-              if (status === TICKET_STATUS.AVAILABLE) {
+                ticket.holder = null;
+                await entityManager.save(Ticket, ticket);
               }
               if (status === TICKET_STATUS.BOOKED) {
+                await this.updateTicket(entityManager, ticket, ticketData, status);
+                await this.deleteTransaction(
+                  entityManager,
+                  ticket,
+                  TRANSACTION_SERVICE.Booked,
+                  user,
+                );
+                transaction = await this.createTransaction(entityManager, ticket, user);
               }
+
               if (status === TICKET_STATUS.SOLD) {
+                await this.updateTicket(entityManager, ticket, ticketData, status);
+                await this.deleteTransaction(
+                  entityManager,
+                  ticket,
+                  TRANSACTION_SERVICE.Sold,
+                  user,
+                );
+                transaction = await this.createTransaction(entityManager, ticket, user); 
               }
             }
 
             if (ticket.status === TICKET_STATUS.AVAILABLE) {
+              if (status == TICKET_STATUS.HOLD){
+                await this.updateTicket(entityManager, ticket, ticketData, status);
+                await this.deleteTransaction(
+                  entityManager,
+                  ticket,
+                  TRANSACTION_SERVICE.Hold,
+                  user,
+                );
+                transaction = await this.createTransaction(entityManager, ticket, user);
+                ticket.holder = user;
+                await entityManager.save(Ticket, ticket);
+              }
+              if (status == TICKET_STATUS.BOOKED || status == TICKET_STATUS.SOLD){
+                throw new BadRequestException('You have to choose the tickets first');               
+              }
             }
-
-            ticket.status = status;
-            const ticketType = await TicketType.findOne(ticketData.typeId);
-            ticket.ticketType = ticketType;
-            await entityManager.save(Ticket, ticket);
-
-            const transaction = await this.createTransaction(
-              entityManager,
-              ticket,
-              user,
-            );
             return transaction;
           },
         ),
