@@ -25,9 +25,32 @@ import { TicketsModule } from './tickets/tickets.module';
 import { TicketTypesModule } from './ticket-types/ticket-types.module';
 import { RatingsModule } from './ratings/ratings.module';
 import { TransactionsModule } from './transactions/transactions.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 
 @Module({
   imports: [
+    MailerModule.forRootAsync({
+      useFactory: () => ({
+        transport: {
+          service: 'Gmail',
+          auth: {
+            user: 'sangnh99@gmail.com',
+            pass: 'ivmemwcmwxaeabpr',
+          },
+        },
+        defaults: {
+          from: '"NestjsCinema" <no-reply@cinema.nestjs.com>',
+        },
+        template: {
+          dir: __dirname + '/templates',
+          adapter: new EjsAdapter(),
+          options: {
+            strict: true,
+          },
+        },
+      }),
+    }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '../..', 'public'),
     }),

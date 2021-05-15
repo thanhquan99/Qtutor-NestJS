@@ -1,3 +1,8 @@
+import {
+  VerifyEmailDto,
+  ForgotPasswordDto,
+  ResetPasswordDto,
+} from './dto/index';
 import { RoleName } from './../roles/role.entity';
 import { LoginUserDto } from './../users/dto/loginUser.dto';
 import { User } from './../users/user.entity';
@@ -15,6 +20,7 @@ import { getManager } from 'typeorm';
 import { Role } from 'src/roles/role.entity';
 import { UserRole } from 'src/user-role/userRole.entity';
 import { UserRoleView } from 'src/user-role/userRoleView.entity';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +28,7 @@ export class AuthService {
     @InjectRepository(UserRepository)
     private userRepository: UserRepository,
     private jwtService: JwtService,
+    private readonly mailerService: MailerService,
   ) {}
 
   async register(registerUserDto: RegisterUserDto) {
@@ -48,8 +55,18 @@ export class AuthService {
       throw new BadRequestException(`Failed due to ${err}`);
     }
 
+    await this.mailerService
+      .sendMail({
+        to: 'thanhquan050399@gmail.com', // list of receivers
+        subject: 'Testing Nest MailerModule ✔', // Subject line
+        html: '<b>welcome</b>', // HTML body content
+      })
+      .catch((err) => {
+        console.log('Send mail failed due to ', err);
+      });
+
     return {
-      message: 'Register success',
+      message: 'Register success. Please verify your email',
     };
   }
 
@@ -73,5 +90,17 @@ export class AuthService {
     delete user.password;
 
     return { accessToken, user, roleName: role.name };
+  }
+
+  async verifyEmail(verifyEmailDto: VerifyEmailDto) {
+    return {};
+  }
+
+  async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
+    return {};
+  }
+
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+    return {};
   }
 }
