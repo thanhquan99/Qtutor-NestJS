@@ -202,7 +202,7 @@ export class MoviesService extends BaseServiceCRUD<Movie> {
   ): Promise<{ movie: Movie; showtimes: Showtime[] }> {
     const movie = await Movie.findOne({
       where: { id },
-      relations: ['showtimes'],
+      relations: ['showtimes', 'actors', 'genres', 'directors'],
     });
     if (!movie) {
       throw new NotFoundException('Movie not found');
@@ -229,12 +229,10 @@ export class MoviesService extends BaseServiceCRUD<Movie> {
     return { movie, showtimes };
   }
 
-  async getRatingsByMovie(id:number){
+  async getRatingsByMovie(id: number) {
     return Movie.find({
-      where : {
-        id, 
-      },
-      relations: ['ratings']
-    }) 
+      where: { id },
+      relations: ['ratings'],
+    });
   }
 }
