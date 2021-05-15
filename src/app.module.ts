@@ -51,7 +51,7 @@ import { TransactionsModule } from './transactions/transactions.module';
     TicketsModule,
     TicketTypesModule,
     RatingsModule,
-    TransactionsModule
+    TransactionsModule,
   ],
   providers: [
     {

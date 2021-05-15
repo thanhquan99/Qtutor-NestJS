@@ -8,9 +8,6 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-
-
-
 export enum PermissionAction {
   CREATE_MOVIE = 'Create movie',
   UPDATE_MOVIE = 'Update movie',
@@ -40,8 +37,8 @@ export enum PermissionAction {
   CREATE_SHOWTIME = 'Create showtime',
   UPDATE_SHOWTIME = 'Update showtime',
   DELETE_SHOWTIME = 'Delete showtime',
-  DELETE_TRANSACTION = "DELETE_TRANSACTION",
-  UPDATE_TRANSACTION = "UPDATE_TRANSACTION"
+  DELETE_TRANSACTION = 'DELETE_TRANSACTION',
+  UPDATE_TRANSACTION = 'UPDATE_TRANSACTION',
 }
 
 @Entity()

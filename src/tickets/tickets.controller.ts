@@ -1,8 +1,6 @@
-import { PermissionAction } from './../permissions/permission.entity';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { TicketsService } from './tickets.service';
 import { Ticket } from './ticket.entity';
-import { BaseControllerCRUD } from 'src/base/base-controller-CRUD';
 import {
   Body,
   Controller,
@@ -23,14 +21,12 @@ import { User } from 'src/users/user.entity';
 
 @Controller('tickets')
 export class TicketsController {
-  constructor(private readonly service: TicketsService) {
-
-  }
+  constructor(private readonly service: TicketsService) {}
 
   @Post()
   @UseGuards(AuthGuard())
   @UsePipes(ValidationPipe)
-  createOne(@Body() createDto: CreateTicketDto, @GetUser() user : User): Promise<Ticket> {
+  createOne(@Body() createDto: CreateTicketDto, @GetUser() user: User) {
     return this.service.bookTickets(createDto.tickets, user);
   }
 

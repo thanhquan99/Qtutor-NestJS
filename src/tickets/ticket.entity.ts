@@ -48,9 +48,8 @@ export class Ticket extends BaseEntity {
   ticketType: TicketType;
 
   @OneToOne(() => Transaction, (transaction) => transaction.ticket, {
-    nullable: false,
     onDelete: 'CASCADE',
   })
-  @JoinColumn() // specify inverse side as a second parameter
+  @JoinColumn()
   transaction: Transaction;
 }
