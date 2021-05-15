@@ -30,7 +30,7 @@ export class TicketsController {
   @Post()
   @UseGuards(AuthGuard())
   @UsePipes(ValidationPipe)
-  createOne(@Body() createDto: CreateTicketDto, @GetUser() user : User): Promise<Ticket> {
+  createOne(@Body() createDto: CreateTicketDto, @GetUser() user : User){
     return this.service.bookTickets(createDto.tickets, user);
   }
 
