@@ -8,6 +8,6 @@ import { RatingsService } from './ratings.service';
 @Module({
   imports: [TypeOrmModule.forFeature([Rating]), AuthModule],
   controllers: [RatingsController],
-  providers: [RatingsService]
+  providers: [RatingsService],
 })
 export class RatingsModule {}

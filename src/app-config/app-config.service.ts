@@ -1,3 +1,4 @@
+import { TICKET_STATUS } from './../tickets/ticket.entity';
 import { SeatType } from './../seats/seat.entity';
 import { Country } from './../movies/movie.entity';
 import { Injectable } from '@nestjs/common';
@@ -8,6 +9,7 @@ export class AppConfigService {
     return {
       Country,
       SeatType,
+      TicketStatus: TICKET_STATUS,
     };
   }
 }

@@ -25,7 +25,9 @@ export class Role extends BaseEntity {
   @Column({ unique: true, type: 'enum', enum: RoleName })
   name: RoleName;
 
-  @OneToMany(() => UserRole, (userRole) => userRole.role)
+  @OneToMany(() => UserRole, (userRole) => userRole.role, {
+    onDelete: 'CASCADE',
+  })
   userRoles: UserRole[];
 
   @OneToMany(() => RolePermission, (rolePermission) => rolePermission.role, {

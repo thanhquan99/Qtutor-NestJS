@@ -1,3 +1,4 @@
+import { User } from 'src/users/user.entity';
 import { TicketType } from './../ticket-types/ticket-type.entity';
 import { Showtime } from './../showtimes/showtimes.entity';
 import { Seat } from './../seats/seat.entity';
@@ -7,13 +8,13 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
 import { Transaction } from 'src/transactions/transactions.entity';
 
-export enum TicketStatus {
+export enum TICKET_STATUS {
   AVAILABLE = 'Available',
   BOOKED = 'Booked',
   HOLD = 'Hold',
@@ -35,6 +36,12 @@ export class Ticket extends BaseEntity {
   @JoinColumn()
   seat: Seat;
 
+  @ManyToOne(() => User, (user) => user.holdTickets, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  holder: User;
+
   @ManyToOne(() => Showtime, (showtime) => showtime.tickets, {
     onDelete: 'CASCADE',
   })
@@ -47,10 +54,9 @@ export class Ticket extends BaseEntity {
   @JoinColumn()
   ticketType: TicketType;
 
-  @OneToOne(() => Transaction, (transaction) => transaction.ticket, {
-    nullable: false,
+  @OneToMany(() => Transaction, (transaction) => transaction.ticket, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn() // specify inverse side as a second parameter
-  transaction: Transaction;
+  @JoinColumn()
+  transactions: Transaction[];
 }

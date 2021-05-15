@@ -1,15 +1,11 @@
+import { Ticket } from 'src/tickets/ticket.entity';
 import { UserRole } from './../user-role/userRole.entity';
 import {
-  AfterInsert,
   BaseEntity,
-  BeforeInsert,
   Column,
   Entity,
-  JoinColumn,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
-
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Rating } from 'src/ratings/ratings.entity';
@@ -37,16 +33,28 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   age: number;
 
-  @OneToOne(() => UserRole, (userRole) => userRole.user, {
-    cascade: true,
+  @OneToMany(() => UserRole, (userRole) => userRole.user, {
+    onDelete: 'CASCADE',
   })
-  userRole: UserRole;
+  userRoles: UserRole[];
 
   @OneToMany(() => Rating, (rating) => rating.user, {
     cascade: true,
     onDelete: 'CASCADE',
   })
   ratings: Rating[];
+
+  @OneToMany(() => Transaction, (transaction) => transaction.user, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  transactions: Transaction[];
+
+  @OneToMany(() => Ticket, (ticket) => ticket.holder, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  holdTickets: Ticket[];
 
   async validatePassword(password: string): Promise<boolean> {
     const hash = await bcrypt.hash(password, this.salt);
@@ -58,9 +66,7 @@ export class User extends BaseEntity {
     this.password = await bcrypt.hash(this.password, this.salt);
   }
 
-  @OneToMany(() => Transaction, (transaction) => transaction.user, {
-    cascade: true,
-    onDelete: 'CASCADE',
-  })
-  transactions: Transaction[];
+  async updatePassword() {
+    this.password = await bcrypt.hash(this.password, this.salt);
+  }
 }

@@ -1,10 +1,10 @@
-import { TicketStatus } from './../ticket.entity';
+import { TICKET_STATUS } from './../ticket.entity';
 import { IsEnum, IsOptional } from 'class-validator';
 
 export class UpdateTicketDto {
   @IsOptional()
-  @IsEnum(TicketStatus, {
-    message: `Country should be in [${TicketStatus.AVAILABLE},${TicketStatus.BOOKED}, ${TicketStatus.HOLD}, ${TicketStatus.SOLD}]`,
+  @IsEnum(TICKET_STATUS, {
+    message: `Country should be in [${TICKET_STATUS.AVAILABLE},${TICKET_STATUS.BOOKED}, ${TICKET_STATUS.HOLD}, ${TICKET_STATUS.SOLD}]`,
   })
-  status: TicketStatus;
+  status: TICKET_STATUS;
 }

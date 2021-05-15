@@ -26,6 +26,17 @@ export class MoviesService extends BaseServiceCRUD<Movie> {
     return `${process.env.DOMAIN}/img/${fileName}`;
   }
 
+  async getOne(id: number): Promise<Movie> {
+    const movie = await Movie.findOne({
+      where: { id },
+      relations: ['genres', 'actors', 'directors'],
+    });
+    if (!movie) {
+      throw new NotFoundException('Movie not found');
+    }
+    return movie;
+  }
+
   async createMovie(
     createMovieDto: CreateMovieDto,
     files: Express.Multer.File,
@@ -43,7 +54,12 @@ export class MoviesService extends BaseServiceCRUD<Movie> {
       image['thumbnailUrl'] = thumbnailUrl;
     }
 
-    const { actorIds, genreIds, directorIds } = createMovieDto;
+    const actorIds =
+      createMovieDto.actorIds?.split(',').map((id) => +id) || undefined;
+    const genreIds =
+      createMovieDto.genreIds?.split(',').map((id) => +id) || undefined;
+    const directorIds =
+      createMovieDto.directorIds?.split(',').map((id) => +id) || undefined;
     delete createMovieDto.actorIds;
     delete createMovieDto.genreIds;
     delete createMovieDto.directorIds;
@@ -126,14 +142,18 @@ export class MoviesService extends BaseServiceCRUD<Movie> {
       return;
     })();
 
-    const { actorIds, genreIds, directorIds } = updateMovieDto;
+    const actorIds =
+      updateMovieDto.actorIds?.split(',').map((id) => +id) || undefined;
+    const genreIds =
+      updateMovieDto.genreIds?.split(',').map((id) => +id) || undefined;
+    const directorIds =
+      updateMovieDto.directorIds?.split(',').map((id) => +id) || undefined;
     delete updateMovieDto.actorIds;
     delete updateMovieDto.genreIds;
     delete updateMovieDto.directorIds;
 
     await getManager()
       .transaction(async (entityManager) => {
-        movie.image = image;
         if (actorIds) {
           const actors = await entityManager
             .createQueryBuilder(Actor, 'actor')
@@ -169,7 +189,11 @@ export class MoviesService extends BaseServiceCRUD<Movie> {
           `Update movie failed due to ${err}`,
         );
       });
-    return movie;
+
+    return Movie.findOne({
+      where: { id },
+      relations: ['actors', 'genres', 'directors'],
+    });
   }
 
   async getOwnShowtimes(
@@ -178,7 +202,7 @@ export class MoviesService extends BaseServiceCRUD<Movie> {
   ): Promise<{ movie: Movie; showtimes: Showtime[] }> {
     const movie = await Movie.findOne({
       where: { id },
-      relations: ['showtimes'],
+      relations: ['showtimes', 'actors', 'genres', 'directors'],
     });
     if (!movie) {
       throw new NotFoundException('Movie not found');
@@ -205,12 +229,10 @@ export class MoviesService extends BaseServiceCRUD<Movie> {
     return { movie, showtimes };
   }
 
-  async getRatingsByMovie(id:number){
+  async getRatingsByMovie(id: number) {
     return Movie.find({
-      where : {
-        id, 
-      },
-      relations: ['ratings']
-    }) 
+      where: { id },
+      relations: ['ratings'],
+    });
   }
 }
