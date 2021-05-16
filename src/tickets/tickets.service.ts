@@ -5,6 +5,7 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TicketType } from 'src/ticket-types/ticket-type.entity';
@@ -68,168 +69,172 @@ export class TicketsService extends BaseServiceCRUD<Ticket> {
   }
 
   async bookTickets(ticketsData: ITicket[], status: string, user: User) {
-    return await getManager().transaction(async (entityManager) => {
-      return Promise.all(
-        ticketsData.map(async (ticketData): Promise<
-          Transaction | { message: string }
-        > => {
-          const ticket = await Ticket.findOne({
-            where: { id: ticketData.id },
-            relations: ['seat', 'ticketType', 'holder'],
-          });
-          if (!ticket) {
-            throw new NotFoundException('Ticket not found');
-          }
-
-          if (ticket.status === TICKET_STATUS.SOLD) {
-            throw new BadRequestException('This ticket is already sold');
-          }
-
-          if (ticket.holder?.id && ticket.holder.id !== user.id) {
-            throw new BadRequestException(
-              'This ticket is already held by another user',
-            );
-          }
-
-          if (ticket.status === status) {
-            throw new BadRequestException(`This ticket already is ${status}`);
-          }
-
-          let transaction: Transaction;
-          if (ticket.status === TICKET_STATUS.BOOKED) {
-            if (status === TICKET_STATUS.AVAILABLE) {
-              await this.updateTicket(
-                entityManager,
-                ticket,
-                ticketData,
-                status,
-              );
-              await this.deleteTransaction(
-                entityManager,
-                ticket,
-                TRANSACTION_SERVICE.Available,
-                user,
-              );
-
-              transaction = await this.createTransaction(
-                entityManager,
-                ticket,
-                user,
-              );
-              ticket.holder = null;
-              await entityManager.save(Ticket, ticket);
-            }
-            if (status === TICKET_STATUS.HOLD) {
-              throw new BadRequestException('This ticket is already booked');
-            }
-            if (status === TICKET_STATUS.SOLD) {
-              await this.updateTicket(
-                entityManager,
-                ticket,
-                ticketData,
-                status,
-              );
-              await this.deleteTransaction(
-                entityManager,
-                ticket,
-                TRANSACTION_SERVICE.Sold,
-                user,
-              );
-              transaction = await this.createTransaction(
-                entityManager,
-                ticket,
-                user,
-              );
-            }
-          }
-
-          if (ticket.status === TICKET_STATUS.HOLD) {
-            if (status === TICKET_STATUS.AVAILABLE) {
-              await this.updateTicket(
-                entityManager,
-                ticket,
-                ticketData,
-                status,
-              );
-              ticket.holder = null;
-              await entityManager.save(Ticket, ticket);
-              return { message: 'Cancel successfully' };
-            }
-            if (status === TICKET_STATUS.BOOKED) {
-              await this.updateTicket(
-                entityManager,
-                ticket,
-                ticketData,
-                status,
-              );
-              await this.deleteTransaction(
-                entityManager,
-                ticket,
-                TRANSACTION_SERVICE.Booked,
-                user,
-              );
-              transaction = await this.createTransaction(
-                entityManager,
-                ticket,
-                user,
-              );
+    return await getManager()
+      .transaction(async (entityManager) => {
+        return Promise.all(
+          ticketsData.map(async (ticketData): Promise<
+            Transaction | { message: string }
+          > => {
+            const ticket = await Ticket.findOne({
+              where: { id: ticketData.id },
+              relations: ['seat', 'ticketType', 'holder'],
+            });
+            if (!ticket) {
+              throw new NotFoundException('Ticket not found');
             }
 
-            if (status === TICKET_STATUS.SOLD) {
-              await this.updateTicket(
-                entityManager,
-                ticket,
-                ticketData,
-                status,
-              );
-              await this.deleteTransaction(
-                entityManager,
-                ticket,
-                TRANSACTION_SERVICE.Sold,
-                user,
-              );
-              transaction = await this.createTransaction(
-                entityManager,
-                ticket,
-                user,
-              );
+            if (ticket.status === TICKET_STATUS.SOLD) {
+              throw new BadRequestException('This ticket is already sold');
             }
-          }
 
-          if (ticket.status === TICKET_STATUS.AVAILABLE) {
-            if (status == TICKET_STATUS.HOLD) {
-              await this.updateTicket(
-                entityManager,
-                ticket,
-                ticketData,
-                status,
-              );
-              await this.deleteTransaction(
-                entityManager,
-                ticket,
-                TRANSACTION_SERVICE.Hold,
-                user,
-              );
-              transaction = await this.createTransaction(
-                entityManager,
-                ticket,
-                user,
-              );
-              ticket.holder = user;
-              await entityManager.save(Ticket, ticket);
-            }
-            if (
-              status == TICKET_STATUS.BOOKED ||
-              status == TICKET_STATUS.SOLD
-            ) {
+            if (ticket.holder?.id && ticket.holder.id !== user.id) {
               throw new BadRequestException(
-                'You have to choose the tickets first',
+                'This ticket is already held by another user',
               );
             }
-          }
-          return transaction;
-        }),
-      );
-    });
+
+            if (ticket.status === status) {
+              throw new BadRequestException(`This ticket already is ${status}`);
+            }
+
+            let transaction: Transaction;
+            if (ticket.status === TICKET_STATUS.BOOKED) {
+              if (status === TICKET_STATUS.AVAILABLE) {
+                await this.updateTicket(
+                  entityManager,
+                  ticket,
+                  ticketData,
+                  status,
+                );
+                await this.deleteTransaction(
+                  entityManager,
+                  ticket,
+                  TRANSACTION_SERVICE.Available,
+                  user,
+                );
+
+                transaction = await this.createTransaction(
+                  entityManager,
+                  ticket,
+                  user,
+                );
+                ticket.holder = null;
+                await entityManager.save(Ticket, ticket);
+              }
+              if (status === TICKET_STATUS.HOLD) {
+                throw new BadRequestException('This ticket is already booked');
+              }
+              if (status === TICKET_STATUS.SOLD) {
+                await this.updateTicket(
+                  entityManager,
+                  ticket,
+                  ticketData,
+                  status,
+                );
+                await this.deleteTransaction(
+                  entityManager,
+                  ticket,
+                  TRANSACTION_SERVICE.Sold,
+                  user,
+                );
+                transaction = await this.createTransaction(
+                  entityManager,
+                  ticket,
+                  user,
+                );
+              }
+            }
+
+            if (ticket.status === TICKET_STATUS.HOLD) {
+              if (status === TICKET_STATUS.AVAILABLE) {
+                await this.updateTicket(
+                  entityManager,
+                  ticket,
+                  ticketData,
+                  status,
+                );
+                ticket.holder = null;
+                await entityManager.save(Ticket, ticket);
+                return { message: 'Cancel successfully' };
+              }
+              if (status === TICKET_STATUS.BOOKED) {
+                await this.updateTicket(
+                  entityManager,
+                  ticket,
+                  ticketData,
+                  status,
+                );
+                await this.deleteTransaction(
+                  entityManager,
+                  ticket,
+                  TRANSACTION_SERVICE.Booked,
+                  user,
+                );
+                transaction = await this.createTransaction(
+                  entityManager,
+                  ticket,
+                  user,
+                );
+              }
+
+              if (status === TICKET_STATUS.SOLD) {
+                await this.updateTicket(
+                  entityManager,
+                  ticket,
+                  ticketData,
+                  status,
+                );
+                await this.deleteTransaction(
+                  entityManager,
+                  ticket,
+                  TRANSACTION_SERVICE.Sold,
+                  user,
+                );
+                transaction = await this.createTransaction(
+                  entityManager,
+                  ticket,
+                  user,
+                );
+              }
+            }
+
+            if (ticket.status === TICKET_STATUS.AVAILABLE) {
+              if (status == TICKET_STATUS.HOLD) {
+                await this.updateTicket(
+                  entityManager,
+                  ticket,
+                  ticketData,
+                  status,
+                );
+                await this.deleteTransaction(
+                  entityManager,
+                  ticket,
+                  TRANSACTION_SERVICE.Hold,
+                  user,
+                );
+                transaction = await this.createTransaction(
+                  entityManager,
+                  ticket,
+                  user,
+                );
+                ticket.holder = user;
+                await entityManager.save(Ticket, ticket);
+              }
+              if (
+                status == TICKET_STATUS.BOOKED ||
+                status == TICKET_STATUS.SOLD
+              ) {
+                throw new BadRequestException(
+                  'You have to choose the tickets first',
+                );
+              }
+            }
+            return transaction;
+          }),
+        );
+      })
+      .catch((err) => {
+        throw new InternalServerErrorException(`Failed due to ${err}`);
+      });
   }
 }
