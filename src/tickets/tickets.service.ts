@@ -151,15 +151,9 @@ export class TicketsService extends BaseServiceCRUD<Ticket> {
                 ticketData,
                 status,
               );
-              await this.deleteTransaction(
-                entityManager,
-                ticket,
-                TRANSACTION_SERVICE.Available,
-                user,
-              );
-              this.createTransaction(entityManager, ticket, user);
               ticket.holder = null;
               await entityManager.save(Ticket, ticket);
+              return { message: 'Cancel successfully' };
             }
             if (status === TICKET_STATUS.BOOKED) {
               await this.updateTicket(
