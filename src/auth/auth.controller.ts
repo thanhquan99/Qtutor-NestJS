@@ -2,6 +2,7 @@ import {
   VerifyEmailDto,
   ForgotPasswordDto,
   ResetPasswordDto,
+  ResendEmailDto,
 } from './dto/index';
 import { LoginUserDto } from './../users/dto/loginUser.dto';
 import { RegisterUserDto } from '../users/dto/registerUser.dto';
@@ -34,5 +35,10 @@ export class AuthController {
   @Post('/reset-password')
   resetPassword(@Body(ValidationPipe) resetPasswordDto: ResetPasswordDto) {
     return this.authService.resetPassword(resetPasswordDto);
+  }
+
+  @Post('/resend-email')
+  resendEmail(@Body(ValidationPipe) resendEmailDto: ResendEmailDto) {
+    return this.authService.resendEmailRegister(resendEmailDto);
   }
 }
