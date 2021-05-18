@@ -27,7 +27,7 @@ import { GetUser } from 'src/auth/get-user.decorator';
 export class TransactionsController {
   constructor(private readonly service: TransactionsService) {}
 
-  @Get()
+  @Get('/me')
   @UseGuards(AuthGuard())
   getMyTransactions(
     @Query() query: QueryParams,
