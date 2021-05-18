@@ -1,4 +1,4 @@
-import { RoleName } from './../../roles/role.entity';
+import { ROLE_NAME } from './../../roles/role.entity';
 import {
   IsEmail,
   IsEnum,
@@ -24,10 +24,10 @@ export class CreateUserDto {
   password: string;
 
   @IsNotEmpty()
-  @IsEnum(RoleName, {
-    message: `Role name should be in ${Object.keys(RoleName).filter((item) => {
+  @IsEnum(ROLE_NAME, {
+    message: `Role name should be in ${Object.keys(ROLE_NAME).filter((item) => {
       return isNaN(Number(item));
     })}}`,
   })
-  roleName: RoleName;
+  roleName: ROLE_NAME;
 }

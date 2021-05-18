@@ -1,3 +1,4 @@
+import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from 'src/users/user.entity';
 import { QueryParams } from '../base/dto/query-params.dto';
@@ -64,6 +65,15 @@ export class UsersController {
   @Permissions(PermissionAction.GET_USER)
   getOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
     return this.service.getOne(id);
+  }
+
+  @Patch('/:id')
+  @Permissions(PermissionAction.UPDATE_USER)
+  adminUpdateUser(
+    @Body() updateDto: AdminUpdateUserDto,
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<User> {
+    return this.service.adminUpdateUser(updateDto, id);
   }
 
   @Delete('/:id')

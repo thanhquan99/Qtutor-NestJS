@@ -3,7 +3,7 @@ import {
   ForgotPasswordDto,
   ResetPasswordDto,
 } from './dto/index';
-import { RoleName } from './../roles/role.entity';
+import { ROLE_NAME } from './../roles/role.entity';
 import { LoginUserDto } from './../users/dto/loginUser.dto';
 import { User } from './../users/user.entity';
 import { RegisterUserDto } from '../users/dto/registerUser.dto';
@@ -43,7 +43,7 @@ export class AuthService {
         await entityManager.save(user);
 
         const role = await entityManager.findOne(Role, {
-          name: RoleName.CUSTOMER,
+          name: ROLE_NAME.CUSTOMER,
         });
         const userRole = entityManager.create(UserRole, {
           user,

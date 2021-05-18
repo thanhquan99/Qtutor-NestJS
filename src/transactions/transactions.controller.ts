@@ -1,3 +1,4 @@
+import { User } from './../users/user.entity';
 import { QueryParams } from './../base/dto/query-params.dto';
 import {
   Body,
@@ -20,10 +21,20 @@ import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { Transaction } from './transactions.entity';
 import { TransactionsService } from './transactions.service';
+import { GetUser } from 'src/auth/get-user.decorator';
 
 @Controller('transactions')
 export class TransactionsController {
   constructor(private readonly service: TransactionsService) {}
+
+  @Get()
+  @UseGuards(AuthGuard())
+  getMyTransactions(
+    @Query() query: QueryParams,
+    @GetUser() user: User,
+  ): Promise<{ results: Transaction[]; total: number }> {
+    return this.service.getMyTransactions(query, user.id);
+  }
 
   @Post()
   @UseGuards(AuthGuard())

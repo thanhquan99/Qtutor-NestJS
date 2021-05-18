@@ -1,10 +1,15 @@
+import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
 import { CreateUserDto } from './dto/createUser.dto';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Role } from 'src/roles/role.entity';
 import { UserRole } from 'src/user-role/userRole.entity';
 import { getManager } from 'typeorm';
@@ -70,5 +75,35 @@ export class UsersService extends BaseServiceCRUD<User> {
     delete user.password;
     delete user.salt;
     return user;
+  }
+
+  async adminUpdateUser(
+    updateDto: AdminUpdateUserDto,
+    userId: number,
+  ): Promise<User> {
+    const { isActive, roleName } = updateDto;
+    const user = await User.findOne(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    await getManager().transaction(async (entityManager) => {
+      if (isActive) {
+        user.isActive = isActive;
+        await entityManager.save(user);
+      }
+
+      if (roleName) {
+        const role = await Role.findOne({ where: { name: roleName } });
+        const userRole = await UserRole.findOne({ where: { user: user } });
+        userRole.role = role;
+        await entityManager.save(userRole);
+      }
+    });
+
+    return await User.findOne({
+      where: { id: userId },
+      relations: ['userRoles', 'userRoles.role'],
+    });
   }
 }
