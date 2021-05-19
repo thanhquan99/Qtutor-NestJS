@@ -24,10 +24,11 @@ export class CreateUserDto {
   password: string;
 
   @IsNotEmpty()
-  @IsEnum(ROLE_NAME, {
-    message: `Role name should be in ${Object.keys(ROLE_NAME).filter((item) => {
-      return isNaN(Number(item));
-    })}}`,
-  })
+  @IsEnum(
+    [ROLE_NAME.CUSTOMER, ROLE_NAME.MOVIE_MANAGER, ROLE_NAME.THEATER_MANAGER],
+    {
+      message: `Role name should be in ${ROLE_NAME.CUSTOMER},${ROLE_NAME.MOVIE_MANAGER},${ROLE_NAME.THEATER_MANAGER}`,
+    },
+  )
   roleName: ROLE_NAME;
 }

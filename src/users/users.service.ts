@@ -13,7 +13,6 @@ import {
 import { Role } from 'src/roles/role.entity';
 import { UserRole } from 'src/user-role/userRole.entity';
 import { getManager } from 'typeorm';
-import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService extends BaseServiceCRUD<User> {
@@ -26,6 +25,7 @@ export class UsersService extends BaseServiceCRUD<User> {
 
   async createUser(createUserDto: CreateUserDto) {
     const { email, roleName } = createUserDto;
+    delete createUserDto.roleName;
     if (await this.userRepository.findOne({ email })) {
       throw new BadRequestException('Email is already exist');
     }
@@ -40,15 +40,15 @@ export class UsersService extends BaseServiceCRUD<User> {
           name: roleName,
         });
 
-        await entityManager
-          .create(UserRole, {
-            user,
-            role,
-          })
-          .save();
+        const userRole = entityManager.create(UserRole, {
+          user,
+          role,
+        });
+        await entityManager.save(userRole);
+
         delete user.password;
         delete user.salt;
-        return user;
+        return { user, role };
       })
       .catch((err) => {
         console.log('Failed due to ', err);
