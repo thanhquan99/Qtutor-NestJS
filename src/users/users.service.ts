@@ -8,11 +8,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { Role } from 'src/roles/role.entity';
 import { UserRole } from 'src/user-role/userRole.entity';
-import { getManager } from 'typeorm';
+import { getManager, Not } from 'typeorm';
 
 @Injectable()
 export class UsersService extends BaseServiceCRUD<User> {
@@ -21,6 +22,31 @@ export class UsersService extends BaseServiceCRUD<User> {
     private userRepository: UserRepository,
   ) {
     super(userRepository, User, 'user');
+  }
+
+  async adminGetMany(
+    query,
+    adminId: number,
+  ): Promise<{ results: any; total: number }> {
+    const { relationsWith, filterByFields, perPage, page, orderBy } =
+      await this.modifyQuery(query);
+
+    const [results, total] = await getManager()
+      .findAndCount(User, {
+        relations: relationsWith,
+        where: { ...filterByFields, id: Not(adminId) },
+        order: orderBy,
+        take: perPage,
+        skip: (page - 1) * perPage,
+      })
+      .catch((err) => {
+        throw new InternalServerErrorException(`Failed due to ${err}`);
+      });
+
+    return {
+      results,
+      total,
+    };
   }
 
   async createUser(createUserDto: CreateUserDto) {

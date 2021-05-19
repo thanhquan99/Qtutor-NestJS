@@ -51,14 +51,14 @@ export class UsersController {
 
   @Get()
   @Permissions(PermissionAction.GET_USER)
-  getMany(@Query() query: QueryParams) {
+  adminGetMany(@Query() query: QueryParams, @GetUser() admin: User) {
     if (query?.filter) {
       query.filter = JSON.parse(query.filter);
     }
     if (query?.orderBy) {
       query.orderBy = JSON.parse(query.orderBy);
     }
-    return this.service.getMany(query);
+    return this.service.adminGetMany(query, admin.id);
   }
 
   @Get('/:id')
