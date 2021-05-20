@@ -5,12 +5,11 @@ import {
   BaseEntity,
   Column,
   Entity,
-  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-export enum RoleName {
+export enum ROLE_NAME {
   ADMIN = 'Admin',
   CUSTOMER = 'Customer',
   MOVIE_MANAGER = 'Movie Manager',
@@ -22,8 +21,8 @@ export class Role extends BaseEntity {
   @PrimaryGeneratedColumn() id: number;
 
   @ApiProperty({ example: 'Admin' })
-  @Column({ unique: true, type: 'enum', enum: RoleName })
-  name: RoleName;
+  @Column({ unique: true, type: 'enum', enum: ROLE_NAME })
+  name: ROLE_NAME;
 
   @OneToMany(() => UserRole, (userRole) => userRole.role, {
     onDelete: 'CASCADE',
