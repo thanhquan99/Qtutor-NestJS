@@ -99,6 +99,9 @@ export class CinemaService extends BaseServiceCRUD<Cinema> {
     const showtimeIds = tickets.map((ticket) => ticket.showtime.id);
     const movieBuilder = Movie.createQueryBuilder('movie')
       .leftJoinAndSelect('movie.showtimes', 'showtime')
+      .leftJoinAndSelect('movie.actors', 'actor')
+      .leftJoinAndSelect('movie.genres', 'genre')
+      .leftJoinAndSelect('movie.directors', 'director')
       .where('showtime.id = ANY(:showtimeIds)', { showtimeIds })
       .orderBy('showtime.startTime');
     if (query.date) {
