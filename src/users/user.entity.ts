@@ -33,6 +33,12 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   age: number;
 
+  @Column({nullable: true})
+  verifyEmailCode: string;
+
+  @Column({nullable: true})
+  forgotPasswordCode: string;
+
   @OneToMany(() => UserRole, (userRole) => userRole.user, {
     onDelete: 'CASCADE',
   })

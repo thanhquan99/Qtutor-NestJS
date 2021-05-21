@@ -2,6 +2,7 @@ import {
   VerifyEmailDto,
   ForgotPasswordDto,
   ResetPasswordDto,
+  ResendEmailDto,
 } from './dto/index';
 import { RoleName } from './../roles/role.entity';
 import { LoginUserDto } from './../users/dto/loginUser.dto';
@@ -21,6 +22,7 @@ import { Role } from 'src/roles/role.entity';
 import { UserRole } from 'src/user-role/userRole.entity';
 import { UserRoleView } from 'src/user-role/userRoleView.entity';
 import { MailerService } from '@nestjs-modules/mailer';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class AuthService {
@@ -36,12 +38,14 @@ export class AuthService {
       throw new BadRequestException('Email is already exist');
     }
 
+    let id : string;
     try {
       await getManager().transaction(async (entityManager) => {
         const user = entityManager.create(User, registerUserDto);
+        id = uuid();
         await user.hashPassword();
+        user.verifyEmailCode = id;
         await entityManager.save(user);
-
         const role = await entityManager.findOne(Role, {
           name: RoleName.CUSTOMER,
         });
@@ -57,9 +61,9 @@ export class AuthService {
 
     await this.mailerService
       .sendMail({
-        to: 'thanhquan050399@gmail.com', // list of receivers
-        subject: 'Testing Nest MailerModule ✔', // Subject line
-        html: '<b>welcome</b>', // HTML body content
+        to: registerUserDto.email, // list of receivers
+        subject: 'Register verify email', // Subject line
+        html: `<b>Your verify code is : ${id} </b>`, // HTML body content
       })
       .catch((err) => {
         console.log('Send mail failed due to ', err);
@@ -93,14 +97,93 @@ export class AuthService {
   }
 
   async verifyEmail(verifyEmailDto: VerifyEmailDto) {
-    return {};
+    const user = await User.findOne({
+      where : {email : verifyEmailDto.email}
+    });
+    if (!user){
+      throw new BadRequestException("User not existed");
+    }
+    if (!user.verifyEmailCode){
+      throw new BadRequestException("Something went wrong! Please resend verify email again");    
+    }
+    if (user.verifyEmailCode !== verifyEmailDto.verifyEmailCode){
+      throw new BadRequestException("Wrong verify email code");        
+    }
+    user.verifyEmailCode = null;
+    await user.save();
+    return {
+      message : 'Verify email succesfullly !'
+    };
+  }
+
+  async resendEmailRegister(resendEmailDto: ResendEmailDto){
+    const id = uuid();
+    const user = await User.findOne({
+      where : {email : resendEmailDto.email}
+    });
+    if (user){
+      throw new BadRequestException("User not existed");
+    }
+    user.verifyEmailCode = id;
+    await user.save();
+    await this.mailerService
+    .sendMail({
+      to: resendEmailDto.email, // list of receivers
+      subject: 'Resend verify email', // Subject line
+      html: `<b>Your verify code is : ${id} </b>`, // HTML body content
+    })
+    .catch((err) => {
+      console.log('Send mail failed due to ', err);
+    });
+
+  return {
+    message: 'Resend verify email success !',
+  };
   }
 
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
-    return {};
+    const id = uuid();
+    const user = await User.findOne({
+      where : {email : forgotPasswordDto.email}
+    });
+    if (!user){
+      throw new BadRequestException("User not existed");
+    }
+    user.forgotPasswordCode = id;
+    await user.save();
+    await this.mailerService
+    .sendMail({
+      to: forgotPasswordDto.email, // list of receivers
+      subject: 'Forgot password email', // Subject line
+      html: `<b>Your verify code is : ${id} </b>`, // HTML body content
+    })
+    .catch((err) => {
+      console.log('Send mail failed due to ', err);
+    });
+
+  return {
+    message: 'Send email forgot password success !',
+  };
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
-    return {};
+    const user = await User.findOne({
+      where : {email : resetPasswordDto.email}
+    });
+    if (!user){
+      throw new BadRequestException("User not existed");
+    }
+    if (!user.forgotPasswordCode){
+      throw new BadRequestException("Something went wrong! Please resent forgot password email");        
+    }
+    if (user.forgotPasswordCode !== resetPasswordDto.resetPasswordCode){
+      throw new BadRequestException("Reset password code not correct");     
+    }
+    user.password = resetPasswordDto.newPassword;
+    user.forgotPasswordCode = null;
+    await user.save();
+    return {
+      message: 'Reset password success !',
+    };
   }
 }

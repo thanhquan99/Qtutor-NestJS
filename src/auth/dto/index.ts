@@ -9,6 +9,11 @@ export class VerifyEmailDto {
   @IsString()
   email: string;
 }
+export class ResendEmailDto {
+  @IsNotEmpty()
+  @IsString()
+  email: string;
+}
 
 export class ForgotPasswordDto {
   @IsNotEmpty()
