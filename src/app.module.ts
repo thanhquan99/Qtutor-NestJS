@@ -27,6 +27,8 @@ import { RatingsModule } from './ratings/ratings.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
+import { ScheduleModule } from '@nestjs/schedule';
+import { CronJobsModule } from './cron-jobs/cron-jobs.module';
 
 @Module({
   imports: [
@@ -54,6 +56,7 @@ import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '../..', 'public'),
     }),
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot(connectionOptions),
     CinemasModule,
@@ -75,6 +78,7 @@ import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
     TicketTypesModule,
     RatingsModule,
     TransactionsModule,
+    CronJobsModule,
   ],
   providers: [
     {

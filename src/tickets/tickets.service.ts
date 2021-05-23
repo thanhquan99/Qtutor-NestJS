@@ -154,6 +154,7 @@ export class TicketsService extends BaseServiceCRUD<Ticket> {
                   status,
                 );
                 ticket.holder = null;
+                ticket.holdingStartTime = null;
                 await entityManager.save(Ticket, ticket);
                 return { message: 'Cancel successfully' };
               }
@@ -218,6 +219,7 @@ export class TicketsService extends BaseServiceCRUD<Ticket> {
                   user,
                 );
                 ticket.holder = user;
+                ticket.holdingStartTime = new Date();
                 await entityManager.save(Ticket, ticket);
               }
               if (
