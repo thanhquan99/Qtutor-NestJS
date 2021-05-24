@@ -1,3 +1,4 @@
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { UpdateTicketTypeDto } from './dto/update-ticket-type.dto';
 import { CreateTicketTypeDto } from './dto/create-ticket-type.dto';
 import { PermissionAction } from './../permissions/permission.entity';
@@ -26,6 +27,7 @@ export class TicketTypesController extends BaseControllerCRUD<TicketType> {
   }
 
   @Post()
+  @ApiBearerAuth()
   @UseGuards(AuthGuard())
   @UsePipes(ValidationPipe)
   createOne(@Body() createDto: CreateTicketTypeDto): Promise<TicketType> {
@@ -33,6 +35,7 @@ export class TicketTypesController extends BaseControllerCRUD<TicketType> {
   }
 
   @Patch('/:id')
+  @ApiBearerAuth()
   @Permissions(PermissionAction.UPDATE_SHOWTIME)
   @UsePipes(ValidationPipe)
   updateOne(
@@ -43,6 +46,7 @@ export class TicketTypesController extends BaseControllerCRUD<TicketType> {
   }
 
   @Delete('/:id')
+  @ApiBearerAuth()
   @Permissions(PermissionAction.DELETE_SHOWTIME)
   deleteOne(
     @Param('id', ParseIntPipe) id: number,

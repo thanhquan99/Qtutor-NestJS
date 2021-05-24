@@ -1,3 +1,4 @@
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { QueryShowtimes } from './dto/query-showtimes.dto';
 import { CreateSeatDto } from './../seats/dto/create-seat.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
@@ -29,6 +30,7 @@ export class RoomsController extends BaseControllerCRUD<Room> {
 
   @Post()
   @UsePipes(ValidationPipe)
+  @ApiBearerAuth()
   @Permissions(PermissionAction.CREATE_THEATER)
   createOne(@Body() createDto: CreateRoomDto): Promise<Room> {
     return this.service.createOne(createDto);
@@ -36,6 +38,7 @@ export class RoomsController extends BaseControllerCRUD<Room> {
 
   @Patch('/:id')
   @UsePipes(ValidationPipe)
+  @ApiBearerAuth()
   @Permissions(PermissionAction.UPDATE_THEATER)
   updateOne(
     @Param('id', ParseIntPipe) id: number,
@@ -45,6 +48,7 @@ export class RoomsController extends BaseControllerCRUD<Room> {
   }
 
   @Delete('/:id')
+  @ApiBearerAuth()
   @Permissions(PermissionAction.DELETE_THEATER)
   deleteOne(
     @Param('id', ParseIntPipe) id: number,
@@ -59,6 +63,7 @@ export class RoomsController extends BaseControllerCRUD<Room> {
 
   @Post('/:id/seats')
   @UsePipes(ValidationPipe)
+  @ApiBearerAuth()
   @Permissions(PermissionAction.CREATE_SEAT)
   createOwnSeats(
     @Param('id', ParseIntPipe) id: number,

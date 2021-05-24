@@ -1,3 +1,4 @@
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { UpdateShowtimeDto } from './dto/update-showtime.dto';
 import {
@@ -27,6 +28,7 @@ export class ShowtimesController extends BaseControllerCRUD<Showtime> {
   }
 
   @Post()
+  @ApiBearerAuth()
   @Permissions(PermissionAction.CREATE_SHOWTIME)
   @UsePipes(ValidationPipe)
   createOne(@Body() createDto: CreateShowtimeDto): Promise<Showtime> {
@@ -34,6 +36,7 @@ export class ShowtimesController extends BaseControllerCRUD<Showtime> {
   }
 
   @Patch('/:id')
+  @ApiBearerAuth()
   @Permissions(PermissionAction.UPDATE_SHOWTIME)
   @UsePipes(ValidationPipe)
   updateOne(
@@ -44,6 +47,7 @@ export class ShowtimesController extends BaseControllerCRUD<Showtime> {
   }
 
   @Delete('/:id')
+  @ApiBearerAuth()
   @Permissions(PermissionAction.DELETE_SHOWTIME)
   deleteOne(
     @Param('id', ParseIntPipe) id: number,

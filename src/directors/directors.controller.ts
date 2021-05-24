@@ -1,3 +1,4 @@
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { UpdateDirectorDto } from './dto/update-director.dto';
 import { PermissionAction } from './../permissions/permission.entity';
 import { Permissions } from 'src/guards/permissions.decorator';
@@ -25,6 +26,7 @@ export class DirectorsController extends BaseControllerCRUD<Director> {
 
   @Post()
   @UsePipes(ValidationPipe)
+  @ApiBearerAuth()
   @Permissions(PermissionAction.CREATE_DIRECTOR)
   createOne(@Body() createDto: CreateActorDto): Promise<Director> {
     return this.service.createOne(createDto);
@@ -32,6 +34,7 @@ export class DirectorsController extends BaseControllerCRUD<Director> {
 
   @Patch('/:id')
   @UsePipes(ValidationPipe)
+  @ApiBearerAuth()
   @Permissions(PermissionAction.UPDATE_DIRECTOR)
   updateOne(
     @Param('id', ParseIntPipe) id: number,
@@ -41,6 +44,7 @@ export class DirectorsController extends BaseControllerCRUD<Director> {
   }
 
   @Delete('/:id')
+  @ApiBearerAuth()
   @Permissions(PermissionAction.DELETE_DIRECTOR)
   deleteOne(
     @Param('id', ParseIntPipe) id: number,

@@ -9,7 +9,8 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('Cinema Api')
     .setDescription(
-      `## Query
+      `
+    ## Query
     filter = {"releaseDate":{"gte": "2020-03-01"}, "name":{"equal": "Quan"}, "email": {"like": "quan@gmail.com"}, "name":{"in": ["Quan", "Sang"]}}
     orderBy = {"id": "ASC", "name":"DESC"}
     page = 1
@@ -49,6 +50,7 @@ async function bootstrap() {
     )
     .setVersion('1.0')
     .addTag('cinemas')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

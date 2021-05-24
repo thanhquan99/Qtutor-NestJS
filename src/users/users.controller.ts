@@ -1,3 +1,4 @@
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from 'src/users/user.entity';
@@ -24,6 +25,7 @@ import {
 import { Permissions } from 'src/guards/permissions.decorator';
 import { GetUser } from 'src/auth/get-user.decorator';
 
+@ApiBearerAuth()
 @UseGuards(AuthGuard())
 @UsePipes(ValidationPipe)
 @Controller('users')
@@ -44,12 +46,14 @@ export class UsersController {
   }
 
   @Post()
+  @ApiBearerAuth()
   @Permissions(PermissionAction.CREATE_USER)
   createUser(@Body() createUserDto: CreateUserDto) {
     return this.service.createUser(createUserDto);
   }
 
   @Get()
+  @ApiBearerAuth()
   @Permissions(PermissionAction.GET_USER)
   adminGetMany(@Query() query: QueryParams, @GetUser() admin: User) {
     if (query?.filter) {
@@ -62,12 +66,14 @@ export class UsersController {
   }
 
   @Get('/:id')
+  @ApiBearerAuth()
   @Permissions(PermissionAction.GET_USER)
   getOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
     return this.service.getOne(id);
   }
 
   @Patch('/:id')
+  @ApiBearerAuth()
   @Permissions(PermissionAction.UPDATE_USER)
   adminUpdateUser(
     @Body() updateDto: AdminUpdateUserDto,
@@ -77,6 +83,7 @@ export class UsersController {
   }
 
   @Delete('/:id')
+  @ApiBearerAuth()
   @Permissions(PermissionAction.DELETE_USER)
   deleteOne(
     @Param('id', ParseIntPipe) id: number,

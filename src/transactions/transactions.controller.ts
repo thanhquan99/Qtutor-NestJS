@@ -1,3 +1,4 @@
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { User } from './../users/user.entity';
 import { QueryParams } from './../base/dto/query-params.dto';
 import {
@@ -28,6 +29,7 @@ export class TransactionsController {
   constructor(private readonly service: TransactionsService) {}
 
   @Get('/me')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard())
   getMyTransactions(
     @Query() query: QueryParams,
@@ -37,6 +39,7 @@ export class TransactionsController {
   }
 
   @Post()
+  @ApiBearerAuth()
   @UseGuards(AuthGuard())
   @UsePipes(ValidationPipe)
   createOne(@Body() createDto: CreateTransactionDto): Promise<Transaction> {
@@ -44,12 +47,14 @@ export class TransactionsController {
   }
 
   @Get()
+  @ApiBearerAuth()
   @UseGuards(AuthGuard())
   getMany(@Query() query: QueryParams) {
     return this.service.getMany(query);
   }
 
   @Delete('/:id')
+  @ApiBearerAuth()
   @Permissions(PermissionAction.DELETE_TRANSACTION)
   deleteOne(
     @Param('id', ParseIntPipe) id: number,
@@ -58,6 +63,7 @@ export class TransactionsController {
   }
 
   @Patch('/:id')
+  @ApiBearerAuth()
   @Permissions(PermissionAction.UPDATE_TRANSACTION)
   @UsePipes(ValidationPipe)
   updateTransaction(

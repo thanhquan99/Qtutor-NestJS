@@ -1,3 +1,4 @@
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { UpdateSeatDto } from './dto/update-seat.dto';
 import { CreateSeatDto } from './dto/create-seat.dto';
 import { SeatsService } from './seats.service';
@@ -24,6 +25,7 @@ export class SeatsController extends BaseControllerCRUD<Seat> {
   }
 
   @Post()
+  @ApiBearerAuth()
   @Permissions(PermissionAction.CREATE_SEAT)
   @UsePipes(ValidationPipe)
   createOne(@Body() createSeatDto: CreateSeatDto): Promise<Seat> {
@@ -32,6 +34,7 @@ export class SeatsController extends BaseControllerCRUD<Seat> {
 
   @Patch('/:id')
   @UsePipes(ValidationPipe)
+  @ApiBearerAuth()
   @Permissions(PermissionAction.UPDATE_SEAT)
   updateOne(
     @Param('id', ParseIntPipe) id: number,
@@ -41,6 +44,7 @@ export class SeatsController extends BaseControllerCRUD<Seat> {
   }
 
   @Delete('/:id')
+  @ApiBearerAuth()
   @Permissions(PermissionAction.DELETE_SEAT)
   deleteOne(
     @Param('id', ParseIntPipe) id: number,

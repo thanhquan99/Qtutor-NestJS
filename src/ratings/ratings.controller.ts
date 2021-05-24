@@ -1,3 +1,4 @@
+import { ApiBearerAuth } from '@nestjs/swagger';
 import {
   Body,
   Controller,
@@ -24,6 +25,7 @@ export class RatingsController extends BaseControllerCRUD<Rating> {
   }
 
   @Post()
+  @ApiBearerAuth()
   @UseGuards(AuthGuard())
   @UsePipes(ValidationPipe)
   createOne(@Body() createDto: CreateRatingDto): Promise<Rating> {
@@ -31,12 +33,14 @@ export class RatingsController extends BaseControllerCRUD<Rating> {
   }
 
   @Delete('/:id')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard())
   deleteRatingById(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.service.deleteOne(id);
   }
 
   @Patch('/:id')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard())
   @UsePipes(ValidationPipe)
   updateTransaction(

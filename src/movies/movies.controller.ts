@@ -1,3 +1,4 @@
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { Showtime } from './../showtimes/showtimes.entity';
 import { QueryShowtimes } from './../rooms/dto/query-showtimes.dto';
 import { BaseControllerCRUD } from 'src/base/base-controller-CRUD';
@@ -33,6 +34,7 @@ export class MoviesController extends BaseControllerCRUD<Movie> {
   }
 
   @Post()
+  @ApiBearerAuth()
   @Permissions(PermissionAction.CREATE_MOVIE)
   @UsePipes(ValidationPipe)
   @UseInterceptors(
@@ -52,6 +54,7 @@ export class MoviesController extends BaseControllerCRUD<Movie> {
   }
 
   @Patch('/:id')
+  @ApiBearerAuth()
   @Permissions(PermissionAction.UPDATE_MOVIE)
   @UsePipes(ValidationPipe)
   @UseInterceptors(
@@ -72,6 +75,7 @@ export class MoviesController extends BaseControllerCRUD<Movie> {
   }
 
   @Delete('/:id')
+  @ApiBearerAuth()
   @Permissions(PermissionAction.DELETE_MOVIE)
   deleteOne(
     @Param('id', ParseIntPipe) id: number,

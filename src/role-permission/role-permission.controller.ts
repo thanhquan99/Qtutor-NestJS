@@ -1,3 +1,4 @@
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { CreateRolePermissionDto } from './dto/create-role-permission.dto';
 import { RolePermissionService } from './role-permission.service';
 import { RolePermission } from './role-permission.entity';
@@ -18,6 +19,7 @@ import {
   ParsedRequest,
 } from '@nestjsx/crud';
 
+@ApiBearerAuth()
 @UseGuards(AuthGuard())
 @Crud({
   model: {
@@ -35,7 +37,8 @@ import {
 })
 @Controller('role-permission')
 export class RolePermissionController
-  implements CrudController<RolePermission> {
+  implements CrudController<RolePermission>
+{
   constructor(public service: RolePermissionService) {}
 
   get base(): CrudController<RolePermission> {
