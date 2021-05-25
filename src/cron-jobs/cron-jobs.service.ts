@@ -14,7 +14,7 @@ export class CronJobsService {
     return manager.query(`
     update ticket
     set "holderId"= NULL, "holdingStartTime" = NULL, status = 'Available' 
-    where "holdingStartTime" is not NULL and "holderId" is not NULL
+    where "holdingStartTime" is not NULL and "holderId" is not NULL and status = 'Hold'
     and "holdingStartTime" <= '${compareDateString}'`);
   }
 }
