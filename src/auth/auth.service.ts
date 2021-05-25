@@ -62,7 +62,7 @@ export class AuthService {
     await this.mailerService
       .sendMail({
         to: registerUserDto.email, // list of receivers
-        subject: 'Register verify email', // Subject line
+        subject: 'Verify your email address', // Subject line
         html: `<b>Your verify code is : ${id} </b>`, // HTML body content
       })
       .catch((err) => {
@@ -121,7 +121,7 @@ export class AuthService {
     const user = await User.findOne({
       where : {email : resendEmailDto.email}
     });
-    if (user){
+    if (!user){
       throw new BadRequestException("User not existed");
     }
     user.verifyEmailCode = id;
@@ -129,7 +129,7 @@ export class AuthService {
     await this.mailerService
     .sendMail({
       to: resendEmailDto.email, // list of receivers
-      subject: 'Resend verify email', // Subject line
+      subject: 'Verify your email address', // Subject line
       html: `<b>Your verify code is : ${id} </b>`, // HTML body content
     })
     .catch((err) => {
@@ -180,6 +180,7 @@ export class AuthService {
       throw new BadRequestException("Reset password code not correct");     
     }
     user.password = resetPasswordDto.newPassword;
+    await user.updatePassword();
     user.forgotPasswordCode = null;
     await user.save();
     return {
