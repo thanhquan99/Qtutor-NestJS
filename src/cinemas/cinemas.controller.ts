@@ -20,6 +20,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { Permissions } from 'src/guards/permissions.decorator';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('cinemas')
 export class CinemasController extends BaseControllerCRUD<Cinema> {
@@ -28,6 +29,7 @@ export class CinemasController extends BaseControllerCRUD<Cinema> {
   }
 
   @Post()
+  @ApiBearerAuth()
   @Permissions(PermissionAction.CREATE_CINEMA)
   @UsePipes(ValidationPipe)
   createOne(@Body() createCinemaDto: CreateCinemaDto): Promise<Cinema> {
@@ -35,6 +37,7 @@ export class CinemasController extends BaseControllerCRUD<Cinema> {
   }
 
   @Delete('/:id')
+  @ApiBearerAuth()
   @Permissions(PermissionAction.DELETE_CINEMA)
   deleteOne(
     @Param('id', ParseIntPipe) id: number,
@@ -43,6 +46,7 @@ export class CinemasController extends BaseControllerCRUD<Cinema> {
   }
 
   @Patch('/:id')
+  @ApiBearerAuth()
   @Permissions(PermissionAction.UPDATE_CINEMA)
   @UsePipes(ValidationPipe)
   updateOne(
@@ -58,6 +62,7 @@ export class CinemasController extends BaseControllerCRUD<Cinema> {
   }
 
   @Post('/:id/rooms')
+  @ApiBearerAuth()
   @Permissions(PermissionAction.CREATE_THEATER)
   @UsePipes(ValidationPipe)
   createOwnRoom(

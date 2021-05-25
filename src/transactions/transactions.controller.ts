@@ -1,3 +1,5 @@
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { User } from './../users/user.entity';
 import { QueryParams } from './../base/dto/query-params.dto';
 import {
   Body,
@@ -20,12 +22,24 @@ import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { Transaction } from './transactions.entity';
 import { TransactionsService } from './transactions.service';
+import { GetUser } from 'src/auth/get-user.decorator';
 
 @Controller('transactions')
 export class TransactionsController {
   constructor(private readonly service: TransactionsService) {}
 
+  @Get('/me')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  getMyTransactions(
+    @Query() query: QueryParams,
+    @GetUser() user: User,
+  ): Promise<{ results: Transaction[]; total: number }> {
+    return this.service.getMyTransactions(query, user.id);
+  }
+
   @Post()
+  @ApiBearerAuth()
   @UseGuards(AuthGuard())
   @UsePipes(ValidationPipe)
   createOne(@Body() createDto: CreateTransactionDto): Promise<Transaction> {
@@ -33,12 +47,14 @@ export class TransactionsController {
   }
 
   @Get()
+  @ApiBearerAuth()
   @UseGuards(AuthGuard())
   getMany(@Query() query: QueryParams) {
     return this.service.getMany(query);
   }
 
   @Delete('/:id')
+  @ApiBearerAuth()
   @Permissions(PermissionAction.DELETE_TRANSACTION)
   deleteOne(
     @Param('id', ParseIntPipe) id: number,
@@ -47,6 +63,7 @@ export class TransactionsController {
   }
 
   @Patch('/:id')
+  @ApiBearerAuth()
   @Permissions(PermissionAction.UPDATE_TRANSACTION)
   @UsePipes(ValidationPipe)
   updateTransaction(

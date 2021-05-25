@@ -1,3 +1,4 @@
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { BaseControllerCRUD } from 'src/base/base-controller-CRUD';
 import { PermissionAction } from 'src/permissions/permission.entity';
@@ -23,6 +24,7 @@ export class PermissionsController extends BaseControllerCRUD<Permission> {
   }
 
   @Post()
+  @ApiBearerAuth()
   @Permissions(PermissionAction.GET_USER)
   @UsePipes(ValidationPipe)
   createPermission(
@@ -32,6 +34,7 @@ export class PermissionsController extends BaseControllerCRUD<Permission> {
   }
 
   @Patch('/:id')
+  @ApiBearerAuth()
   @Permissions(PermissionAction.GET_USER)
   @UsePipes(ValidationPipe)
   updateOne(

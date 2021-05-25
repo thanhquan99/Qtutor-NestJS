@@ -1,10 +1,16 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { QueryParams } from './../base/dto/query-params.dto';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
 import { Ticket } from 'src/tickets/ticket.entity';
 import { User } from 'src/users/user.entity';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { Transaction } from './transactions.entity';
+import { getManager } from 'typeorm';
 
 @Injectable()
 export class TransactionsService extends BaseServiceCRUD<Transaction> {
@@ -13,12 +19,8 @@ export class TransactionsService extends BaseServiceCRUD<Transaction> {
   }
 
   async createOne(createTransactionDto: CreateTransactionDto) {
-    const {
-      transaction_time,
-      service,
-      ticketId,
-      userId,
-    } = createTransactionDto;
+    const { transaction_time, service, ticketId, userId } =
+      createTransactionDto;
     const ticket = await Ticket.findOne(ticketId);
     if (!ticket) {
       throw new NotFoundException('Ticket not found!');
@@ -34,5 +36,35 @@ export class TransactionsService extends BaseServiceCRUD<Transaction> {
       user,
     });
     return transaction.save();
+  }
+
+  async getMyTransactions(
+    query: QueryParams,
+    userId: number,
+  ): Promise<{ results: Transaction[]; total: number }> {
+    const { relationsWith, filterByFields, perPage, page, orderBy } =
+      await this.modifyQuery(query);
+
+    const [results, total] = await getManager()
+      .findAndCount(Transaction, {
+        relations: relationsWith,
+        where: {
+          ...filterByFields,
+          user: {
+            id: userId,
+          },
+        },
+        order: orderBy,
+        take: perPage,
+        skip: (page - 1) * perPage,
+      })
+      .catch((err) => {
+        throw new InternalServerErrorException(`Failed due to ${err}`);
+      });
+
+    return {
+      results,
+      total,
+    };
   }
 }

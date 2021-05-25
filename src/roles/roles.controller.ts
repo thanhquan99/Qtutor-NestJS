@@ -1,7 +1,7 @@
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { RolesService } from './roles.service';
 import { Role } from './role.entity';
 import {
-  CreateManyDto,
   Crud,
   CrudController,
   CrudRequest,
@@ -26,6 +26,7 @@ import { AuthGuard } from '@nestjs/passport';
     ],
   },
 })
+@ApiBearerAuth()
 @UseGuards(AuthGuard())
 @Controller('roles')
 export class RolesController implements CrudController<Role> {

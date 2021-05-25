@@ -1,3 +1,4 @@
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { UpdateActorDto } from './dto/updateActor.dto';
 import { CreateActorDto } from './dto/createActor.dto';
 import { ActorsService } from './actors.service';
@@ -24,6 +25,7 @@ export class ActorsController extends BaseControllerCRUD<Actor> {
   }
 
   @Post()
+  @ApiBearerAuth()
   @Permissions(PermissionAction.CREATE_ACTOR)
   @UsePipes(ValidationPipe)
   createOne(@Body() createActorDto: CreateActorDto): Promise<Actor> {
@@ -31,6 +33,7 @@ export class ActorsController extends BaseControllerCRUD<Actor> {
   }
 
   @Patch('/:id')
+  @ApiBearerAuth()
   @Permissions(PermissionAction.UPDATE_ACTOR)
   @UsePipes(ValidationPipe)
   updateOne(
@@ -41,6 +44,7 @@ export class ActorsController extends BaseControllerCRUD<Actor> {
   }
 
   @Patch('/:id')
+  @ApiBearerAuth()
   @Permissions(PermissionAction.DELETE_ACTOR)
   deleteOne(
     @Param('id', ParseIntPipe) id: number,

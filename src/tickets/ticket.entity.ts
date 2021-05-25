@@ -30,6 +30,9 @@ export class Ticket extends BaseEntity {
   @Column()
   status: string;
 
+  @Column({ nullable: true })
+  holdingStartTime: Date;
+
   @ManyToOne(() => Seat, (seat) => seat.tickets, {
     onDelete: 'CASCADE',
   })

@@ -1,3 +1,4 @@
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { UpdateGenreDto } from './dto/update-genre.dto';
 import { PermissionAction } from './../permissions/permission.entity';
 import { CreateGenreDto } from './dto/create-genre.dto';
@@ -24,6 +25,7 @@ export class GenresController extends BaseControllerCRUD<Genre> {
   }
 
   @Post()
+  @ApiBearerAuth()
   @Permissions(PermissionAction.CREATE_GENRE)
   @UsePipes(ValidationPipe)
   createOne(@Body() createDto: CreateGenreDto) {
@@ -32,6 +34,7 @@ export class GenresController extends BaseControllerCRUD<Genre> {
 
   @Patch('/:id')
   @UsePipes(ValidationPipe)
+  @ApiBearerAuth()
   @Permissions(PermissionAction.UPDATE_GENRE)
   updateOne(
     @Param('id', ParseIntPipe) id: number,
@@ -41,6 +44,7 @@ export class GenresController extends BaseControllerCRUD<Genre> {
   }
 
   @Delete('/:id')
+  @ApiBearerAuth()
   @Permissions(PermissionAction.DELETE_GENRE)
   deleteDirector(@Param('id', ParseIntPipe) id: number) {
     return this.service.deleteOne(id);

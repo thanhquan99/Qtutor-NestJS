@@ -5,6 +5,7 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TicketType } from 'src/ticket-types/ticket-type.entity';
@@ -13,7 +14,6 @@ import { User } from 'src/users/user.entity';
 import { Transaction } from 'src/transactions/transactions.entity';
 import { SEAT_TYPE_PRICE } from 'src/seats/seat.entity';
 import { EntityManager, getManager } from 'typeorm';
-import e from 'express';
 
 @Injectable()
 export class TicketsService extends BaseServiceCRUD<Ticket> {
@@ -69,10 +69,12 @@ export class TicketsService extends BaseServiceCRUD<Ticket> {
   }
 
   async bookTickets(ticketsData: ITicket[], status: string, user: User) {
-    return await getManager().transaction(async (entityManager) => {
-      return Promise.all(
-        ticketsData.map(
-          async (ticketData): Promise<Transaction | { message: string }> => {
+    return await getManager()
+      .transaction(async (entityManager) => {
+        return Promise.all(
+          ticketsData.map(async (ticketData): Promise<
+            Transaction | { message: string }
+          > => {
             const ticket = await Ticket.findOne({
               where: { id: ticketData.id },
               relations: ['seat', 'ticketType', 'holder'],
@@ -151,15 +153,10 @@ export class TicketsService extends BaseServiceCRUD<Ticket> {
                   ticketData,
                   status,
                 );
-                await this.deleteTransaction(
-                  entityManager,
-                  ticket,
-                  TRANSACTION_SERVICE.Available,
-                  user,
-                );
-                this.createTransaction(entityManager, ticket, user);
                 ticket.holder = null;
+                ticket.holdingStartTime = null;
                 await entityManager.save(Ticket, ticket);
+                return { message: 'Cancel successfully' };
               }
               if (status === TICKET_STATUS.BOOKED) {
                 await this.updateTicket(
@@ -222,6 +219,7 @@ export class TicketsService extends BaseServiceCRUD<Ticket> {
                   user,
                 );
                 ticket.holder = user;
+                ticket.holdingStartTime = new Date();
                 await entityManager.save(Ticket, ticket);
               }
               if (
@@ -234,9 +232,11 @@ export class TicketsService extends BaseServiceCRUD<Ticket> {
               }
             }
             return transaction;
-          },
-        ),
-      );
-    });
+          }),
+        );
+      })
+      .catch((err) => {
+        throw new InternalServerErrorException(`Failed due to ${err}`);
+      });
   }
 }

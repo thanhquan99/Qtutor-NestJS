@@ -7,10 +7,9 @@ import {
 } from 'typeorm';
 import { Ticket } from 'src/tickets/ticket.entity';
 
-export enum TicketTypeName {
+export enum TICKET_TYPE_NAME {
   NORMAL = 'Normal',
-  U22 = 'U22',
-  HOLIDAY = 'Holiday',
+  STUDENT = 'Student',
 }
 
 @Entity()

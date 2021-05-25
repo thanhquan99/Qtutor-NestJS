@@ -1,12 +1,14 @@
-import { IsDate, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsDate, IsNotEmpty, IsString } from 'class-validator';
 
 export class UpdateTransactionDto {
-    @IsNotEmpty()
-    @IsDate()
-    transactionTime: Date;
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsDate()
+  transactionTime: Date;
 
-    @IsNotEmpty()
-    @IsString()
-    service: string;
-  }
-  
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  service: string;
+}

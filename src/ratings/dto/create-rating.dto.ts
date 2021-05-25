@@ -1,26 +1,19 @@
-// import { Country } from './../movie.entity';
-import {
-    IsArray,
-      IsDate,
-    IsDateString,
-    IsEnum,
-    IsNotEmpty,
-    IsNumber,
-    IsObject,
-    IsOptional,
-    IsString,
-  } from 'class-validator';
-  
-  export class CreateRatingDto {
-    @IsNotEmpty()
-    @IsString()
-    comment: string;
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-    @IsNotEmpty()
-    @IsNumber()
-    movieId: number;
+export class CreateRatingDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  comment: string;
 
-    @IsNotEmpty()
-    @IsNumber()
-    userId: number;
-  }
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsNumber()
+  movieId: number;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsNumber()
+  userId: number;
+}
