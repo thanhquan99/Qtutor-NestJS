@@ -38,7 +38,7 @@ export class AuthService {
       throw new BadRequestException('Email is already exist');
     }
 
-    let id : string;
+    let id: string;
     try {
       await getManager().transaction(async (entityManager) => {
         const user = entityManager.create(User, registerUserDto);
@@ -98,86 +98,90 @@ export class AuthService {
 
   async verifyEmail(verifyEmailDto: VerifyEmailDto) {
     const user = await User.findOne({
-      where : {email : verifyEmailDto.email}
+      where: { email: verifyEmailDto.email },
     });
-    if (!user){
-      throw new BadRequestException("User not existed");
+    if (!user) {
+      throw new BadRequestException('User not existed');
     }
-    if (!user.verifyEmailCode){
-      throw new BadRequestException("Something went wrong! Please resend verify email again");    
+    if (!user.verifyEmailCode) {
+      throw new BadRequestException(
+        'Something went wrong! Please resend verify email again',
+      );
     }
-    if (user.verifyEmailCode !== verifyEmailDto.verifyEmailCode){
-      throw new BadRequestException("Wrong verify email code");        
+    if (user.verifyEmailCode !== verifyEmailDto.verifyEmailCode) {
+      throw new BadRequestException('Wrong verify email code');
     }
     user.verifyEmailCode = null;
     await user.save();
     return {
-      message : 'Verify email succesfullly !'
+      message: 'Verify email succesfullly !',
     };
   }
 
-  async resendEmailRegister(resendEmailDto: ResendEmailDto){
+  async resendEmailRegister(resendEmailDto: ResendEmailDto) {
     const id = uuid();
     const user = await User.findOne({
-      where : {email : resendEmailDto.email}
+      where: { email: resendEmailDto.email },
     });
-    if (!user){
-      throw new BadRequestException("User not existed");
+    if (!user) {
+      throw new BadRequestException('User not existed');
     }
     user.verifyEmailCode = id;
     await user.save();
     await this.mailerService
-    .sendMail({
-      to: resendEmailDto.email, // list of receivers
-      subject: 'Verify your email address', // Subject line
-      html: `<b>Your verify code is : ${id} </b>`, // HTML body content
-    })
-    .catch((err) => {
-      console.log('Send mail failed due to ', err);
-    });
+      .sendMail({
+        to: resendEmailDto.email, // list of receivers
+        subject: 'Verify your email address', // Subject line
+        html: `<b>Your verify code is : ${id} </b>`, // HTML body content
+      })
+      .catch((err) => {
+        console.log('Send mail failed due to ', err);
+      });
 
-  return {
-    message: 'Resend verify email success !',
-  };
+    return {
+      message: 'Resend verify email success !',
+    };
   }
 
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
     const id = uuid();
     const user = await User.findOne({
-      where : {email : forgotPasswordDto.email}
+      where: { email: forgotPasswordDto.email },
     });
-    if (!user){
-      throw new BadRequestException("User not existed");
+    if (!user) {
+      throw new BadRequestException('User not existed');
     }
     user.forgotPasswordCode = id;
     await user.save();
     await this.mailerService
-    .sendMail({
-      to: forgotPasswordDto.email, // list of receivers
-      subject: 'Forgot password email', // Subject line
-      html: `<b>Your verify code is : ${id} </b>`, // HTML body content
-    })
-    .catch((err) => {
-      console.log('Send mail failed due to ', err);
-    });
+      .sendMail({
+        to: forgotPasswordDto.email, // list of receivers
+        subject: 'Forgot password email', // Subject line
+        html: `<b>Your verify code is : ${id} </b>`, // HTML body content
+      })
+      .catch((err) => {
+        console.log('Send mail failed due to ', err);
+      });
 
-  return {
-    message: 'Send email forgot password success !',
-  };
+    return {
+      message: 'Send email forgot password success !',
+    };
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
     const user = await User.findOne({
-      where : {email : resetPasswordDto.email}
+      where: { email: resetPasswordDto.email },
     });
-    if (!user){
-      throw new BadRequestException("User not existed");
+    if (!user) {
+      throw new BadRequestException('User not existed');
     }
-    if (!user.forgotPasswordCode){
-      throw new BadRequestException("Something went wrong! Please resent forgot password email");        
+    if (!user.forgotPasswordCode) {
+      throw new BadRequestException(
+        'Something went wrong! Please resent forgot password email',
+      );
     }
-    if (user.forgotPasswordCode !== resetPasswordDto.resetPasswordCode){
-      throw new BadRequestException("Reset password code not correct");     
+    if (user.forgotPasswordCode !== resetPasswordDto.resetPasswordCode) {
+      throw new BadRequestException('Reset password code not correct');
     }
     user.password = resetPasswordDto.newPassword;
     await user.updatePassword();
