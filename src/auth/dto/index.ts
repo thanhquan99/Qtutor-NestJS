@@ -13,6 +13,7 @@ export class VerifyEmailDto {
   email: string;
 }
 export class ResendEmailDto {
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   email: string;
