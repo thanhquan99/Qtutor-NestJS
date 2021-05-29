@@ -6,6 +6,7 @@ import {
   Controller,
   Delete,
   Get,
+  InternalServerErrorException,
   Param,
   ParseIntPipe,
   Patch,
@@ -35,6 +36,17 @@ export class TransactionsController {
     @Query() query: QueryParams,
     @GetUser() user: User,
   ): Promise<{ results: Transaction[]; total: number }> {
+    try {
+      if (query?.filter) {
+        query.filter = JSON.parse(query.filter);
+      }
+      if (query?.orderBy) {
+        query.orderBy = JSON.parse(query.orderBy);
+      }
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+
     return this.service.getMyTransactions(query, user.id);
   }
 

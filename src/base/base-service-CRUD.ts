@@ -78,12 +78,6 @@ export abstract class BaseServiceCRUD<T> {
   }
 
   async modifyQuery(query) {
-    try {
-      query.orderBy = JSON.parse(query.orderBy);
-    } catch (error) {
-      throw new InternalServerErrorException('Invalid orderBy: ', error);
-    }
-
     const { filter, relations, perPage = 10, page = 1, orderBy = {} } = query;
     const filterByFields = {};
     let relationsWith = [];

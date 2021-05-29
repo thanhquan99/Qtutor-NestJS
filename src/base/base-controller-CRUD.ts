@@ -3,6 +3,7 @@ import {
   Delete,
   Get,
   Injectable,
+  InternalServerErrorException,
   Param,
   ParseIntPipe,
   Patch,
@@ -24,11 +25,15 @@ export abstract class BaseControllerCRUD<T> {
   getMany(
     @Query(ValidationPipe) query: QueryParams,
   ): Promise<{ results: T[]; total: number }> {
-    if (query?.filter) {
-      query.filter = JSON.parse(query.filter);
-    }
-    if (query?.orderBy) {
-      query.orderBy = JSON.parse(query.orderBy);
+    try {
+      if (query?.filter) {
+        query.filter = JSON.parse(query.filter);
+      }
+      if (query?.orderBy) {
+        query.orderBy = JSON.parse(query.orderBy);
+      }
+    } catch (error) {
+      throw new InternalServerErrorException(error);
     }
 
     return this.service.getMany(query);
