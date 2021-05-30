@@ -12,11 +12,9 @@ import {
   Patch,
   Post,
   Query,
-  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { Permissions } from 'src/guards/permissions.decorator';
 import { PermissionAction } from 'src/permissions/permission.entity';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
@@ -31,7 +29,7 @@ export class TransactionsController {
 
   @Get('/me')
   @ApiBearerAuth()
-  @UseGuards(AuthGuard())
+  @Permissions('')
   getMyTransactions(
     @Query() query: QueryParams,
     @GetUser() user: User,
@@ -52,7 +50,7 @@ export class TransactionsController {
 
   @Post()
   @ApiBearerAuth()
-  @UseGuards(AuthGuard())
+  @Permissions('')
   @UsePipes(ValidationPipe)
   createOne(@Body() createDto: CreateTransactionDto): Promise<Transaction> {
     return this.service.createOne(createDto);
@@ -60,7 +58,7 @@ export class TransactionsController {
 
   @Get()
   @ApiBearerAuth()
-  @UseGuards(AuthGuard())
+  @Permissions('')
   getMany(@Query() query: QueryParams) {
     return this.service.getMany(query);
   }

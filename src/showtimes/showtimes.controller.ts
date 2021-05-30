@@ -1,5 +1,4 @@
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
 import { UpdateShowtimeDto } from './dto/update-showtime.dto';
 import {
   Body,
@@ -10,7 +9,6 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';

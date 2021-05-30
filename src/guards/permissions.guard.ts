@@ -1,3 +1,4 @@
+import { User } from './../users/user.entity';
 import {
   Injectable,
   CanActivate,
@@ -19,15 +20,15 @@ export class PermissionGuard implements CanActivate {
       'permissions',
       context.getHandler(),
     );
-    if (!permissions) {
-      return true;
-    }
 
     const request = context.switchToHttp().getRequest();
     const {
       headers: { authorization: token },
     } = request;
 
+    if (permissions === undefined) {
+      return true;
+    }
     if (!token) {
       throw new UnauthorizedException();
     }
@@ -39,6 +40,19 @@ export class PermissionGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
+    const currentUser = await User.findOne({ where: { email: user.email } });
+    delete currentUser.password;
+    delete currentUser.salt;
+    if (!currentUser.isActive) {
+      throw new UnauthorizedException(
+        'Your account is not active. Please verify your email',
+      );
+    }
+    request.user = currentUser;
+
+    if (!permissions || permissions[0] === '') {
+      return true;
+    }
     const { roleName } = user;
 
     const manager = getManager();

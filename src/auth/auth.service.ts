@@ -77,9 +77,13 @@ export class AuthService {
   async login(loginUserDto: LoginUserDto) {
     const user = await this.userRepository.validateUserPassword(loginUserDto);
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Your password is incorrect');
     }
-
+    if (!user.isActive) {
+      throw new UnauthorizedException(
+        'Your account is not active. Please verify your email',
+      );
+    }
     const { role } = await getManager().findOne(UserRoleView, {
       email: user.email,
     });
@@ -112,6 +116,7 @@ export class AuthService {
       throw new BadRequestException('Wrong verify email code');
     }
     user.verifyEmailCode = null;
+    user.isActive = true;
     await user.save();
     return {
       message: 'Verify email succesfullly !',

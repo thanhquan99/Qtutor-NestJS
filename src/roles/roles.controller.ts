@@ -9,8 +9,8 @@ import {
   ParsedBody,
   ParsedRequest,
 } from '@nestjsx/crud';
-import { Controller, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { Controller } from '@nestjs/common';
+import { Permissions } from 'src/guards/permissions.decorator';
 
 @Crud({
   model: {
@@ -27,7 +27,7 @@ import { AuthGuard } from '@nestjs/passport';
   },
 })
 @ApiBearerAuth()
-@UseGuards(AuthGuard())
+@Permissions('')
 @Controller('roles')
 export class RolesController implements CrudController<Role> {
   constructor(public service: RolesService) {}

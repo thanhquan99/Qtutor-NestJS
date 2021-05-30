@@ -9,14 +9,13 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { CreateTicketDto } from './dto/create-ticket.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/auth/get-user.decorator';
 import { User } from 'src/users/user.entity';
+import { Permissions } from 'src/guards/permissions.decorator';
 
 @Controller('tickets')
 export class TicketsController {
@@ -24,7 +23,7 @@ export class TicketsController {
 
   @Post()
   @ApiBearerAuth()
-  @UseGuards(AuthGuard())
+  @Permissions('')
   @UsePipes(ValidationPipe)
   bookTickets(@Body() createDto: CreateTicketDto, @GetUser() user: User) {
     return this.service.bookTickets(createDto.tickets, createDto.status, user);
@@ -32,7 +31,7 @@ export class TicketsController {
 
   @Patch('/:id')
   @ApiBearerAuth()
-  @UseGuards(AuthGuard())
+  @Permissions('')
   @UsePipes(ValidationPipe)
   updateOne(
     @Param('id', ParseIntPipe) id: number,

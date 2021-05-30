@@ -2,14 +2,7 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { CreateRolePermissionDto } from './dto/create-role-permission.dto';
 import { RolePermissionService } from './role-permission.service';
 import { RolePermission } from './role-permission.entity';
-import {
-  Body,
-  Controller,
-  UseGuards,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { Body, Controller, UsePipes, ValidationPipe } from '@nestjs/common';
 import {
   Crud,
   CrudController,
@@ -18,9 +11,10 @@ import {
   ParsedBody,
   ParsedRequest,
 } from '@nestjsx/crud';
+import { Permissions } from 'src/guards/permissions.decorator';
 
 @ApiBearerAuth()
-@UseGuards(AuthGuard())
+@Permissions('')
 @Crud({
   model: {
     type: RolePermission,

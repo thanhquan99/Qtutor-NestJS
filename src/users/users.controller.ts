@@ -4,7 +4,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from 'src/users/user.entity';
 import { QueryParams } from '../base/dto/query-params.dto';
 import { PermissionAction } from './../permissions/permission.entity';
-import { AuthGuard } from '@nestjs/passport';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UsersService } from './users.service';
 
@@ -18,7 +17,6 @@ import {
   Patch,
   Post,
   Query,
-  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -26,18 +24,19 @@ import { Permissions } from 'src/guards/permissions.decorator';
 import { GetUser } from 'src/auth/get-user.decorator';
 
 @ApiBearerAuth()
-@UseGuards(AuthGuard())
 @UsePipes(ValidationPipe)
 @Controller('users')
 export class UsersController {
   constructor(private readonly service: UsersService) {}
 
   @Get('/me')
+  @Permissions('')
   getMe(@GetUser() user: User): User {
     return this.service.getMe(user);
   }
 
   @Patch('/me')
+  @Permissions('')
   updateMe(
     @GetUser() user: User,
     @Body() updateDto: UpdateUserDto,
