@@ -1,3 +1,4 @@
+import { MovieQueryParams } from './dto/index';
 import { Showtime } from './../showtimes/showtimes.entity';
 import { QueryShowtimes } from './../rooms/dto/query-showtimes.dto';
 import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
@@ -24,6 +25,49 @@ export class MoviesService extends BaseServiceCRUD<Movie> {
 
   makeImageUrl(fileName: string): string {
     return `${process.env.DOMAIN}/img/${fileName}`;
+  }
+
+  async getMany(
+    query: MovieQueryParams,
+  ): Promise<{ results: Movie[]; total: number }> {
+    const { relationsWith, filterByFields, perPage, page, orderBy } =
+      await this.modifyQuery(query);
+
+    let movieGenres: any[];
+    if (query.genreId) {
+      const genre = await Genre.findOne({ where: { id: query.genreId } });
+      if (!genre) {
+        throw new NotFoundException('Genre not found');
+      }
+      movieGenres = await getManager().query(`
+        Select DISTINCT "movieId" from movie_genres_genre
+        WHERE "genreId" = '${genre.id}'
+      `);
+    }
+
+    const [results, total] = await getManager()
+      .findAndCount(Movie, {
+        relations: relationsWith,
+        where: (qb) => {
+          qb.where(filterByFields);
+          if (query.genreId) {
+            qb.andWhereInIds(
+              movieGenres.map((movieGenre) => movieGenre.movieId),
+            );
+          }
+        },
+        order: orderBy,
+        take: perPage,
+        skip: (page - 1) * perPage,
+      })
+      .catch((err) => {
+        throw new InternalServerErrorException(`Failed due to ${err}`);
+      });
+
+    return {
+      results,
+      total,
+    };
   }
 
   async getOne(id: number): Promise<Movie> {
