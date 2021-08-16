@@ -1,3 +1,4 @@
+import { UsersQueryParams } from './dto/index';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
@@ -25,16 +26,30 @@ export class UsersService extends BaseServiceCRUD<User> {
   }
 
   async adminGetMany(
-    query,
+    query: UsersQueryParams,
     adminId: number,
   ): Promise<{ results: any; total: number }> {
     const { relationsWith, filterByFields, perPage, page, orderBy } =
       await this.modifyQuery(query);
 
+    let role: Role;
+    let userIds: any[];
+    if (query.roleName) {
+      role = await Role.findOne({ where: { name: query.roleName } });
+      userIds = await getManager().query(
+        `Select DISTINCT "userId" from "user_role" WHERE "roleId" = ${role.id}`,
+      );
+    }
+
     const [results, total] = await getManager()
       .findAndCount(User, {
         relations: relationsWith,
-        where: { ...filterByFields, id: Not(adminId) },
+        where: (qb) => {
+          qb.where({ ...filterByFields, id: Not(adminId) });
+          if (query.roleName) {
+            qb.andWhereInIds(userIds.map((userId) => userId.userId));
+          }
+        },
         order: orderBy,
         take: perPage,
         skip: (page - 1) * perPage,
@@ -114,7 +129,7 @@ export class UsersService extends BaseServiceCRUD<User> {
     }
 
     await getManager().transaction(async (entityManager) => {
-      if (isActive) {
+      if (isActive !== undefined) {
         user.isActive = isActive;
         await entityManager.save(user);
       }
@@ -131,5 +146,17 @@ export class UsersService extends BaseServiceCRUD<User> {
       where: { id: userId },
       relations: ['userRoles', 'userRoles.role'],
     });
+  }
+
+  async adminGetOne(id: number): Promise<User> {
+    const user = await User.findOne({
+      where: { id },
+      relations: ['userRoles', 'userRoles.role'],
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
   }
 }

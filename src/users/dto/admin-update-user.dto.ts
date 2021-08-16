@@ -14,8 +14,8 @@ export class AdminUpdateUserDto {
   @IsEnum(
     [ROLE_NAME.CUSTOMER, ROLE_NAME.MOVIE_MANAGER, ROLE_NAME.THEATER_MANAGER],
     {
-      message: `Country should be in [${ROLE_NAME.CUSTOMER},${ROLE_NAME.MOVIE_MANAGER},${ROLE_NAME.THEATER_MANAGER}]`,
+      message: `Role name should be in [${ROLE_NAME.CUSTOMER},${ROLE_NAME.MOVIE_MANAGER},${ROLE_NAME.THEATER_MANAGER}]`,
     },
   )
-  roleName: boolean;
+  roleName: ROLE_NAME;
 }
