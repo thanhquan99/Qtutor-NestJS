@@ -1,3 +1,4 @@
+import { MovieQueryParams } from './dto/index';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { Showtime } from './../showtimes/showtimes.entity';
 import { QueryShowtimes } from './../rooms/dto/query-showtimes.dto';
@@ -11,6 +12,7 @@ import {
   Controller,
   Delete,
   Get,
+  InternalServerErrorException,
   Param,
   ParseIntPipe,
   Patch,
@@ -31,6 +33,24 @@ import { PermissionAction } from 'src/permissions/permission.entity';
 export class MoviesController extends BaseControllerCRUD<Movie> {
   constructor(public service: MoviesService) {
     super(service);
+  }
+
+  @Get()
+  getMany(
+    @Query(ValidationPipe) query: MovieQueryParams,
+  ): Promise<{ results: Movie[]; total: number }> {
+    try {
+      if (query?.filter) {
+        query.filter = JSON.parse(query.filter);
+      }
+      if (query?.orderBy) {
+        query.orderBy = JSON.parse(query.orderBy);
+      }
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+
+    return this.service.getMany(query);
   }
 
   @Post()
@@ -92,9 +112,7 @@ export class MoviesController extends BaseControllerCRUD<Movie> {
   }
 
   @Get('/:id/ratings')
-  getRatingsByMovie(
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  getRatingsByMovie(@Param('id', ParseIntPipe) id: number) {
     return this.service.getRatingsByMovie(id);
   }
 }
