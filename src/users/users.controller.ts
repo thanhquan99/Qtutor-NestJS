@@ -1,3 +1,4 @@
+import { UsersQueryParams } from './dto/index';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -54,7 +55,7 @@ export class UsersController {
   @Get()
   @ApiBearerAuth()
   @Permissions(PermissionAction.GET_USER)
-  adminGetMany(@Query() query: QueryParams, @GetUser() admin: User) {
+  adminGetMany(@Query() query: UsersQueryParams, @GetUser() admin: User) {
     if (query?.filter) {
       query.filter = JSON.parse(query.filter);
     }
@@ -68,7 +69,7 @@ export class UsersController {
   @ApiBearerAuth()
   @Permissions(PermissionAction.GET_USER)
   getOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
-    return this.service.getOne(id);
+    return this.service.adminGetOne(id);
   }
 
   @Patch('/:id')

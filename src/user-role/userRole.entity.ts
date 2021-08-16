@@ -1,6 +1,5 @@
 import { Role } from './../roles/role.entity';
 import { User } from './../users/user.entity';
-import { ApiProperty } from '@nestjs/swagger';
 import {
   BaseEntity,
   Entity,
