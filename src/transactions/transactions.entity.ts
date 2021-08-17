@@ -17,6 +17,34 @@ export enum TRANSACTION_SERVICE {
   Hold = 'Draft',
 }
 
+export interface ICinema {
+  id: number;
+  name: string;
+}
+
+export interface IRoom {
+  id: number;
+  roomNumber: number;
+}
+
+export interface IMovie {
+  id: number;
+  name: string;
+}
+
+export interface IShowTime {
+  id: number;
+  startTime: Date;
+  endTime: Date;
+}
+
+export interface Detail {
+  cinema: ICinema;
+  room: IRoom;
+  movie: IMovie;
+  showtime: IShowTime;
+}
+
 @Entity()
 @Unique(['ticket', 'service', 'user'])
 export class Transaction extends BaseEntity {
@@ -31,6 +59,9 @@ export class Transaction extends BaseEntity {
 
   @Column()
   price: number;
+
+  @Column({ type: 'jsonb', nullable: true })
+  detail: Detail;
 
   @ManyToOne(() => User, (user) => user.transactions, {
     onDelete: 'CASCADE',

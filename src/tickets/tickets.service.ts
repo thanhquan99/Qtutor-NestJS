@@ -1,4 +1,7 @@
-import { TRANSACTION_SERVICE } from './../transactions/transactions.entity';
+import {
+  TRANSACTION_SERVICE,
+  Detail,
+} from './../transactions/transactions.entity';
 import { Ticket, TICKET_STATUS as TICKET_STATUS } from './ticket.entity';
 import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
 import {
@@ -25,6 +28,7 @@ export class TicketsService extends BaseServiceCRUD<Ticket> {
     entityManager: EntityManager,
     ticket: Ticket,
     user: User,
+    detail: Detail,
   ): Promise<Transaction> {
     const transaction = entityManager.create(Transaction, {
       transaction_time: new Date(),
@@ -32,6 +36,7 @@ export class TicketsService extends BaseServiceCRUD<Ticket> {
       user: user,
       ticket: ticket,
       service: TRANSACTION_SERVICE[ticket.status],
+      detail,
     });
 
     await entityManager.save(Transaction, transaction);
@@ -68,6 +73,33 @@ export class TicketsService extends BaseServiceCRUD<Ticket> {
     }
   }
 
+  async getDetail(ticketId: number): Promise<Detail> {
+    const ticket = await Ticket.findOne(ticketId, {
+      relations: [
+        'showtime',
+        'showtime.movie',
+        'seat',
+        'seat.room',
+        'seat.room.cinema',
+      ],
+    });
+    const room = ticket.seat.room;
+    const cinema = room.cinema;
+    const showtime = ticket.showtime;
+    const movie = showtime.movie;
+
+    return {
+      movie: { id: movie.id, name: movie.name },
+      cinema: { id: cinema.id, name: cinema.name },
+      room: { id: room.id, roomNumber: room.roomNumber },
+      showtime: {
+        id: showtime.id,
+        endTime: showtime.endTime,
+        startTime: showtime.startTime,
+      },
+    };
+  }
+
   async bookTickets(ticketsData: ITicket[], status: string, user: User) {
     return await getManager()
       .transaction(async (entityManager) => {
@@ -97,6 +129,7 @@ export class TicketsService extends BaseServiceCRUD<Ticket> {
               throw new BadRequestException(`This ticket already is ${status}`);
             }
 
+            const detail = await this.getDetail(ticket.id);
             let transaction: Transaction;
             if (ticket.status === TICKET_STATUS.BOOKED) {
               if (status === TICKET_STATUS.AVAILABLE) {
@@ -117,6 +150,7 @@ export class TicketsService extends BaseServiceCRUD<Ticket> {
                   entityManager,
                   ticket,
                   user,
+                  detail,
                 );
                 ticket.holder = null;
                 await entityManager.save(Ticket, ticket);
@@ -141,6 +175,7 @@ export class TicketsService extends BaseServiceCRUD<Ticket> {
                   entityManager,
                   ticket,
                   user,
+                  detail,
                 );
               }
             }
@@ -175,6 +210,7 @@ export class TicketsService extends BaseServiceCRUD<Ticket> {
                   entityManager,
                   ticket,
                   user,
+                  detail,
                 );
               }
 
@@ -195,6 +231,7 @@ export class TicketsService extends BaseServiceCRUD<Ticket> {
                   entityManager,
                   ticket,
                   user,
+                  detail,
                 );
               }
             }
@@ -217,6 +254,7 @@ export class TicketsService extends BaseServiceCRUD<Ticket> {
                   entityManager,
                   ticket,
                   user,
+                  detail,
                 );
                 ticket.holder = user;
                 ticket.holdingStartTime = new Date();
