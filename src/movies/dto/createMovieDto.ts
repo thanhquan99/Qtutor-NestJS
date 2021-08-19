@@ -34,6 +34,11 @@ export class CreateMovieDto {
 
   @ApiProperty()
   @IsNotEmpty()
+  @IsString()
+  trailer: string;  
+
+  @ApiProperty()
+  @IsNotEmpty()
   @IsDateString()
   releaseDate: Date;
 
