@@ -31,6 +31,11 @@ export class UpdateMovieDto {
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsString()
+  trailer: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
   @IsDateString()
   releaseDate: Date;
 
