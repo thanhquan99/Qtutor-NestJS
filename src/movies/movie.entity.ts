@@ -39,8 +39,8 @@ export class Movie extends BaseEntity {
   @Column()
   description: string;
 
-  @ApiProperty({ example: 'string' })
-  @Column()
+  @ApiProperty({ example: 'string' })  
+  @Column({nullable : true})
   trailer: string;  
 
   @ApiProperty({ example: '2020-01-01' })
