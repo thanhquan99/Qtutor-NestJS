@@ -1,3 +1,4 @@
+import { ServiceAnalysisQueryParams } from './dto/index';
 import { QueryParams } from './../base/dto/query-params.dto';
 import {
   Injectable,
@@ -66,5 +67,40 @@ export class TransactionsService extends BaseServiceCRUD<Transaction> {
       results,
       total,
     };
+  }
+
+  async serviceAnalysis(
+    query: ServiceAnalysisQueryParams,
+  ): Promise<{ buy: number; book: number; cancel: number }> {
+    const year = query.year || new Date().getFullYear();
+
+    return await getManager().query(`
+      select service, count(service) as total
+      FROM transaction
+      WHERE date_part('year', transaction_time) = ${year}
+      group by service
+    `);
+  }
+
+  async saleAnalysis(
+    query: ServiceAnalysisQueryParams,
+  ): Promise<{ [k: string]: any }> {
+    const year = query.year || new Date().getFullYear();
+
+    return await getManager().query(`
+      select to_char(transaction_time,'MM-YYYY') as month_year, sum(price) as "sumSales"
+      FROM transaction
+      WHERE date_part('year', transaction_time) = ${year}
+      group by month_year
+    `);
+  }
+
+  async movieAnalysis(): Promise<{ [k: string]: any }> {
+    return await getManager().query(`
+      Select (detail->'movie'->'name') as "movieName", count(*) as "buyQuantity"
+      FROM transaction
+      WHERE service = 'Buy'
+      group by (detail->'movie'->'name')
+    `);
   }
 }

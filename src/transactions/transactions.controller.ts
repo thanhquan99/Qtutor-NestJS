@@ -1,3 +1,4 @@
+import { ServiceAnalysisQueryParams } from './dto/index';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { User } from './../users/user.entity';
 import { QueryParams } from './../base/dto/query-params.dto';
@@ -60,6 +61,17 @@ export class TransactionsController {
   @ApiBearerAuth()
   @Permissions('')
   getMany(@Query() query: QueryParams) {
+    try {
+      if (query?.filter) {
+        query.filter = JSON.parse(query.filter);
+      }
+      if (query?.orderBy) {
+        query.orderBy = JSON.parse(query.orderBy);
+      }
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+
     return this.service.getMany(query);
   }
 
@@ -81,5 +93,30 @@ export class TransactionsController {
     @Body() updateTransactionDto: UpdateTransactionDto,
   ): Promise<Transaction> {
     return this.service.updateOne(id, updateTransactionDto);
+  }
+
+  @Get('/service-analysis')
+  @ApiBearerAuth()
+  @Permissions(PermissionAction.DELETE_TRANSACTION)
+  serviceAnalysis(
+    @Query() query: ServiceAnalysisQueryParams,
+  ): Promise<{ buy: number; book: number; cancel: number }> {
+    return this.service.serviceAnalysis(query);
+  }
+
+  @Get('/sale-analysis')
+  @ApiBearerAuth()
+  @Permissions(PermissionAction.DELETE_TRANSACTION)
+  saleAnalysis(
+    @Query() query: ServiceAnalysisQueryParams,
+  ): Promise<{ [k: string]: any }> {
+    return this.service.saleAnalysis(query);
+  }
+
+  @Get('/movie-analysis')
+  @ApiBearerAuth()
+  @Permissions(PermissionAction.DELETE_TRANSACTION)
+  movieAnalysis(): Promise<{ [k: string]: any }> {
+    return this.service.movieAnalysis();
   }
 }
