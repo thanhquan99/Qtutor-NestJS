@@ -1,7 +1,4 @@
-import {
-  ServiceAnalysisQueryParams,
-  TransactionQueryParams,
-} from './dto/index';
+import { AnalysisQueryParams, TransactionQueryParams } from './dto/index';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { User } from './../users/user.entity';
 import { QueryParams } from './../base/dto/query-params.dto';
@@ -104,7 +101,7 @@ export class TransactionsController {
   @ApiBearerAuth()
   @Permissions(PermissionAction.DELETE_TRANSACTION)
   serviceAnalysis(
-    @Query() query: ServiceAnalysisQueryParams,
+    @Query() query: AnalysisQueryParams,
   ): Promise<{ buy: number; book: number; cancel: number }> {
     return this.service.serviceAnalysis(query);
   }
@@ -113,7 +110,7 @@ export class TransactionsController {
   @ApiBearerAuth()
   @Permissions(PermissionAction.DELETE_TRANSACTION)
   saleAnalysis(
-    @Query() query: ServiceAnalysisQueryParams,
+    @Query() query: AnalysisQueryParams,
   ): Promise<{ [k: string]: any }> {
     return this.service.saleAnalysis(query);
   }
@@ -121,7 +118,9 @@ export class TransactionsController {
   @Get('/movie-analysis')
   @ApiBearerAuth()
   @Permissions(PermissionAction.DELETE_TRANSACTION)
-  movieAnalysis(): Promise<{ [k: string]: any }> {
-    return this.service.movieAnalysis();
+  movieAnalysis(
+    @Query() query: AnalysisQueryParams,
+  ): Promise<{ [k: string]: any }> {
+    return this.service.movieAnalysis(query);
   }
 }

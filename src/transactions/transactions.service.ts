@@ -1,7 +1,4 @@
-import {
-  ServiceAnalysisQueryParams,
-  TransactionQueryParams,
-} from './dto/index';
+import { AnalysisQueryParams, TransactionQueryParams } from './dto/index';
 import { QueryParams } from './../base/dto/query-params.dto';
 import {
   Injectable,
@@ -41,6 +38,18 @@ export class TransactionsService extends BaseServiceCRUD<Transaction> {
           if (query.movieId) {
             qb.andWhere(`detail->'movie'->>'id' = :movieId`, {
               movieId: query.movieId,
+            });
+          }
+          if (query.startDate) {
+            const startDate = new Date(`${query.startDate} 0:0 UTC`);
+            qb.andWhere('transaction_time >= :startDate', {
+              startDate: startDate.toUTCString(),
+            });
+          }
+          if (query.endDate) {
+            const endDate = new Date(`${query.endDate} 23:59 UTC`);
+            qb.andWhere('transaction_time <= :endDate', {
+              endDate: endDate.toUTCString(),
             });
           }
         },
@@ -109,36 +118,76 @@ export class TransactionsService extends BaseServiceCRUD<Transaction> {
   }
 
   async serviceAnalysis(
-    query: ServiceAnalysisQueryParams,
+    query: AnalysisQueryParams,
   ): Promise<{ buy: number; book: number; cancel: number }> {
-    const year = query.year || new Date().getFullYear();
+    let startDateQuery: string;
+    if (query.startDate) {
+      const startDate = new Date(`${query.startDate} 0:0 UTC`);
+      startDateQuery = `AND transaction_time >= '${startDate.toUTCString()}'`;
+    }
+
+    let endDateQuery: string;
+    if (query.endDate) {
+      const endDate = new Date(`${query.endDate} 23:59 UTC`);
+      endDateQuery = `AND transaction_time <= '${endDate.toUTCString()}'`;
+    }
 
     return await getManager().query(`
       select service, count(service) as total
       FROM transaction
-      WHERE date_part('year', transaction_time) = ${year}
+      WHERE service != 'Draft'
+      ${startDateQuery ? startDateQuery : ''}
+      ${endDateQuery ? endDateQuery : ''}
       group by service
     `);
   }
 
   async saleAnalysis(
-    query: ServiceAnalysisQueryParams,
+    query: AnalysisQueryParams,
   ): Promise<{ [k: string]: any }> {
-    const year = query.year || new Date().getFullYear();
+    let startDateQuery: string;
+    if (query.startDate) {
+      const startDate = new Date(`${query.startDate} 0:0 UTC`);
+      startDateQuery = `AND transaction_time >= '${startDate.toUTCString()}'`;
+    }
+
+    let endDateQuery: string;
+    if (query.endDate) {
+      const endDate = new Date(`${query.endDate} 23:59 UTC`);
+      endDateQuery = `AND transaction_time <= '${endDate.toUTCString()}'`;
+    }
 
     return await getManager().query(`
       select to_char(transaction_time,'MM-YYYY') as month_year, sum(price) as "sumSales"
       FROM transaction
-      WHERE date_part('year', transaction_time) = ${year}
+      WHERE service = 'Buy'
+      ${startDateQuery ? startDateQuery : ''}
+      ${endDateQuery ? endDateQuery : ''}
       group by month_year
     `);
   }
 
-  async movieAnalysis(): Promise<{ [k: string]: any }> {
+  async movieAnalysis(
+    query: AnalysisQueryParams,
+  ): Promise<{ [k: string]: any }> {
+    let startDateQuery: string;
+    if (query.startDate) {
+      const startDate = new Date(`${query.startDate} 0:0 UTC`);
+      startDateQuery = `AND transaction_time >= '${startDate.toUTCString()}'`;
+    }
+
+    let endDateQuery: string;
+    if (query.endDate) {
+      const endDate = new Date(`${query.endDate} 23:59 UTC`);
+      endDateQuery = `AND transaction_time <= '${endDate.toUTCString()}'`;
+    }
+
     return await getManager().query(`
       Select (detail->'movie'->'name') as "movieName", count(*) as "buyQuantity"
       FROM transaction
       WHERE service = 'Buy'
+      ${startDateQuery ? startDateQuery : ''}
+      ${endDateQuery ? endDateQuery : ''}
       group by (detail->'movie'->'name')
     `);
   }

@@ -1,11 +1,21 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNumberString, IsOptional, IsString } from 'class-validator';
+import {
+  IsNumberString,
+  IsOptional,
+  IsString,
+  IsDateString,
+} from 'class-validator';
 
-export class ServiceAnalysisQueryParams {
+export class AnalysisQueryParams {
   @ApiPropertyOptional()
   @IsOptional()
-  @IsNumberString()
-  year: number;
+  @IsDateString()
+  startDate: Date;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  endDate: Date;
 }
 
 export class TransactionQueryParams {
@@ -43,4 +53,14 @@ export class TransactionQueryParams {
   @IsOptional()
   @IsNumberString()
   movieId: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  startDate: Date;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  endDate: Date;
 }
