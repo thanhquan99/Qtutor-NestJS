@@ -1,4 +1,7 @@
-import { ServiceAnalysisQueryParams } from './dto/index';
+import {
+  ServiceAnalysisQueryParams,
+  TransactionQueryParams,
+} from './dto/index';
 import { QueryParams } from './../base/dto/query-params.dto';
 import {
   Injectable,
@@ -17,6 +20,42 @@ import { getManager } from 'typeorm';
 export class TransactionsService extends BaseServiceCRUD<Transaction> {
   constructor(@InjectRepository(Transaction) repo) {
     super(repo, Transaction, 'Transaction');
+  }
+
+  async getMany(
+    query: TransactionQueryParams,
+  ): Promise<{ results: Transaction[]; total: number }> {
+    const { relationsWith, filterByFields, perPage, page, orderBy } =
+      await this.modifyQuery(query);
+
+    const [results, total] = await getManager()
+      .findAndCount(Transaction, {
+        relations: relationsWith,
+        where: (qb) => {
+          qb.where(filterByFields);
+          if (query.cinemaId) {
+            qb.andWhere(`detail->'cinema'->>'id' = :cinemaId`, {
+              cinemaId: query.cinemaId,
+            });
+          }
+          if (query.movieId) {
+            qb.andWhere(`detail->'movie'->>'id' = :movieId`, {
+              movieId: query.movieId,
+            });
+          }
+        },
+        order: orderBy,
+        take: perPage,
+        skip: (page - 1) * perPage,
+      })
+      .catch((err) => {
+        throw new InternalServerErrorException(`Failed due to ${err}`);
+      });
+
+    return {
+      results,
+      total,
+    };
   }
 
   async createOne(createTransactionDto: CreateTransactionDto) {

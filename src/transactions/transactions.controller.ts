@@ -1,4 +1,7 @@
-import { ServiceAnalysisQueryParams } from './dto/index';
+import {
+  ServiceAnalysisQueryParams,
+  TransactionQueryParams,
+} from './dto/index';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { User } from './../users/user.entity';
 import { QueryParams } from './../base/dto/query-params.dto';
@@ -60,7 +63,9 @@ export class TransactionsController {
   @Get()
   @ApiBearerAuth()
   @Permissions('')
-  getMany(@Query() query: QueryParams) {
+  getMany(
+    @Query() query: TransactionQueryParams,
+  ): Promise<{ results: Transaction[]; total: number }> {
     try {
       if (query?.filter) {
         query.filter = JSON.parse(query.filter);
