@@ -1,3 +1,4 @@
+import { ShowtimeQueryParams } from './dto/index';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { UpdateShowtimeDto } from './dto/update-showtime.dto';
 import {
@@ -5,10 +6,12 @@ import {
   Controller,
   Delete,
   Get,
+  InternalServerErrorException,
   Param,
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -23,6 +26,24 @@ import { ShowtimesService } from './showtimes.service';
 export class ShowtimesController extends BaseControllerCRUD<Showtime> {
   constructor(service: ShowtimesService) {
     super(service);
+  }
+
+  @Get()
+  getMany(
+    @Query(ValidationPipe) query: ShowtimeQueryParams,
+  ): Promise<{ results: any; total: number }> {
+    try {
+      if (query?.filter) {
+        query.filter = JSON.parse(query.filter);
+      }
+      if (query?.orderBy) {
+        query.orderBy = JSON.parse(query.orderBy);
+      }
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+
+    return this.service.getMany(query);
   }
 
   @Post()

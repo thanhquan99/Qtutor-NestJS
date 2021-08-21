@@ -33,4 +33,6 @@ export class Showtime extends BaseEntity {
     onDelete: 'CASCADE',
   })
   tickets: Ticket[];
+
+  room?: any;
 }

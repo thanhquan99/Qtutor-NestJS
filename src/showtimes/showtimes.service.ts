@@ -1,3 +1,5 @@
+import { Cinema } from './../cinemas/cinema.entity';
+import { ShowtimeQueryParams } from './dto/index';
 import { Seat } from './../seats/seat.entity';
 import {
   TicketType,
@@ -16,12 +18,92 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
 import { Showtime } from './showtimes.entity';
-import { getManager } from 'typeorm';
+import { Equal, getManager } from 'typeorm';
 
 @Injectable()
 export class ShowtimesService extends BaseServiceCRUD<Showtime> {
   constructor(@InjectRepository(Showtime) repo) {
     super(repo, Showtime, 'showtime');
+  }
+
+  async getMany(
+    query: ShowtimeQueryParams,
+  ): Promise<{ results: Showtime[]; total: number }> {
+    const { relationsWith, filterByFields, perPage, page, orderBy } =
+      await this.modifyQuery(query);
+
+    let showtimeIds: number[] = [];
+    if (query.cinemaId) {
+      const cinema = await Cinema.findOne(query.cinemaId);
+      if (!cinema) {
+        throw new NotFoundException('Cinema not found');
+      }
+
+      const rooms = await Room.find({ where: { cinema }, select: ['id'] });
+
+      const seats: Seat[] = [];
+      for (const room of rooms) {
+        const seat = await Seat.findOne({
+          where: { room },
+          relations: ['tickets'],
+          select: ['id'],
+        });
+        if (seat) {
+          seats.push(seat);
+        }
+      }
+
+      const tickets: Ticket[] = [];
+      for (const seat of seats) {
+        const results = await Ticket.find({
+          where: { seat },
+          relations: ['showtime'],
+          select: ['id'],
+        });
+        if (results?.length) {
+          tickets.push(...results);
+        }
+      }
+
+      showtimeIds = tickets.map((ticket) => ticket.showtime.id);
+    }
+
+    const [results, total] = await getManager()
+      .findAndCount(Showtime, {
+        relations: relationsWith,
+        where: (qb) => {
+          qb.where(filterByFields);
+          if (query.cinemaId) {
+            qb.andWhereInIds(showtimeIds);
+          }
+          if (query.movieId) {
+            qb.andWhere({ movie: { id: query.movieId } });
+          }
+        },
+        order: orderBy,
+        take: perPage,
+        skip: (page - 1) * perPage,
+      })
+      .catch((err) => {
+        console.log(err);
+        throw new InternalServerErrorException(`Failed due to ${err}`);
+      });
+
+    await Promise.all(
+      results.map(async (showtime) => {
+        const ticket = await Ticket.findOne({
+          relations: ['seat', 'seat.room', 'seat.room.cinema'],
+          where: { showtime },
+          select: ['id'],
+        });
+        showtime.room = ticket?.seat?.room;
+      }),
+    );
+
+    return {
+      results,
+      total,
+    };
   }
 
   async createOne(createDto: CreateShowtimeDto) {

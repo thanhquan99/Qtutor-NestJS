@@ -12,6 +12,7 @@ import {
   Patch,
   Param,
   ParseIntPipe,
+  Delete,
 } from '@nestjs/common';
 
 import { BaseControllerCRUD } from 'src/base/base-controller-CRUD';
@@ -43,7 +44,7 @@ export class ActorsController extends BaseControllerCRUD<Actor> {
     return this.service.updateOne(id, createActorDto);
   }
 
-  @Patch('/:id')
+  @Delete('/:id')
   @ApiBearerAuth()
   @Permissions(PermissionAction.DELETE_ACTOR)
   deleteOne(
