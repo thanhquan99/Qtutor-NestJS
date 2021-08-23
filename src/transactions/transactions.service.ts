@@ -11,7 +11,7 @@ import { Ticket } from 'src/tickets/ticket.entity';
 import { User } from 'src/users/user.entity';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { Transaction } from './transactions.entity';
-import { getManager } from 'typeorm';
+import { getManager, Not } from 'typeorm';
 
 @Injectable()
 export class TransactionsService extends BaseServiceCRUD<Transaction> {
@@ -30,6 +30,7 @@ export class TransactionsService extends BaseServiceCRUD<Transaction> {
         relations: relationsWith,
         where: (qb) => {
           qb.where(filterByFields);
+          qb.andWhere(`service != 'Draft'`);
           if (query.cinemaId) {
             qb.andWhere(`detail->'cinema'->>'id' = :cinemaId`, {
               cinemaId: query.cinemaId,
@@ -102,6 +103,7 @@ export class TransactionsService extends BaseServiceCRUD<Transaction> {
           user: {
             id: userId,
           },
+          service: Not('Draft'),
         },
         order: orderBy,
         take: perPage,
