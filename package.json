@@ -50,7 +50,7 @@
     "findup-sync": "^4.0.0",
     "jwt-decode": "^3.1.2",
     "knex": "0.21.2",
-    "knex-postgis": "^0.14.1",
+    "knex-postgis": "^0.13.0",
     "nodemailer": "^6.6.0",
     "objection": "^2.2.17",
     "objection-filter": "^4.2.0",
