@@ -1,4 +1,4 @@
-import * as CONFIG from 'config';
+import CONFIG = require('config');
 import { ConnectionOptions } from 'typeorm';
 import { join } from 'path';
 const dbConfig = CONFIG.get('db');
