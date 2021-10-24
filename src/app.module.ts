@@ -5,7 +5,6 @@ import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ScheduleModule } from '@nestjs/schedule';
-import { CronJobsModule } from './cron-jobs/cron-jobs.module';
 import { TutorsModule } from './tutors/tutors.module';
 
 @Module({
@@ -36,7 +35,6 @@ import { TutorsModule } from './tutors/tutors.module';
     }),
     ScheduleModule.forRoot(),
     ConfigModule.forRoot(),
-    CronJobsModule,
     TutorsModule,
   ],
   providers: [],
