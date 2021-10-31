@@ -20,9 +20,9 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config src/ormconfig.ts",
-    "knex:migrate:make": "knex --knexfile src/db/knex.ts migrate:make -x ts",
-    "knex:migrate:latest": "knex --knexfile src/db/knex.ts migrate:latest",
-    "knex:migrate:rollback": "knex --knexfile src/db/knex.ts migrate:rollback"
+    "knex:migrate:make": "knex --knexfile src/db/knex.js migrate:make -x ts",
+    "knex:migrate:latest": "knex --knexfile src/db/knex.js migrate:latest",
+    "knex:migrate:rollback": "knex --knexfile src/db/knex.js migrate:rollback"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.6.0",

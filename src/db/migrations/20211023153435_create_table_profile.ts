@@ -2,14 +2,17 @@ import Knex from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
   await knex.raw(`
-    CREATE TABLE tutor (
+    CREATE TABLE profile (
       id BIGINT PRIMARY KEY DEFAULT (generate_id()),
       "userId" BIGINT NOT NULL,
-      "description" TEXT,
+      name VARCHAR(255) NOT NULL,
+      "dateOfBirth" TIMESTAMP WITH TIME ZONE,
+      "avatar" TEXT,
+      "academicLevel" VARCHAR(255),
+      "additionalInformation" TEXT,
       "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
       "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      UNIQUE("userId"),
-    
+
       CONSTRAINT fk_users
         FOREIGN KEY("userId") 
         REFERENCES users(id)
@@ -19,5 +22,5 @@ export async function up(knex: Knex): Promise<void> {
 }
 
 export async function down(knex: Knex): Promise<void> {
-  await knex.raw(`DROP table tutor`);
+  await knex.raw(`DROP table profile`);
 }

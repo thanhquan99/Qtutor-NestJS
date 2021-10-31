@@ -4,12 +4,18 @@ export async function up(knex: Knex): Promise<void> {
   await knex.raw(`
     CREATE TABLE users (
       id BIGINT PRIMARY KEY DEFAULT (generate_id()),
-      name VARCHAR(255),
-      phone VARCHAR(255),
+      "roleId" BIGINT,
       email VARCHAR(255),
       password TEXT,
+      "verifyEmailCode" TEXT,
+      "forgotPasswordCode" TEXT,
       "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+      "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+      CONSTRAINT fk_role
+        FOREIGN KEY("roleId") 
+        REFERENCES role(id)
+        ON DELETE SET NULL
     )
   `);
 }
