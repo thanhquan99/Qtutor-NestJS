@@ -6,6 +6,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TutorsModule } from './tutors/tutors.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { TutorsModule } from './tutors/tutors.module';
     ScheduleModule.forRoot(),
     ConfigModule.forRoot(),
     TutorsModule,
+    AuthModule,
   ],
   providers: [],
 })

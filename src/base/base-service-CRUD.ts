@@ -28,8 +28,13 @@ export abstract class BaseServiceCRUD<T> {
   }
 
   async getMany(query): Promise<{ results: any; total: number }> {
-    const { relationsWith, filterByFields, perPage, page, orderBy } =
-      await this.modifyQuery(query);
+    const {
+      relationsWith,
+      filterByFields,
+      perPage,
+      page,
+      orderBy,
+    } = await this.modifyQuery(query);
 
     const [results, total] = await getManager()
       .findAndCount(this.entity, {

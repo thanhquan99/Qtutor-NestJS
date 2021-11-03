@@ -1,10 +1,10 @@
 import BaseModel from './BaseModel';
 
-export default class Tutor extends BaseModel {
-  userId: bigint;
+export default class Role extends BaseModel {
+  name: string;
 
   static get tableName() {
-    return 'tutor';
+    return 'role';
   }
 
   $beforeInsert() {
