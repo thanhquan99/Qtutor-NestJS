@@ -13,6 +13,7 @@ export default class User extends BaseModel {
   forgotPasswordCode: string;
 
   role?: ModelFields<Role>;
+  profile?: ModelFields<Profile>;
 
   static get tableName() {
     return 'users';
