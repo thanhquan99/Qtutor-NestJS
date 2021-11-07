@@ -4,7 +4,7 @@ import BaseModel, { ModelFields } from './BaseModel';
 import { Profile } from '.';
 
 export default class User extends BaseModel {
-  roleId: bigint;
+  roleId: string;
 
   email: string;
   password: string;

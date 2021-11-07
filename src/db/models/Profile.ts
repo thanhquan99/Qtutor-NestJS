@@ -2,7 +2,7 @@ import User from './User';
 import BaseModel, { ModelFields } from './BaseModel';
 
 export default class Profile extends BaseModel {
-  userId: bigint;
+  userId: string;
 
   name: string;
   dateOfBirth: Date;

@@ -1,7 +1,8 @@
 import BaseModel from './BaseModel';
 
 export default class Tutor extends BaseModel {
-  userId: bigint;
+  userId: string;
+  description: string;
 
   static get tableName() {
     return 'tutor';

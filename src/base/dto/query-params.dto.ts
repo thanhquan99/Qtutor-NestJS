@@ -25,5 +25,5 @@ export class QueryParams {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  relations: string;
+  customFilter: string;
 }

@@ -3,15 +3,15 @@ import {
   Delete,
   Get,
   Injectable,
-  InternalServerErrorException,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   Query,
+  UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { QueryParams } from 'src/base/dto/query-params.dto';
+import { IdParam } from './params';
 
 @Injectable()
 export abstract class BaseControllerCRUD<T> {
@@ -22,45 +22,40 @@ export abstract class BaseControllerCRUD<T> {
   }
 
   @Get()
-  getMany(
-    @Query(ValidationPipe) query: QueryParams,
-  ): Promise<{ results: T[]; total: number }> {
-    try {
-      if (query?.filter) {
-        query.filter = JSON.parse(query.filter);
-      }
-      if (query?.orderBy) {
-        query.orderBy = JSON.parse(query.orderBy);
-      }
-    } catch (error) {
-      throw new InternalServerErrorException(error);
+  @UsePipes(ValidationPipe)
+  getMany(@Query() query: QueryParams): Promise<{ results: T[]; total }> {
+    if (query.filter) {
+      query.filter = JSON.parse(query.filter);
     }
-
+    if (query.orderBy) {
+      query.orderBy = JSON.parse(query.orderBy);
+    }
+    query.page = query.page || 1;
+    query.perPage = query.perPage || 10;
     return this.service.getMany(query);
   }
 
   @Get('/:id')
-  getOne(@Param('id', ParseIntPipe) id: number): Promise<T> {
-    return this.service.getOne(id);
+  @UsePipes(ValidationPipe)
+  getOne(@Param() params: IdParam): Promise<T> {
+    return this.service.getOne(params.id);
   }
 
   @Post()
-  createOne(@Body() createDto: any): Promise<T> {
-    return this.service.createOne(createDto);
+  @UsePipes(ValidationPipe)
+  createOne(@Body() payload): Promise<T> {
+    return this.service.createOne(payload);
   }
 
   @Patch('/:id')
-  updateOne(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateDto: any,
-  ): Promise<T> {
-    return this.service.updateOne(id, updateDto);
+  @UsePipes(ValidationPipe)
+  updateOne(@Body() payload, @Param() params: IdParam): Promise<T> {
+    return this.service.updateOne(params.id, payload);
   }
 
   @Delete('/:id')
-  deleteOne(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<void | { message: string }> {
-    return this.service.deleteOne(id);
+  @UsePipes(ValidationPipe)
+  deleteOne(@Param() params: IdParam): Promise<{ message: string }> {
+    return this.service.deleteOne(params.id);
   }
 }

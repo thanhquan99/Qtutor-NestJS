@@ -1,131 +1,68 @@
-import {
-  Injectable,
-  NotFoundException,
-  InternalServerErrorException,
-} from '@nestjs/common';
-import {
-  getManager,
-  ILike,
-  Equal,
-  MoreThan,
-  MoreThanOrEqual,
-  Not,
-  LessThan,
-  LessThanOrEqual,
-  Any,
-} from 'typeorm';
+import { QueryBuilder } from 'objection';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import BaseModel from 'src/db/models/BaseModel';
 
 @Injectable()
-export abstract class BaseServiceCRUD<T> {
-  private repository;
-  private entity;
+export abstract class BaseServiceCRUD<T extends BaseModel> {
+  private model;
   private modelName: string;
 
-  constructor(repository, entity, modelName: string) {
-    this.repository = repository;
-    this.entity = entity;
+  constructor(model, modelName: string) {
+    this.model = model;
     this.modelName = modelName;
   }
 
-  async getMany(query): Promise<{ results: any; total: number }> {
-    const {
-      relationsWith,
-      filterByFields,
-      perPage,
-      page,
-      orderBy,
-    } = await this.modifyQuery(query);
+  async paginate(
+    builder: QueryBuilder<T>,
+    query,
+  ): Promise<{ results: T[]; total }> {
+    const { orderBy, perPage, page } = query;
+    const resultsBuilder = builder.clone();
+    const totalBuilder = builder.clone().clearSelect().count().first();
 
-    const [results, total] = await getManager()
-      .findAndCount(this.entity, {
-        relations: relationsWith,
-        where: filterByFields,
-        order: orderBy,
-        take: perPage,
-        skip: (page - 1) * perPage,
-      })
-      .catch((err) => {
-        throw new InternalServerErrorException(`Failed due to ${err}`);
-      });
-
-    return {
-      results,
-      total,
-    };
-  }
-
-  async getOne(id: number): Promise<T> {
-    const base = await this.repository.findOne({ id });
-    if (!base) {
-      throw new NotFoundException(`${this.modelName} not found`);
-    }
-    return base;
-  }
-
-  async createOne(createDto) {
-    const base = this.entity.create(createDto);
-    return base.save();
-  }
-
-  async updateOne(id: number, updateDto) {
-    const base = await this.repository.findOne({ id });
-    if (!base) {
-      throw new NotFoundException(`${this.modelName} not found`);
-    }
-    return await this.repository.save({ id, ...updateDto });
-  }
-
-  async deleteOne(id: number): Promise<void | { message: string }> {
-    await this.repository.delete({
-      id,
-    });
-    return { message: 'delete success' };
-  }
-
-  async modifyQuery(query) {
-    const { filter, relations, perPage = 10, page = 1, orderBy = {} } = query;
-    const filterByFields = {};
-    let relationsWith = [];
-
-    if (filter) {
-      for (const field in filter) {
-        const operator = Object.keys(filter[field])[0];
-        const value = filter[field][operator];
-        switch (operator) {
-          case 'equal':
-            filterByFields[field] = Equal(value);
-            break;
-          case 'notequal':
-            filterByFields[field] = Not(value);
-            break;
-          case 'gt':
-            filterByFields[field] = MoreThan(value);
-            break;
-          case 'gte':
-            filterByFields[field] = MoreThanOrEqual(value);
-            break;
-          case 'lt':
-            filterByFields[field] = LessThan(value);
-            break;
-          case 'lte':
-            filterByFields[field] = LessThanOrEqual(value);
-            break;
-          case 'in':
-            filterByFields[field] = Any(value);
-            break;
-          case 'like':
-            filterByFields[field] = ILike(`%${value}%`);
-            break;
-          default:
-            break;
-        }
+    if (orderBy) {
+      for (const field in orderBy) {
+        resultsBuilder.orderBy(field, orderBy[field]);
       }
     }
+    resultsBuilder.limit(perPage).offset(page - 1);
 
-    if (relations) {
-      relationsWith = relations.split(',');
+    const [results, { count: total }] = await Promise.all([
+      resultsBuilder,
+      totalBuilder,
+    ]);
+    return { results, total };
+  }
+
+  async getMany(query): Promise<{ results: T[]; total }> {
+    const builder = this.model.queryBuilder(query);
+    return await this.paginate(builder, query);
+  }
+
+  async getOne(id: string): Promise<T> {
+    const tutor = await this.model.query().findById(id);
+    if (!tutor) {
+      throw new NotFoundException(`${this.modelName} not found`);
     }
 
-    return { filterByFields, relationsWith, perPage, page, orderBy };
+    return tutor;
+  }
+
+  async createOne(payload) {
+    return await this.model.query().insertGraphAndFetch(payload);
+  }
+
+  async updateOne(id: string, payload): Promise<T> {
+    const tutor = await this.model.query().updateAndFetchById(id, payload);
+    if (!tutor) {
+      throw new NotFoundException(`${this.modelName} not found`);
+    }
+
+    return tutor;
+  }
+
+  async deleteOne(id): Promise<{ message: string }> {
+    await this.model.query().deleteById(id);
+    return { message: 'Delete successfully' };
   }
 }

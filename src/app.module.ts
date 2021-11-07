@@ -1,3 +1,4 @@
+import { RoleGuard } from './guards/role.guard';
 import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
@@ -7,6 +8,7 @@ import { join } from 'path';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TutorsModule } from './tutors/tutors.module';
 import { AuthModule } from './auth/auth.module';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -39,6 +41,11 @@ import { AuthModule } from './auth/auth.module';
     TutorsModule,
     AuthModule,
   ],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: RoleGuard,
+    },
+  ],
 })
 export class AppModule {}
