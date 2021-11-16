@@ -22,7 +22,7 @@ import { APP_GUARD } from '@nestjs/core';
           },
         },
         defaults: {
-          from: '"NestjsCinema" <no-reply@cinema.nestjs.com>',
+          from: '"QTutor" <no-reply@Qtutor.nestjs.com>',
         },
         template: {
           dir: __dirname + '/templates',

@@ -1,4 +1,7 @@
+import { ROLE } from './../../constant/index';
 import Knex from 'knex';
+import { Role, User } from '../models';
+import * as bcrypt from 'bcrypt';
 
 export async function up(knex: Knex): Promise<void> {
   await knex.raw(`
@@ -19,6 +22,21 @@ export async function up(knex: Knex): Promise<void> {
         ON DELETE CASCADE
     )
   `);
+
+  const role = await Role.query(knex).findOne({ name: ROLE.SUPER_ADMIN });
+  const password = bcrypt.hashSync(
+    '123456789',
+    '$2b$10$leL65eC89pj8mWzejdSVbe',
+  );
+  await User.query(knex).insertGraph({
+    email: 'superadmin@gmail.com',
+    password,
+    roleId: role.id,
+    isActive: true,
+    profile: {
+      name: 'Admin',
+    },
+  });
 }
 
 export async function down(knex: Knex): Promise<void> {

@@ -15,7 +15,7 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from 'src/service/jwt/jwt-payload.interface';
 import { MailerService } from '@nestjs-modules/mailer';
 import { v4 as uuid } from 'uuid';
-import { Profile, Role, User } from 'src/db/models';
+import { Role, User } from 'src/db/models';
 import * as bcrypt from 'bcrypt';
 import { ROLE } from 'src/constant';
 const salt = '$2b$10$leL65eC89pj8mWzejdSVbe';
@@ -36,13 +36,13 @@ export class AuthService {
 
     const role = await Role.query().findOne({ name: ROLE.CUSTOMER });
     const verifyEmailCode = uuid();
-    await Profile.query().insertGraphAndFetch({
-      name,
-      user: {
-        email,
-        password: bcrypt.hashSync(password, salt),
-        roleId: role.id,
-        verifyEmailCode,
+    await User.query().insertGraphAndFetch({
+      email,
+      password: bcrypt.hashSync(password, salt),
+      roleId: role.id,
+      verifyEmailCode,
+      profile: {
+        name: name,
       },
     });
 
@@ -94,11 +94,16 @@ export class AuthService {
       throw new UnauthorizedException('Wrong email or password');
     }
 
+    if (!user.isActive) {
+      throw new BadRequestException('Verify your email');
+    }
+
     const payload: JwtPayload = {
       email: user.email,
       roleName: user.role?.name,
     };
     const accessToken = this.jwtService.sign(payload);
+    delete user.password;
     return { accessToken, user };
   }
 

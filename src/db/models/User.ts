@@ -38,9 +38,8 @@ export default class User extends BaseModel {
           to: 'role.id',
         },
       },
-
       profile: {
-        relation: BaseModel.BelongsToOneRelation,
+        relation: BaseModel.HasOneRelation,
         modelClass: Profile,
         join: {
           from: 'users.id',
@@ -55,7 +54,7 @@ export default class User extends BaseModel {
       qb.select('email').withGraphFetched('profile');
     },
     selectInLogin(qb: QueryBuilder<BaseModel>) {
-      qb.select('email', 'password').withGraphFetched('profile');
+      qb.select('email', 'password', 'isActive').withGraphFetched('profile');
     },
   };
 }
