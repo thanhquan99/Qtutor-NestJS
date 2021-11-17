@@ -1,3 +1,4 @@
+import { QueryBuilder } from 'objection';
 import User from './User';
 import BaseModel, { ModelFields } from './BaseModel';
 
@@ -37,4 +38,16 @@ export default class Profile extends BaseModel {
       },
     };
   }
+
+  static modifiers = {
+    defaultSelect(qb: QueryBuilder<BaseModel>) {
+      qb.select(
+        'name',
+        'dateOfBirth',
+        'avatar',
+        'academicLevel',
+        'additionalInformation',
+      );
+    },
+  };
 }

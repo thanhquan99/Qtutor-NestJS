@@ -9,6 +9,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { TutorsModule } from './tutors/tutors.module';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { APP_GUARD } from '@nestjs/core';
     ConfigModule.forRoot(),
     TutorsModule,
     AuthModule,
+    UsersModule,
   ],
   providers: [
     {

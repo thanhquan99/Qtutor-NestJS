@@ -51,10 +51,12 @@ export default class User extends BaseModel {
 
   static modifiers = {
     defaultSelect(qb: QueryBuilder<BaseModel>) {
-      qb.select('email').withGraphFetched('profile');
+      qb.select('email').withGraphFetched('profile(defaultSelect)');
     },
     selectInLogin(qb: QueryBuilder<BaseModel>) {
-      qb.select('email', 'password', 'isActive').withGraphFetched('profile');
+      qb.select('email', 'password', 'isActive').withGraphFetched(
+        'profile(defaultSelect)',
+      );
     },
   };
 }
