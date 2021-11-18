@@ -1,6 +1,7 @@
 import { QueryBuilder } from 'objection';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import BaseModel from 'src/db/models/BaseModel';
+import { knex } from 'src/db/models';
 
 @Injectable()
 export abstract class BaseServiceCRUD<T extends BaseModel> {
@@ -15,10 +16,14 @@ export abstract class BaseServiceCRUD<T extends BaseModel> {
   async paginate(
     builder: QueryBuilder<T>,
     query,
-  ): Promise<{ results: T[]; total }> {
+  ): Promise<{ results: T[]; total: number }> {
     const { orderBy, perPage, page } = query;
     const resultsBuilder = builder.clone();
-    const totalBuilder = builder.clone().clearSelect().count().first();
+    const totalBuilder = knex.raw(
+      `SELECT COUNT(*) 
+      FROM (${builder.clone().clearSelect().toKnexQuery().toQuery()}) as temp
+    `,
+    );
 
     if (orderBy) {
       for (const field in orderBy) {
@@ -27,11 +32,13 @@ export abstract class BaseServiceCRUD<T extends BaseModel> {
     }
     resultsBuilder.limit(perPage).offset(page - 1);
 
-    const [results, { count: total }] = await Promise.all([
-      resultsBuilder,
-      totalBuilder,
-    ]);
-    return { results, total };
+    const [
+      results,
+      {
+        rows: [{ count: total }],
+      },
+    ] = await Promise.all([resultsBuilder, totalBuilder]);
+    return { results, total: Number(total) };
   }
 
   async getMany(query): Promise<{ results: T[]; total }> {

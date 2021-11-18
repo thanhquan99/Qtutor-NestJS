@@ -58,5 +58,10 @@ export default class User extends BaseModel {
         'profile(defaultSelect)',
       );
     },
+    adminSelect(qb: QueryBuilder<BaseModel>) {
+      qb.select('id', 'email', 'isActive', 'createdAt').withGraphFetched(
+        'profile(defaultSelect)',
+      );
+    },
   };
 }

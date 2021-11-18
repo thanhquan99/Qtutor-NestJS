@@ -1,3 +1,4 @@
+import { SALT } from './../constant/index';
 import {
   VerifyEmailDto,
   ForgotPasswordDto,
@@ -18,7 +19,6 @@ import { v4 as uuid } from 'uuid';
 import { Role, User } from 'src/db/models';
 import * as bcrypt from 'bcrypt';
 import { ROLE } from 'src/constant';
-const salt = '$2b$10$leL65eC89pj8mWzejdSVbe';
 
 @Injectable()
 export class AuthService {
@@ -38,7 +38,7 @@ export class AuthService {
     const verifyEmailCode = uuid();
     await User.query().insertGraphAndFetch({
       email,
-      password: bcrypt.hashSync(password, salt),
+      password: bcrypt.hashSync(password, SALT),
       roleId: role.id,
       verifyEmailCode,
       profile: {
@@ -90,7 +90,7 @@ export class AuthService {
       throw new UnauthorizedException('Wrong email or password');
     }
 
-    if (user.password !== bcrypt.hashSync(password, salt)) {
+    if (user.password !== bcrypt.hashSync(password, SALT)) {
       throw new UnauthorizedException('Wrong email or password');
     }
 
