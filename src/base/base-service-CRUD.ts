@@ -30,7 +30,7 @@ export abstract class BaseServiceCRUD<T extends BaseModel> {
         resultsBuilder.orderBy(field, orderBy[field]);
       }
     }
-    resultsBuilder.limit(perPage).offset(page - 1);
+    resultsBuilder.limit(perPage).offset((page - 1) * perPage);
 
     const [
       results,
