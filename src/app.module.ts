@@ -10,6 +10,8 @@ import { TutorsModule } from './tutors/tutors.module';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { UsersModule } from './users/users.module';
+import { CitiesModule } from './cities/cities.module';
+import { SubjectsModule } from './subjects/subjects.module';
 
 @Module({
   imports: [
@@ -42,6 +44,8 @@ import { UsersModule } from './users/users.module';
     TutorsModule,
     AuthModule,
     UsersModule,
+    CitiesModule,
+    SubjectsModule,
   ],
   providers: [
     {
