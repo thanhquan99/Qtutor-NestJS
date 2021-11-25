@@ -17,7 +17,15 @@ export default class BaseModel extends Model {
     query,
     trx = undefined,
   ): QueryBuilder<T, T[]> {
-    const builder = buildFilter(this, trx, {}).build({
+    console.log(query);
+    const options = {
+      operators: {
+        $ilike: (property, operand, builder) =>
+          builder.whereRaw(`?? ILIKE $$%${operand}%$$`, [property]),
+      },
+    };
+
+    const builder = buildFilter(this, trx, options).build({
       where: query.filter || {},
     });
     return (builder as unknown) as QueryBuilder<T, T[]>;
