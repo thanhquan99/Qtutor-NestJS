@@ -1,3 +1,4 @@
+import { QueryBuilder } from 'objection';
 import BaseModel from './BaseModel';
 
 export default class Subject extends BaseModel {
@@ -15,4 +16,10 @@ export default class Subject extends BaseModel {
   $beforeUpdate() {
     this.updatedAt = new Date().toISOString();
   }
+
+  static modifiers = {
+    defaultSelect(qb: QueryBuilder<BaseModel>) {
+      qb.select('subject.name', 'subject.id');
+    },
+  };
 }

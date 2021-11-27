@@ -19,6 +19,8 @@ export class TutorsService extends BaseServiceCRUD<Tutor> {
   }
 
   async getMe(userId: string): Promise<Tutor> {
-    return await Tutor.query().findOne({ userId });
+    return await Tutor.query()
+      .findOne({ userId })
+      .withGraphFetched('[profile(defaultSelect), subjects(defaultSelect)]');
   }
 }

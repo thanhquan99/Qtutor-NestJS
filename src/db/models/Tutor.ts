@@ -1,9 +1,11 @@
-import { Subject, TutorSubject } from 'src/db/models';
+import { Subject, TutorSubject, Profile } from 'src/db/models';
 import BaseModel from './BaseModel';
 
 export default class Tutor extends BaseModel {
-  userId: string;
   description: string;
+  isPublished: boolean;
+
+  userId: string;
 
   static get tableName() {
     return 'tutor';
@@ -21,7 +23,7 @@ export default class Tutor extends BaseModel {
   static get relationMappings() {
     return {
       subjects: {
-        relation: BaseModel.HasManyRelation,
+        relation: BaseModel.ManyToManyRelation,
         modelClass: Subject,
         join: {
           from: 'tutor.id',
@@ -38,6 +40,14 @@ export default class Tutor extends BaseModel {
         join: {
           from: 'tutor.id',
           to: 'tutor_subject.tutorId',
+        },
+      },
+      profile: {
+        relation: BaseModel.HasOneRelation,
+        modelClass: Profile,
+        join: {
+          from: 'tutor.userId',
+          to: 'profile.userId',
         },
       },
     };
