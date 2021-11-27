@@ -5,5 +5,6 @@ import Role from './Role';
 import Profile from './Profile';
 import City from './City';
 import Subject from './Subject';
+import TutorSubject from './TutorSubject';
 
-export { knex, User, Tutor, Role, Profile, City, Subject };
+export { knex, User, Tutor, Role, Profile, City, Subject, TutorSubject };

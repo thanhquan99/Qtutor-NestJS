@@ -25,6 +25,14 @@ import { Role } from 'src/guards/role.decorator';
 export class TutorsController {
   public readonly service = new TutorsService();
 
+  @Get('/me')
+  @ApiBearerAuth()
+  @Role(ROLE.CUSTOMER)
+  @UsePipes(ValidationPipe)
+  getMe(@GetUser() user: User): Promise<Tutor> {
+    return this.service.getMe(user.id);
+  }
+
   @Get()
   @UsePipes(ValidationPipe)
   getMany(@Query() query: QueryParams): Promise<{ results: Tutor[]; total }> {
