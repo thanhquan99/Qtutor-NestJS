@@ -6,6 +6,7 @@ import {
   IsArray,
   ValidateNested,
   IsNotEmpty,
+  ArrayMinSize,
 } from 'class-validator';
 
 export class ITutorSubject {
@@ -18,7 +19,12 @@ export class ITutorSubject {
 export class CreateTutorDto {
   @ApiPropertyOptional()
   @IsOptional()
+  @IsString()
+  description: string;
+
+  @ApiPropertyOptional()
   @IsArray()
+  @ArrayMinSize(1)
   @ValidateNested({ each: true })
   @Type(() => ITutorSubject)
   tutorSubjects: ITutorSubject[];
