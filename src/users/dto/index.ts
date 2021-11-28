@@ -6,6 +6,7 @@ import {
   IsEmail,
   IsNotEmpty,
   IsBoolean,
+  IsNumberString,
 } from 'class-validator';
 
 export class UpdateMeDto {
@@ -28,6 +29,16 @@ export class UpdateMeDto {
   @IsOptional()
   @IsString()
   additionalInformation: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  isMale: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumberString()
+  cityId: string;
 }
 
 export class CreateUserDto {

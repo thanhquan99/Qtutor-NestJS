@@ -1,3 +1,4 @@
+import { knex } from 'src/db/models';
 import { QueryBuilder } from 'objection';
 import User from './User';
 import BaseModel, { ModelFields } from './BaseModel';
@@ -47,6 +48,14 @@ export default class Profile extends BaseModel {
         'avatar',
         'academicLevel',
         'additionalInformation',
+        'isMale',
+      ).modify('selectCityName');
+    },
+    selectCityName(qb: QueryBuilder<BaseModel>) {
+      qb.select(
+        knex.raw(
+          '(SELECT name from city where city.id = profile."cityId" limit 1) as "cityName"',
+        ),
       );
     },
   };
