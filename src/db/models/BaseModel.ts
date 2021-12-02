@@ -17,7 +17,6 @@ export default class BaseModel extends Model {
     query,
     trx = undefined,
   ): QueryBuilder<T, T[]> {
-    console.log(query);
     const options = {
       operators: {
         $ilike: (property, operand, builder) =>

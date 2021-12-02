@@ -12,6 +12,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { UsersModule } from './users/users.module';
 import { CitiesModule } from './cities/cities.module';
 import { SubjectsModule } from './subjects/subjects.module';
+import { StudentsModule } from './students/students.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { SubjectsModule } from './subjects/subjects.module';
     UsersModule,
     CitiesModule,
     SubjectsModule,
+    StudentsModule,
   ],
   providers: [
     {
