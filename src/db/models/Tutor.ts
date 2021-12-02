@@ -1,3 +1,4 @@
+import { QueryBuilder } from 'objection';
 import { Subject, TutorSubject, Profile } from 'src/db/models';
 import BaseModel from './BaseModel';
 
@@ -52,4 +53,12 @@ export default class Tutor extends BaseModel {
       },
     };
   }
+
+  static modifiers = {
+    defaultSelect(qb: QueryBuilder<BaseModel>) {
+      qb.select('id', 'description').withGraphFetched(
+        '[profile(defaultSelect), subjects(defaultSelect)]',
+      );
+    },
+  };
 }
