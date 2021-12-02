@@ -6,6 +6,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { knex, Student, StudentSubject, TutorSubject } from 'src/db/models';
 
 @Injectable()
 export class TutorsService extends BaseServiceCRUD<Tutor> {
@@ -40,5 +41,29 @@ export class TutorsService extends BaseServiceCRUD<Tutor> {
     }
 
     return tutor;
+  }
+
+  async getSuggestion(
+    query,
+    userId: string,
+  ): Promise<{ results: Tutor[]; total }> {
+    const student = await Student.query().findOne({ userId });
+    if (!student) {
+      throw new BadRequestException(`You are not student`);
+    }
+
+    const studentSubjectBuilder = StudentSubject.query()
+      .select('subjectId')
+      .where({ studentId: student.id });
+    const tutorSubjectBuilder = TutorSubject.query()
+      .select(knex.raw('DISTINCT "tutorId"'))
+      .whereRaw(
+        `"subjectId" = ANY(${studentSubjectBuilder.toKnexQuery().toQuery()})`,
+      );
+
+    const builder = Tutor.queryBuilder(query)
+      .modify('defaultSelect')
+      .whereIn('id', knex.raw(tutorSubjectBuilder.toKnexQuery().toQuery()));
+    return await this.paginate(builder, query);
   }
 }
