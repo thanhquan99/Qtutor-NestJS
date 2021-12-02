@@ -1,4 +1,4 @@
-import { knex } from 'src/db/models';
+import { City, knex } from 'src/db/models';
 import { QueryBuilder } from 'objection';
 import User from './User';
 import BaseModel, { ModelFields } from './BaseModel';
@@ -37,6 +37,14 @@ export default class Profile extends BaseModel {
           to: 'users.id',
         },
       },
+      city: {
+        relation: BaseModel.BelongsToOneRelation,
+        modelClass: City,
+        join: {
+          from: 'profile.cityId',
+          to: 'city.id',
+        },
+      },
     };
   }
 
@@ -49,7 +57,7 @@ export default class Profile extends BaseModel {
         'academicLevel',
         'additionalInformation',
         'isMale',
-      ).modify('selectCityName');
+      ).withGraphFetched('city(defaultSelect)');
     },
     selectCityName(qb: QueryBuilder<BaseModel>) {
       qb.select(
