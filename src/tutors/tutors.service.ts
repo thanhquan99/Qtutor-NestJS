@@ -7,6 +7,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { knex, Student, StudentSubject, TutorSubject } from 'src/db/models';
+import { customFilterInTutors } from './utils';
 
 @Injectable()
 export class TutorsService extends BaseServiceCRUD<Tutor> {
@@ -31,6 +32,7 @@ export class TutorsService extends BaseServiceCRUD<Tutor> {
 
   async getMany(query): Promise<{ results: Tutor[]; total }> {
     const builder = Tutor.queryBuilder(query).modify('defaultSelect');
+    customFilterInTutors(builder, query.customFilter);
     return await this.paginate(builder, query);
   }
 

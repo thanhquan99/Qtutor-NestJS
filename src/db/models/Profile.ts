@@ -4,13 +4,15 @@ import User from './User';
 import BaseModel, { ModelFields } from './BaseModel';
 
 export default class Profile extends BaseModel {
-  userId: string;
-
   name: string;
   dateOfBirth: Date;
   avatar: string;
   academicLevel: string;
   additionalInformation: string;
+  isMale: boolean;
+
+  userId: string;
+  cityId: string;
 
   user?: ModelFields<User>;
 

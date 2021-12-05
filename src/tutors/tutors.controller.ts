@@ -61,6 +61,9 @@ export class TutorsController {
     if (query.orderBy) {
       query.orderBy = JSON.parse(query.orderBy);
     }
+    if (query.customFilter) {
+      query.customFilter = JSON.parse(query.customFilter);
+    }
     query.page = query.page || 1;
     query.perPage = query.perPage || 10;
     return this.service.getMany(query);
