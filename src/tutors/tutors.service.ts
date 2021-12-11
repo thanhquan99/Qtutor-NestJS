@@ -30,8 +30,11 @@ export class TutorsService extends BaseServiceCRUD<Tutor> {
       .withGraphFetched('[profile(defaultSelect), subjects(defaultSelect)]');
   }
 
-  async getMany(query): Promise<{ results: Tutor[]; total }> {
+  async getTutors(query, userId: string): Promise<{ results: Tutor[]; total }> {
     const builder = Tutor.queryBuilder(query).modify('defaultSelect');
+    if (userId) {
+      builder.andWhere('userId', '!=', userId);
+    }
     customFilterInTutors(builder, query.customFilter);
     return await this.paginate(builder, query);
   }
@@ -65,7 +68,8 @@ export class TutorsService extends BaseServiceCRUD<Tutor> {
 
     const builder = Tutor.queryBuilder(query)
       .modify('defaultSelect')
-      .whereIn('id', knex.raw(tutorSubjectBuilder.toKnexQuery().toQuery()));
+      .whereIn('id', knex.raw(tutorSubjectBuilder.toKnexQuery().toQuery()))
+      .andWhere('userId', '!=', userId);
     return await this.paginate(builder, query);
   }
 }

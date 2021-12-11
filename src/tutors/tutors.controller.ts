@@ -54,7 +54,12 @@ export class TutorsController {
 
   @Get()
   @UsePipes(ValidationPipe)
-  getMany(@Query() query: QueryParams): Promise<{ results: Tutor[]; total }> {
+  @ApiBearerAuth()
+  @Role(ROLE.OPTIONAL)
+  getMany(
+    @Query() query: QueryParams,
+    @GetUser() user: User,
+  ): Promise<{ results: Tutor[]; total }> {
     if (query.filter) {
       query.filter = JSON.parse(query.filter);
     }
@@ -66,7 +71,7 @@ export class TutorsController {
     }
     query.page = query.page || 1;
     query.perPage = query.perPage || 10;
-    return this.service.getMany(query);
+    return this.service.getTutors(query, user?.id);
   }
 
   @Get('/:id')

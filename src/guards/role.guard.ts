@@ -26,7 +26,12 @@ export class RoleGuard implements CanActivate {
       if (role === undefined) {
         return true;
       }
-      if (!token) {
+
+      if (role === ROLE.OPTIONAL && !token) {
+        return true;
+      }
+
+      if (role !== ROLE.OPTIONAL && !token) {
         throw new UnauthorizedException();
       }
 
@@ -34,7 +39,7 @@ export class RoleGuard implements CanActivate {
 
       const user = await User.query().findOne({ email }).select('id', 'email');
       request.user = { ...user, roleName };
-      if (roleName === ROLE.SUPER_ADMIN) {
+      if (role === ROLE.OPTIONAL || roleName === ROLE.SUPER_ADMIN) {
         return true;
       }
 
