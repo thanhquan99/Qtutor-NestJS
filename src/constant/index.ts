@@ -10,6 +10,6 @@ export enum AcademicLevel {
   STUDENT = 'Student',
   COLLEGE_STUDENT = 'College Student',
   TEACHER = 'Teacher',
-  Master = 'Master',
-  professor = 'Professor',
+  MASTER = 'Master',
+  PROFESSOR = 'Professor',
 }
