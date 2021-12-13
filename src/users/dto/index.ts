@@ -1,3 +1,4 @@
+import { AcademicLevel } from './../../constant/index';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsString,
@@ -7,6 +8,7 @@ import {
   IsNotEmpty,
   IsBoolean,
   IsNumberString,
+  IsEnum,
 } from 'class-validator';
 
 export class UpdateMeDto {
@@ -39,6 +41,16 @@ export class UpdateMeDto {
   @IsOptional()
   @IsNumberString()
   cityId: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsEnum(AcademicLevel)
+  academicLevel: AcademicLevel;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  workLocation: string;
 }
 
 export class CreateUserDto {

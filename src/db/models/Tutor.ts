@@ -1,10 +1,12 @@
 import { QueryBuilder } from 'objection';
 import { Subject, TutorSubject, Profile } from 'src/db/models';
 import BaseModel from './BaseModel';
+import TeachingPrice from './TeachingPrice';
 
 export default class Tutor extends BaseModel {
   description: string;
   isPublished: boolean;
+  minimumSalary: number;
 
   userId: string;
 
@@ -51,13 +53,26 @@ export default class Tutor extends BaseModel {
           to: 'profile.userId',
         },
       },
+      teachingPrices: {
+        relation: BaseModel.HasManyRelation,
+        modelClass: TeachingPrice,
+        join: {
+          from: 'tutor.id',
+          to: 'teaching_price.tutorId',
+        },
+      },
     };
   }
 
   static modifiers = {
     defaultSelect(qb: QueryBuilder<BaseModel>) {
-      qb.select('id', 'description').withGraphFetched(
+      qb.select('id', 'description', 'minimumSalary').withGraphFetched(
         '[profile(defaultSelect), subjects(defaultSelect)]',
+      );
+    },
+    selectInGetOne(qb: QueryBuilder<BaseModel>) {
+      qb.modify('defaultSelect').withGraphFetched(
+        '[teachingPrices(defaultSelect)]',
       );
     },
   };

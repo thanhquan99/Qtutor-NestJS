@@ -10,6 +10,7 @@ export default class Profile extends BaseModel {
   academicLevel: string;
   additionalInformation: string;
   isMale: boolean;
+  workLocation: string;
 
   userId: string;
   cityId: string;
@@ -59,6 +60,7 @@ export default class Profile extends BaseModel {
         'academicLevel',
         'additionalInformation',
         'isMale',
+        'workLocation',
       ).withGraphFetched('city(defaultSelect)');
     },
     selectCityName(qb: QueryBuilder<BaseModel>) {
