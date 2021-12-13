@@ -25,9 +25,7 @@ export class TutorsService extends BaseServiceCRUD<Tutor> {
   }
 
   async getMe(userId: string): Promise<Tutor> {
-    return await Tutor.query()
-      .findOne({ userId })
-      .withGraphFetched('[profile(defaultSelect), subjects(defaultSelect)]');
+    return await Tutor.query().findOne({ userId }).modify('selectInGetOne');
   }
 
   async getTutors(query, userId: string): Promise<{ results: Tutor[]; total }> {
@@ -40,7 +38,7 @@ export class TutorsService extends BaseServiceCRUD<Tutor> {
   }
 
   async getOne(id: string): Promise<Tutor> {
-    const tutor = await Tutor.query().modify('defaultSelect').findById(id);
+    const tutor = await Tutor.query().modify('selectInGetOne').findById(id);
     if (!tutor) {
       throw new NotFoundException(`Tutor not found`);
     }
