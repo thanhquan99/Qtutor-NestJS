@@ -7,7 +7,7 @@ import {
   ValidateNested,
   IsNotEmpty,
   ArrayMinSize,
-  IsNumberString,
+  IsNumber,
 } from 'class-validator';
 
 export class ITutorSubject {
@@ -25,12 +25,12 @@ export class ITeachingPrice {
 
   @ApiPropertyOptional()
   @IsNotEmpty()
-  @IsNumberString()
+  @IsNumber()
   sessionsOfWeek: number;
 
   @ApiPropertyOptional()
   @IsNotEmpty()
-  @IsNumberString()
+  @IsNumber()
   price: number;
 }
 
@@ -42,7 +42,7 @@ export class CreateTutorDto {
 
   @ApiPropertyOptional()
   @IsNotEmpty()
-  @IsNumberString()
+  @IsNumber()
   minimumSalary: number;
 
   @ApiPropertyOptional()
@@ -68,6 +68,6 @@ export class UpdateTutorDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsNumberString()
+  @IsNumber()
   minimumSalary: number;
 }
