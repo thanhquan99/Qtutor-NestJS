@@ -14,6 +14,7 @@ import { CitiesModule } from './cities/cities.module';
 import { SubjectsModule } from './subjects/subjects.module';
 import { StudentsModule } from './students/students.module';
 import { TutorStudentsModule } from './tutor-students/tutor-students.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { TutorStudentsModule } from './tutor-students/tutor-students.module';
     SubjectsModule,
     StudentsModule,
     TutorStudentsModule,
+    NotificationModule,
   ],
   providers: [
     {

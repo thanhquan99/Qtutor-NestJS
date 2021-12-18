@@ -1,21 +1,14 @@
-import { ROLE, TutorStudentStatus } from 'src/constant';
-import { SALT } from './../constant/index';
-import { UpdateMeDto, CreateUserDto } from './dto/index';
 import {
-  Profile,
-  Role,
-  Student,
-  Tutor,
-  TutorStudent,
-  User,
-} from 'src/db/models';
-import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
-import {
+  BadRequestException,
   Injectable,
   NotFoundException,
-  BadRequestException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
+import { ROLE } from 'src/constant';
+import { Notification, Profile, Role, User } from 'src/db/models';
+import { SALT } from './../constant/index';
+import { CreateUserDto, UpdateMeDto } from './dto/index';
 
 @Injectable()
 export class UsersService extends BaseServiceCRUD<User> {
@@ -42,30 +35,22 @@ export class UsersService extends BaseServiceCRUD<User> {
     return await this.paginate(builder, query);
   }
 
-  async getMyNotification(id: string, query: any) {
-    const student = await Student.query().findOne({ userId: id });
-    const tutor = await Tutor.query().findOne({ userId: id });
-    if (!tutor && !student) {
-      return { total: 0, results: [] };
-    }
-    const builder = TutorStudent.queryBuilder(query)
+  async getMyNotification(userId: string, query: any) {
+    const builder = Notification.queryBuilder(query)
       .modify('defaultSelect')
-      .where((qb) => {
-        if (student) {
-          qb.orWhere({
-            studentId: student.id,
-            status: TutorStudentStatus.WAITING_STUDENT_ACCEPT,
-          });
-        }
-        if (tutor) {
-          qb.orWhere({
-            tutorId: tutor.id,
-            status: TutorStudentStatus.WAITING_TUTOR_ACCEPT,
-          });
-        }
-      });
+      .where({ userId });
+    return await this.paginate(builder, query);
+  }
 
-    const notifications = await this.paginate(builder, query);
+  async getMyNotificationSummary(userId: string): Promise<{
+    total: string;
+    totalUnread: string;
+  }> {
+    const [{ count: total }, { count: totalUnread }] = await Promise.all([
+      Notification.query().where({ userId }).count().first(),
+      Notification.query().where({ userId, isRead: false }).count().first(),
+    ]);
+    return { total, totalUnread };
   }
 
   async getOne(id: string): Promise<User> {

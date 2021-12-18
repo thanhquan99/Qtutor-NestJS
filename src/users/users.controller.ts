@@ -40,7 +40,7 @@ export class UsersController {
     return this.service.updateMe(user.id, payload);
   }
 
-  @Get('/me/notification')
+  @Get('/me/notifications')
   @UsePipes(ValidationPipe)
   @ApiBearerAuth()
   @Role(ROLE.CUSTOMER)
@@ -54,6 +54,16 @@ export class UsersController {
     query.page = query.page || 1;
     query.perPage = query.perPage || 10;
     return this.service.getMyNotification(user.id, query);
+  }
+
+  @Get('/me/notifications/summary')
+  @UsePipes(ValidationPipe)
+  @ApiBearerAuth()
+  @Role(ROLE.CUSTOMER)
+  getMyNotificationSummary(
+    @GetUser() user: User,
+  ): Promise<{ total: string; totalUnread: string }> {
+    return this.service.getMyNotificationSummary(user.id);
   }
 
   @Get()
