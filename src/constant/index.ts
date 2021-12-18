@@ -13,3 +13,10 @@ export enum AcademicLevel {
   MASTER = 'Master',
   PROFESSOR = 'Professor',
 }
+
+export enum TutorStudentStatus {
+  WAITING_TUTOR_ACCEPT = 'Waiting Tutor Accept',
+  WAITING_STUDENT_ACCEPT = 'Waiting Student Accept',
+  COMPLETED = 'Completed',
+  CANCEL = 'Cancel',
+}

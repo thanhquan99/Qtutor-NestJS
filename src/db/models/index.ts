@@ -9,6 +9,7 @@ import TutorSubject from './TutorSubject';
 import Student from './Student';
 import StudentSubject from './StudentSubject';
 import TeachingPrice from './TeachingPrice';
+import TutorStudent from './TutorStudent';
 
 export {
   knex,
@@ -22,4 +23,5 @@ export {
   Student,
   StudentSubject,
   TeachingPrice,
+  TutorStudent,
 };

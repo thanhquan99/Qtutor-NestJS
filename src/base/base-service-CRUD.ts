@@ -14,9 +14,9 @@ export abstract class BaseServiceCRUD<T extends BaseModel> {
   }
 
   async paginate(
-    builder: QueryBuilder<T>,
+    builder: QueryBuilder<BaseModel>,
     query,
-  ): Promise<{ results: T[]; total: number }> {
+  ): Promise<{ results: any[]; total: number }> {
     const { orderBy, perPage, page } = query;
     const resultsBuilder = builder.clone();
     const totalBuilder = knex.raw(

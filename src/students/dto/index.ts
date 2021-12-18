@@ -7,7 +7,10 @@ import {
   ValidateNested,
   IsNotEmpty,
   ArrayMinSize,
+  IsEnum,
+  IsNumber,
 } from 'class-validator';
+import { TutorStudentStatus } from 'src/constant';
 
 export class IStudentSubject {
   @ApiPropertyOptional()
@@ -35,4 +38,26 @@ export class UpdateStudentDto {
   @IsOptional()
   @IsString()
   description: string;
+}
+
+export class RegisterStudyDto {
+  @ApiPropertyOptional()
+  @IsNotEmpty()
+  @IsNumber()
+  salary: number;
+
+  @ApiPropertyOptional()
+  @IsNotEmpty()
+  @IsEnum(TutorStudentStatus)
+  status: TutorStudentStatus;
+
+  @ApiPropertyOptional()
+  @IsNotEmpty()
+  @IsString()
+  tutorId: string;
+
+  @ApiPropertyOptional()
+  @IsNotEmpty()
+  @IsString()
+  subjectId: string;
 }

@@ -1,4 +1,9 @@
-import { CreateStudentDto, UpdateStudentDto } from './dto/index';
+import { TutorStudentsService } from './../tutor-students/tutor-students.service';
+import {
+  CreateStudentDto,
+  RegisterStudyDto,
+  UpdateStudentDto,
+} from './dto/index';
 import { IdParam } from './../base/params/index';
 import { QueryParams } from './../base/dto/query-params.dto';
 import { User, Student } from 'src/db/models';
@@ -11,6 +16,7 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -23,6 +29,7 @@ import { Role } from 'src/guards/role.decorator';
 @Controller('students')
 export class StudentsController {
   public readonly service = new StudentsService();
+  public readonly tutorStudentService = new TutorStudentsService();
 
   @Get('/me')
   @ApiBearerAuth()
@@ -30,6 +37,26 @@ export class StudentsController {
   @UsePipes(ValidationPipe)
   getMe(@GetUser() user: User): Promise<Student> {
     return this.service.getMe(user.id);
+  }
+
+  @Post('/register-study')
+  @UsePipes(ValidationPipe)
+  @ApiBearerAuth()
+  @Role(ROLE.CUSTOMER)
+  async registerStudy(
+    @Body() payload: RegisterStudyDto,
+    @GetUser() user: User,
+  ) {
+    const student = await Student.query().findOne({ userId: user.id });
+    if (!student) {
+      throw new NotFoundException(
+        'You are not a student. Please register to be a student',
+      );
+    }
+    return this.tutorStudentService.createOne({
+      ...payload,
+      studentId: student.id,
+    });
   }
 
   @Get()

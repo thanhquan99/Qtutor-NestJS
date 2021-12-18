@@ -75,5 +75,8 @@ export default class Tutor extends BaseModel {
         '[teachingPrices(defaultSelect)]',
       );
     },
+    selectInTutorStudent(qb: QueryBuilder<BaseModel>) {
+      qb.select('id').withGraphFetched('[profile(defaultSelect)]');
+    },
   };
 }

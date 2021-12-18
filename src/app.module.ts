@@ -13,6 +13,7 @@ import { UsersModule } from './users/users.module';
 import { CitiesModule } from './cities/cities.module';
 import { SubjectsModule } from './subjects/subjects.module';
 import { StudentsModule } from './students/students.module';
+import { TutorStudentsModule } from './tutor-students/tutor-students.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { StudentsModule } from './students/students.module';
     CitiesModule,
     SubjectsModule,
     StudentsModule,
+    TutorStudentsModule,
   ],
   providers: [
     {

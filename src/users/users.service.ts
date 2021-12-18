@@ -1,7 +1,14 @@
-import { ROLE } from 'src/constant';
+import { ROLE, TutorStudentStatus } from 'src/constant';
 import { SALT } from './../constant/index';
 import { UpdateMeDto, CreateUserDto } from './dto/index';
-import { Profile, Role, User } from 'src/db/models';
+import {
+  Profile,
+  Role,
+  Student,
+  Tutor,
+  TutorStudent,
+  User,
+} from 'src/db/models';
 import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
 import {
   Injectable,
@@ -33,6 +40,32 @@ export class UsersService extends BaseServiceCRUD<User> {
       .modify('adminSelect')
       .whereNot({ id: adminId });
     return await this.paginate(builder, query);
+  }
+
+  async getMyNotification(id: string, query: any) {
+    const student = await Student.query().findOne({ userId: id });
+    const tutor = await Tutor.query().findOne({ userId: id });
+    if (!tutor && !student) {
+      return { total: 0, results: [] };
+    }
+    const builder = TutorStudent.queryBuilder(query)
+      .modify('defaultSelect')
+      .where((qb) => {
+        if (student) {
+          qb.orWhere({
+            studentId: student.id,
+            status: TutorStudentStatus.WAITING_STUDENT_ACCEPT,
+          });
+        }
+        if (tutor) {
+          qb.orWhere({
+            tutorId: tutor.id,
+            status: TutorStudentStatus.WAITING_TUTOR_ACCEPT,
+          });
+        }
+      });
+
+    const notifications = await this.paginate(builder, query);
   }
 
   async getOne(id: string): Promise<User> {
