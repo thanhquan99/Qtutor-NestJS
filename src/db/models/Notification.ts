@@ -48,6 +48,7 @@ export default class Notification extends BaseModel {
         'isRead',
         'type',
         'url',
+        'createdAt',
       ).withGraphFetched('[sender(defaultSelect)]');
     },
   };
