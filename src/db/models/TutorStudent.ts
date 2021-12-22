@@ -5,7 +5,7 @@ import Student from './Student';
 import Tutor from './Tutor';
 
 export default class TutorStudent extends BaseModel {
-  salary: string;
+  salary: number;
   status: string;
 
   tutorId: string;

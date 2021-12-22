@@ -48,11 +48,6 @@ export class RegisterStudyDto {
 
   @ApiPropertyOptional()
   @IsNotEmpty()
-  @IsEnum(TutorStudentStatus)
-  status: TutorStudentStatus;
-
-  @ApiPropertyOptional()
-  @IsNotEmpty()
   @IsString()
   tutorId: string;
 

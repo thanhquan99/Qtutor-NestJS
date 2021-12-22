@@ -20,3 +20,12 @@ export enum TutorStudentStatus {
   COMPLETED = 'Completed',
   CANCEL = 'Cancel',
 }
+
+export enum NotificationExtraType {
+  TUTOR_STUDENT = 'Tutor Student',
+}
+
+export enum NotificationType {
+  EDIT = 'Edit',
+  READ_ONLY = 'Read Only',
+}

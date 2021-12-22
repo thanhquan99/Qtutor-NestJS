@@ -6,7 +6,7 @@ import {
 } from './dto/index';
 import { IdParam } from './../base/params/index';
 import { QueryParams } from './../base/dto/query-params.dto';
-import { User, Student } from 'src/db/models';
+import { User, Student, Tutor } from 'src/db/models';
 import { GetUser } from './../auth/get-user.decorator';
 import { ROLE } from './../constant/index';
 import { ApiBearerAuth } from '@nestjs/swagger';
@@ -39,7 +39,7 @@ export class StudentsController {
     return this.service.getMe(user.id);
   }
 
-  @Post('/register-study')
+  @Post('/me/tutor-students')
   @UsePipes(ValidationPipe)
   @ApiBearerAuth()
   @Role(ROLE.CUSTOMER)
@@ -53,10 +53,13 @@ export class StudentsController {
         'You are not a student. Please register to be a student',
       );
     }
-    return this.tutorStudentService.createOne({
-      ...payload,
-      studentId: student.id,
-    });
+
+    const tutor = await Tutor.query().findById(payload.tutorId);
+    if (!tutor) {
+      throw new NotFoundException('Tutor not found');
+    }
+
+    return this.service.registerStudy(payload, student, tutor);
   }
 
   @Get()
