@@ -24,55 +24,61 @@ export class NotificationService extends BaseServiceCRUD<Notification> {
       throw new NotFoundException('Notification not found');
     }
 
-    const { status } = payload;
-    const tutorStudent = await TutorStudent.query().findById(
-      notification.extraId,
-    );
-    if (!tutorStudent) {
-      throw new BadRequestException('Something went wrong. Contact admin');
+    if (payload.isRead) {
+      await notification.$query().patch({ isRead: payload.isRead });
     }
 
-    if (tutorStudent.status === TutorStudentStatus.WAITING_TUTOR_ACCEPT) {
-      let message = notification.message;
-      const subject = await Subject.query().findById(tutorStudent.subjectId);
-
-      if (status === TutorStudentStatus.ACCEPTED) {
-        message += '<br/>You <b>accepted</b> this';
-        //Send notification to student
-        const acceptedMessage = `Your register for <b>${subject.name}</b> course for <b>${tutorStudent.salary}</b> already <b>accepted</b>.`;
-        await Notification.query().insertGraph({
-          userId: notification.senderId,
-          senderId: notification.userId,
-          message: acceptedMessage,
-          type: NotificationType.READ_ONLY,
-          url: `/tutors/${tutorStudent.tutorId}`,
-        });
-
-        await tutorStudent.$query().patch({ status });
+    if (payload.status) {
+      const { status } = payload;
+      const tutorStudent = await TutorStudent.query().findById(
+        notification.extraId,
+      );
+      if (!tutorStudent) {
+        throw new BadRequestException('Something went wrong. Contact admin');
       }
 
-      if (status === TutorStudentStatus.CANCEL) {
-        message += '<br/>You <b>canceled</b> this';
-        //Send notification to student
-        const declinedMessage = `Your register for <b>${subject.name}</b> course for <b>${tutorStudent.salary}</b> has been <b>declined</b>.`;
-        await Notification.query().insertGraph({
-          userId: notification.senderId,
-          senderId: notification.userId,
-          message: declinedMessage,
+      if (tutorStudent.status === TutorStudentStatus.WAITING_TUTOR_ACCEPT) {
+        let message = notification.message;
+        const subject = await Subject.query().findById(tutorStudent.subjectId);
+
+        if (status === TutorStudentStatus.ACCEPTED) {
+          message += '<br/>You <b>accepted</b> this';
+          //Send notification to student
+          const acceptedMessage = `Your register for <b>${subject.name}</b> course for <b>${tutorStudent.salary}</b> already <b>accepted</b>.`;
+          await Notification.query().insertGraph({
+            userId: notification.senderId,
+            senderId: notification.userId,
+            message: acceptedMessage,
+            type: NotificationType.READ_ONLY,
+            url: `/tutors/${tutorStudent.tutorId}`,
+          });
+
+          await tutorStudent.$query().patch({ status });
+        }
+
+        if (status === TutorStudentStatus.CANCEL) {
+          message += '<br/>You <b>canceled</b> this';
+          //Send notification to student
+          const declinedMessage = `Your register for <b>${subject.name}</b> course for <b>${tutorStudent.salary}</b> has been <b>declined</b>.`;
+          await Notification.query().insertGraph({
+            userId: notification.senderId,
+            senderId: notification.userId,
+            message: declinedMessage,
+            type: NotificationType.READ_ONLY,
+            url: `/tutors/${tutorStudent.tutorId}`,
+          });
+
+          //Delete tutor-student
+          await tutorStudent.$query().delete();
+        }
+
+        //Update type and read notification
+        await notification.$query().patch({
+          message,
           type: NotificationType.READ_ONLY,
-          url: `/tutors/${tutorStudent.tutorId}`,
+          isRead: true,
         });
-
-        //Delete tutor-student
-        await tutorStudent.$query().delete();
       }
-
-      //Update type and read notification
-      await notification.$query().patch({
-        message,
-        type: NotificationType.READ_ONLY,
-        isRead: true,
-      });
     }
 
     return notification;
