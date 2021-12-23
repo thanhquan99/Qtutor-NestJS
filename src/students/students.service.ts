@@ -65,7 +65,7 @@ export class StudentsService extends BaseServiceCRUD<Student> {
         payload.salary,
       )}</b>.`,
       type: NotificationType.EDIT,
-      url: `students/${student.id}/profile`,
+      url: `students/${student.id}`,
       userId: tutor.userId,
       senderId: student.userId,
       extraId: tutorStudent.id,
