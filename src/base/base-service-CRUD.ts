@@ -47,12 +47,12 @@ export abstract class BaseServiceCRUD<T extends BaseModel> {
   }
 
   async getOne(id: string): Promise<T> {
-    const tutor = await this.model.query().findById(id);
-    if (!tutor) {
+    const object = await this.model.query().findById(id);
+    if (!object) {
       throw new NotFoundException(`${this.modelName} not found`);
     }
 
-    return tutor;
+    return object;
   }
 
   async createOne(payload) {
@@ -60,12 +60,12 @@ export abstract class BaseServiceCRUD<T extends BaseModel> {
   }
 
   async updateOne(id: string, payload): Promise<T> {
-    const tutor = await this.model.query().updateAndFetchById(id, payload);
-    if (!tutor) {
+    const object = await this.model.query().updateAndFetchById(id, payload);
+    if (!object) {
       throw new NotFoundException(`${this.modelName} not found`);
     }
 
-    return tutor;
+    return object;
   }
 
   async deleteOne(id): Promise<{ message: string }> {

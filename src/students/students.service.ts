@@ -55,15 +55,15 @@ export class StudentsService extends BaseServiceCRUD<Student> {
       studentId: student.id,
       status: TutorStudentStatus.WAITING_TUTOR_ACCEPT,
     });
+
     const profile = await Profile.query().findOne({ userId: student.userId });
     const subject = await Subject.query().findById(payload.subjectId);
-
     await Notification.query().insertGraphAndFetch({
       message: `<b>${profile.name}</b> want to register for <b>${
         subject.name
       }</b> course for <b>${new Intl.NumberFormat().format(
         payload.salary,
-      )}</b>`,
+      )}</b>.`,
       type: NotificationType.EDIT,
       url: `students/${student.id}/profile`,
       userId: tutor.userId,
