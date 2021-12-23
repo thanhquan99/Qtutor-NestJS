@@ -4,11 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
-import {
-  NotificationExtraType,
-  NotificationType,
-  TutorStudentStatus,
-} from 'src/constant';
+import { NotificationType, TutorStudentStatus } from 'src/constant';
 import { Notification, Subject, TutorStudent } from 'src/db/models';
 import { UpdateNotificationDto } from './dto';
 
@@ -29,9 +25,8 @@ export class NotificationService extends BaseServiceCRUD<Notification> {
     }
 
     const { status } = payload;
-    const tutorStudent = await TutorStudent.query().patchAndFetchById(
+    const tutorStudent = await TutorStudent.query().findById(
       notification.extraId,
-      { status },
     );
     if (!tutorStudent) {
       throw new BadRequestException('Something went wrong. Contact admin');
@@ -50,9 +45,10 @@ export class NotificationService extends BaseServiceCRUD<Notification> {
           senderId: notification.userId,
           message: acceptedMessage,
           type: NotificationType.READ_ONLY,
-          extraType: NotificationExtraType.TUTOR_STUDENT,
           url: `/tutors/${tutorStudent.tutorId}`,
         });
+
+        await tutorStudent.$query().patch({ status });
       }
 
       if (status === TutorStudentStatus.CANCEL) {
@@ -64,7 +60,6 @@ export class NotificationService extends BaseServiceCRUD<Notification> {
           senderId: notification.userId,
           message: declinedMessage,
           type: NotificationType.READ_ONLY,
-          extraType: NotificationExtraType.TUTOR_STUDENT,
           url: `/tutors/${tutorStudent.tutorId}`,
         });
 
@@ -73,9 +68,11 @@ export class NotificationService extends BaseServiceCRUD<Notification> {
       }
 
       //Update type and read notification
-      await notification
-        .$query()
-        .patch({ message, type: NotificationType.READ_ONLY, isRead: true });
+      await notification.$query().patch({
+        message,
+        type: NotificationType.READ_ONLY,
+        isRead: true,
+      });
     }
 
     return notification;
