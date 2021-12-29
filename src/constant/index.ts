@@ -29,3 +29,31 @@ export enum NotificationType {
   EDIT = 'Edit',
   READ_ONLY = 'Read Only',
 }
+
+export enum ScheduleDays {
+  MONDAY = 25,
+  TUESDAY = 26,
+  WEDNESDAY = 27,
+  THURSDAY = 28,
+  FRIDAY = 29,
+  SATURDAY = 30,
+  SUNDAY = 31,
+}
+
+export enum DefaultDate {
+  YEAR = 2018,
+  MONTH = 5,
+}
+
+export enum DaysOfWeek {
+  MONDAY = 'MONDAY',
+  TUESDAY = 'TUESDAY',
+  WEDNESDAY = 'WEDNESDAY',
+  THURSDAY = 'THURSDAY',
+  FRIDAY = 'FRIDAY',
+  SATURDAY = 'SATURDAY',
+  SUNDAY = 'SUNDAY ',
+}
+
+export const HOURS_OF_DAY = [...Array(16).keys()].map((i) => i + 7);
+export const MINUTES_OF_HOUR = [0, 15, 30, 45];

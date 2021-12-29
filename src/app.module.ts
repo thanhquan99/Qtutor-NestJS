@@ -15,6 +15,7 @@ import { SubjectsModule } from './subjects/subjects.module';
 import { StudentsModule } from './students/students.module';
 import { TutorStudentsModule } from './tutor-students/tutor-students.module';
 import { NotificationModule } from './notification/notification.module';
+import { SchedulesModule } from './schedules/schedules.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { NotificationModule } from './notification/notification.module';
     StudentsModule,
     TutorStudentsModule,
     NotificationModule,
+    SchedulesModule,
   ],
   providers: [
     {

@@ -11,6 +11,7 @@ import StudentSubject from './StudentSubject';
 import TeachingPrice from './TeachingPrice';
 import TutorStudent from './TutorStudent';
 import Notification from './Notification';
+import Schedule from './Schedule';
 
 export {
   knex,
@@ -26,4 +27,5 @@ export {
   TeachingPrice,
   TutorStudent,
   Notification,
+  Schedule,
 };
