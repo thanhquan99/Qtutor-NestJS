@@ -1,3 +1,4 @@
+import { TutorStudentStatus } from './../constant/index';
 import { CreateTutorDto } from './dto/index';
 import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
 import Tutor from 'src/db/models/Tutor';
@@ -6,7 +7,13 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { knex, Student, StudentSubject, TutorSubject } from 'src/db/models';
+import {
+  knex,
+  Student,
+  StudentSubject,
+  TutorStudent,
+  TutorSubject,
+} from 'src/db/models';
 import { customFilterInTutors } from './utils';
 
 @Injectable()
@@ -29,7 +36,7 @@ export class TutorsService extends BaseServiceCRUD<Tutor> {
   }
 
   async getTutors(query, userId: string): Promise<{ results: Tutor[]; total }> {
-    const builder = Tutor.queryBuilder(query).modify('defaultSelect');
+    const builder = Tutor.queryBuilder<Tutor>(query).modify('defaultSelect');
     if (userId) {
       builder.andWhere('userId', '!=', userId);
     }
@@ -69,5 +76,26 @@ export class TutorsService extends BaseServiceCRUD<Tutor> {
       .whereIn('id', knex.raw(tutorSubjectBuilder.toKnexQuery().toQuery()))
       .andWhere('userId', '!=', userId);
     return await this.paginate(builder, query);
+  }
+
+  async getMyStudents(
+    query: any,
+    userId: string,
+  ): Promise<{ results: Student[]; total: number }> {
+    const tutor = await Tutor.query().findOne({ userId });
+    if (!tutor) {
+      throw new BadRequestException('You are not tutor');
+    }
+
+    const tutorStudentBuilder = TutorStudent.query()
+      .select('studentId')
+      .where({ tutorId: tutor.id })
+      .andWhere({ status: TutorStudentStatus.ACCEPTED });
+
+    const studentBuilder = Student.query()
+      .withGraphFetched('profile(defaultSelect)')
+      .whereIn('id', knex.raw(tutorStudentBuilder.toKnexQuery().toQuery()));
+
+    return await this.paginate(studentBuilder, query);
   }
 }
