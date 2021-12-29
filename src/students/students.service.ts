@@ -1,6 +1,10 @@
-import { CreateStudentDto, RegisterStudyDto } from './dto/index';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  NotificationExtraType,
+  NotificationType,
+  TutorStudentStatus,
+} from 'src/constant';
 import {
   Notification,
   Profile,
@@ -9,11 +13,8 @@ import {
   Tutor,
   TutorStudent,
 } from 'src/db/models';
-import {
-  NotificationExtraType,
-  NotificationType,
-  TutorStudentStatus,
-} from 'src/constant';
+import { CreateStudentDto, RegisterStudyDto } from './dto/index';
+import { customFilterInStudents } from './utils';
 
 @Injectable()
 export class StudentsService extends BaseServiceCRUD<Student> {
@@ -73,5 +74,18 @@ export class StudentsService extends BaseServiceCRUD<Student> {
     });
 
     return tutorStudent;
+  }
+
+  async getStudents(
+    query,
+    userId: string,
+  ): Promise<{ results: Student[]; total }> {
+    const builder =
+      Student.queryBuilder<Student>(query).modify('defaultSelect');
+    if (userId) {
+      builder.andWhere('userId', '!=', userId);
+    }
+    customFilterInStudents(builder, query.customFilter);
+    return await this.paginate(builder, query);
   }
 }

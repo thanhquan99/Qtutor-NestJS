@@ -64,16 +64,24 @@ export class StudentsController {
 
   @Get()
   @UsePipes(ValidationPipe)
-  getMany(@Query() query: QueryParams): Promise<{ results: Student[]; total }> {
+  @Role(ROLE.OPTIONAL)
+  @ApiBearerAuth()
+  getMany(
+    @Query() query: QueryParams,
+    @GetUser() user: User,
+  ): Promise<{ results: Student[]; total }> {
     if (query.filter) {
       query.filter = JSON.parse(query.filter);
     }
     if (query.orderBy) {
       query.orderBy = JSON.parse(query.orderBy);
     }
+    if (query.customFilter) {
+      query.customFilter = JSON.parse(query.customFilter);
+    }
     query.page = query.page || 1;
     query.perPage = query.perPage || 10;
-    return this.service.getMany(query);
+    return this.service.getStudents(query, user?.id);
   }
 
   @Get('/:id')
