@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { QueryBuilder } from 'objection';
-import { knex, Profile, Student, TutorSubject } from 'src/db/models';
+import { knex, Profile, Student, StudentSubject } from 'src/db/models';
 
 const customFilterInStudents = (
   builder: QueryBuilder<Student>,
@@ -31,7 +31,7 @@ const customFilterInStudents = (
   }
 
   if (subjectId) {
-    const tutorSubjectBuilder = TutorSubject.query()
+    const tutorSubjectBuilder = StudentSubject.query()
       .select('studentId')
       .where({ subjectId });
     builder.whereIn(
