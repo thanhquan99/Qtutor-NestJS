@@ -6,7 +6,7 @@ import {
 } from './dto/index';
 import { IdParam } from './../base/params/index';
 import { QueryParams } from './../base/dto/query-params.dto';
-import { User, Student, Tutor } from 'src/db/models';
+import { User, Student, Tutor, TutorStudent } from 'src/db/models';
 import { GetUser } from './../auth/get-user.decorator';
 import { ROLE } from './../constant/index';
 import { ApiBearerAuth } from '@nestjs/swagger';
@@ -60,6 +60,29 @@ export class StudentsController {
     }
 
     return this.service.registerStudy(payload, student, tutor);
+  }
+
+  @Get('/my-courses')
+  @ApiBearerAuth()
+  @Role(ROLE.CUSTOMER)
+  @UsePipes(ValidationPipe)
+  getMyCourses(
+    @GetUser() user: User,
+    @Query() query: QueryParams,
+  ): Promise<{ results: TutorStudent[]; total }> {
+    if (query.filter) {
+      query.filter = JSON.parse(query.filter);
+    }
+    if (query.orderBy) {
+      query.orderBy = JSON.parse(query.orderBy);
+    }
+    if (query.customFilter) {
+      query.customFilter = JSON.parse(query.customFilter);
+    }
+    query.page = query.page || 1;
+    query.perPage = query.perPage || 10;
+
+    return this.service.getMyCourses(user.id, query);
   }
 
   @Get()

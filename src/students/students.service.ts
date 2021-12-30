@@ -92,4 +92,24 @@ export class StudentsService extends BaseServiceCRUD<Student> {
     customFilterInStudents(builder, query.customFilter);
     return await this.paginate(builder, query);
   }
+
+  async getMyCourses(
+    userId: string,
+    query: any,
+  ): Promise<{ results: TutorStudent[]; total }> {
+    const student = await Student.query().findOne({ userId });
+    if (!student) {
+      throw new BadRequestException('You are not student');
+    }
+
+    const builder = TutorStudent.query()
+      .modify('selectInGetCourse')
+      .where({ studentId: student.id })
+      .whereIn('status', [
+        TutorStudentStatus.ACCEPTED,
+        TutorStudentStatus.ARCHIVED,
+      ]);
+
+    return await this.paginate(builder, query);
+  }
 }

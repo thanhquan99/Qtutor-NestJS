@@ -18,6 +18,7 @@ export enum TutorStudentStatus {
   WAITING_TUTOR_ACCEPT = 'Waiting Tutor Accept',
   WAITING_STUDENT_ACCEPT = 'Waiting Student Accept',
   ACCEPTED = 'Accepted',
+  ARCHIVED = 'Archived',
   CANCEL = 'Cancel',
 }
 
