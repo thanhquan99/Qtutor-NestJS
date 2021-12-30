@@ -40,6 +40,17 @@ export class SchedulesService extends BaseServiceCRUD<Schedule> {
       throw new BadRequestException('Invalid date');
     }
 
+    const [overlapSchedule] = await Schedule.query()
+      .where({ userId })
+      .andWhereRaw(`(?, ?) OVERLAPS ("startTime", "endTime")`, [
+        startTime.toISOString(),
+        endTime.toISOString(),
+      ])
+      .limit(1);
+    if (overlapSchedule) {
+      throw new BadRequestException('Overlap date');
+    }
+
     if (tutorStudentId) {
       const tutorStudent = await TutorStudent.query().findById(tutorStudentId);
       if (!tutorStudent) {
