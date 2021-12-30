@@ -1,6 +1,6 @@
 import { QueryBuilder } from 'objection';
 import { Subject } from 'src/db/models';
-import BaseModel from './BaseModel';
+import BaseModel, { ModelFields } from './BaseModel';
 import Student from './Student';
 import Tutor from './Tutor';
 
@@ -11,6 +11,10 @@ export default class TutorStudent extends BaseModel {
   tutorId: string;
   studentId: string;
   subjectId: string;
+
+  tutor?: ModelFields<Tutor>;
+  student?: ModelFields<Student>;
+  subject?: ModelFields<Subject>;
 
   static get tableName() {
     return 'tutor_student';

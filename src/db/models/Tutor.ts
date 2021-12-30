@@ -1,6 +1,6 @@
 import { QueryBuilder } from 'objection';
 import { Subject, TutorSubject, Profile } from 'src/db/models';
-import BaseModel from './BaseModel';
+import BaseModel, { ModelFields } from './BaseModel';
 import TeachingPrice from './TeachingPrice';
 
 export default class Tutor extends BaseModel {
@@ -9,6 +9,8 @@ export default class Tutor extends BaseModel {
   minimumSalary: number;
 
   userId: string;
+
+  profile?: ModelFields<Profile>;
 
   static get tableName() {
     return 'tutor';
@@ -76,7 +78,7 @@ export default class Tutor extends BaseModel {
       );
     },
     selectInTutorStudent(qb: QueryBuilder<BaseModel>) {
-      qb.select('id').withGraphFetched('[profile(defaultSelect)]');
+      qb.select('id', 'userId').withGraphFetched('[profile(defaultSelect)]');
     },
   };
 }

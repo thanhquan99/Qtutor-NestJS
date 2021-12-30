@@ -8,6 +8,8 @@ import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
 import Schedule from 'src/db/models/Schedule';
 import { CreateScheduleDto } from './dto';
 import { TutorStudent } from 'src/db/models';
+import { modifySchedule } from './utils';
+import { ISchedule } from './interface';
 
 @Injectable()
 export class SchedulesService extends BaseServiceCRUD<Schedule> {
@@ -18,7 +20,7 @@ export class SchedulesService extends BaseServiceCRUD<Schedule> {
   async createSchedule(
     payload: CreateScheduleDto,
     userId: string,
-  ): Promise<Schedule> {
+  ): Promise<ISchedule> {
     const { startTimeDate, endTimeDate, tutorStudentId, description } = payload;
     const startTime = new Date(
       DefaultDate.YEAR,
@@ -45,12 +47,22 @@ export class SchedulesService extends BaseServiceCRUD<Schedule> {
       }
     }
 
-    return await Schedule.query().insertAndFetch({
+    const schedule = await Schedule.query().insertAndFetch({
       startTime,
       endTime,
       userId,
       tutorStudentId,
       description,
     });
+
+    return await modifySchedule(schedule);
+  }
+
+  async getMySchedules(userId: string): Promise<ISchedule[]> {
+    const schedules = await Schedule.query().where({ userId });
+
+    return await Promise.all(
+      schedules.map((schedule) => modifySchedule(schedule)),
+    );
   }
 }

@@ -1,3 +1,4 @@
+import { ModelFields } from 'src/db/models/BaseModel';
 import { QueryBuilder } from 'objection';
 import { Profile, StudentSubject, Subject } from 'src/db/models';
 import BaseModel from './BaseModel';
@@ -6,6 +7,8 @@ export default class Student extends BaseModel {
   description: string;
 
   userId: string;
+
+  profile?: ModelFields<Profile>;
 
   static get tableName() {
     return 'student';
@@ -57,6 +60,11 @@ export default class Student extends BaseModel {
     defaultSelect(qb: QueryBuilder<BaseModel>) {
       qb.select('id', 'description').withGraphFetched(
         '[profile(defaultSelect), subjects(defaultSelect)]',
+      );
+    },
+    selectInTutorStudent(qb: QueryBuilder<BaseModel>) {
+      qb.select('id', 'description', 'userId').withGraphFetched(
+        'profile(defaultSelect)',
       );
     },
   };
