@@ -37,6 +37,10 @@ export class StudentsService extends BaseServiceCRUD<Student> {
       .withGraphFetched('[profile(defaultSelect), subjects(defaultSelect)]');
   }
 
+  async getOne(id: string): Promise<Student> {
+    return await Student.query().findById(id).modify('defaultSelect');
+  }
+
   async registerStudy(
     payload: RegisterStudyDto,
     student: Student,
@@ -80,9 +84,8 @@ export class StudentsService extends BaseServiceCRUD<Student> {
     query,
     userId: string,
   ): Promise<{ results: Student[]; total }> {
-    const builder = Student.queryBuilder<Student>(query).modify(
-      'defaultSelect',
-    );
+    const builder =
+      Student.queryBuilder<Student>(query).modify('defaultSelect');
     if (userId) {
       builder.andWhere('userId', '!=', userId);
     }
