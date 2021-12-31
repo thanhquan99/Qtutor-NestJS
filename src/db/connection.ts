@@ -14,11 +14,11 @@ export default knexInstance;
 //     console.log(result);
 //   });
 
-// knexInstance.migrate
-//   .latest({
-//     directory: 'src/db/migrations',
-//     tableName: 'knex_migrations',
-//   })
-//   .then((result) => {
-//     console.log(result);
-//   });
+knexInstance.migrate
+  .latest({
+    directory: 'src/db/migrations',
+    tableName: 'knex_migrations',
+  })
+  .then((result) => {
+    console.log(result);
+  });
