@@ -1,4 +1,6 @@
-import BaseModel from './BaseModel';
+import { QueryBuilder } from 'objection';
+import { TutorStudent } from '.';
+import BaseModel, { ModelFields } from './BaseModel';
 
 export default class Schedule extends BaseModel {
   description: string;
@@ -8,6 +10,8 @@ export default class Schedule extends BaseModel {
 
   userId: string;
   tutorStudentId: string;
+
+  tutorStudent?: ModelFields<TutorStudent>;
 
   static get tableName() {
     return 'schedule';
@@ -21,4 +25,30 @@ export default class Schedule extends BaseModel {
   $beforeUpdate() {
     this.updatedAt = new Date().toISOString();
   }
+
+  static get relationMappings() {
+    return {
+      tutorStudent: {
+        relation: BaseModel.BelongsToOneRelation,
+        modelClass: TutorStudent,
+        join: {
+          from: 'schedule.tutorStudentId',
+          to: 'tutor_student.id',
+        },
+      },
+    };
+  }
+
+  static modifiers = {
+    defaultSelect(qb: QueryBuilder<BaseModel>) {
+      qb.select(
+        'id',
+        'description',
+        'startTime',
+        'endTime',
+        'userId',
+        'tutorStudentId',
+      ).withGraphFetched('tutorStudent(defaultSelect)');
+    },
+  };
 }

@@ -1,10 +1,7 @@
-import { BadRequestException } from '@nestjs/common';
-import { Schedule, TutorStudent } from 'src/db/models';
+import { Schedule } from 'src/db/models';
 import { ISchedule } from '../interface';
 
-export const modifySchedule = async (
-  schedule: Schedule,
-): Promise<ISchedule> => {
+export const modifySchedule = (schedule: Schedule): ISchedule => {
   let title = 'Default title';
 
   if (schedule.description) {
@@ -12,14 +9,7 @@ export const modifySchedule = async (
   }
 
   if (schedule.tutorStudentId) {
-    const tutorStudent = await TutorStudent.query()
-      .modify('defaultSelect')
-      .findById(schedule.tutorStudentId);
-    if (!tutorStudent) {
-      throw new BadRequestException(
-        'Something wrong with this data. Contact admin',
-      );
-    }
+    const { tutorStudent } = schedule;
 
     if (tutorStudent.student.userId === schedule.userId) {
       title = `Teacher ${tutorStudent.tutor.profile.name} - ${tutorStudent.subject.name}`;

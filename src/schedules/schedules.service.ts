@@ -58,22 +58,24 @@ export class SchedulesService extends BaseServiceCRUD<Schedule> {
       }
     }
 
-    const schedule = await Schedule.query().insertAndFetch({
-      startTime,
-      endTime,
-      userId,
-      tutorStudentId,
-      description,
-    });
+    const schedule = await Schedule.query()
+      .insertAndFetch({
+        startTime,
+        endTime,
+        userId,
+        tutorStudentId,
+        description,
+      })
+      .modify('defaultSelect');
 
     return await modifySchedule(schedule);
   }
 
   async getMySchedules(userId: string): Promise<ISchedule[]> {
-    const schedules = await Schedule.query().where({ userId });
+    const schedules = await Schedule.query()
+      .where({ userId })
+      .modify('defaultSelect');
 
-    return await Promise.all(
-      schedules.map((schedule) => modifySchedule(schedule)),
-    );
+    return schedules.map((schedule) => modifySchedule(schedule));
   }
 }
