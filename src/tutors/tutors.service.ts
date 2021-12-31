@@ -78,24 +78,23 @@ export class TutorsService extends BaseServiceCRUD<Tutor> {
     return await this.paginate(builder, query);
   }
 
-  async getMyStudents(
+  async getMyTeachings(
     query: any,
     userId: string,
-  ): Promise<{ results: Student[]; total: number }> {
+  ): Promise<{ results: TutorStudent[]; total: number }> {
     const tutor = await Tutor.query().findOne({ userId });
     if (!tutor) {
       throw new BadRequestException('You are not tutor');
     }
 
     const tutorStudentBuilder = TutorStudent.query()
-      .select('studentId')
+      .modify('selectInGetTeaching')
       .where({ tutorId: tutor.id })
-      .andWhere({ status: TutorStudentStatus.ACCEPTED });
+      .whereIn('status', [
+        TutorStudentStatus.ACCEPTED,
+        TutorStudentStatus.ARCHIVED,
+      ]);
 
-    const studentBuilder = Student.query()
-      .withGraphFetched('profile(defaultSelect)')
-      .whereIn('id', knex.raw(tutorStudentBuilder.toKnexQuery().toQuery()));
-
-    return await this.paginate(studentBuilder, query);
+    return await this.paginate(tutorStudentBuilder, query);
   }
 }

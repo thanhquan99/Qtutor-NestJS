@@ -18,7 +18,7 @@ import {
 import Tutor from 'src/db/models/Tutor';
 import { IdParam } from 'src/base/params';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { Student, User } from 'src/db/models';
+import { TutorStudent, User } from 'src/db/models';
 import { Role } from 'src/guards/role.decorator';
 
 @Controller('tutors')
@@ -52,14 +52,14 @@ export class TutorsController {
     return this.service.getSuggestion(query, user.id);
   }
 
-  @Get('/my-students')
+  @Get('/my-teachings')
   @ApiBearerAuth()
   @Role(ROLE.CUSTOMER)
   @UsePipes(ValidationPipe)
-  getMyStudents(
+  getMyTeachings(
     @GetUser() user: User,
     @Query() query: QueryParams,
-  ): Promise<{ results: Student[]; total: number }> {
+  ): Promise<{ results: TutorStudent[]; total: number }> {
     if (query.filter) {
       query.filter = JSON.parse(query.filter);
     }
@@ -68,7 +68,7 @@ export class TutorsController {
     }
     query.page = query.page || 1;
     query.perPage = query.perPage || 10;
-    return this.service.getMyStudents(query, user.id);
+    return this.service.getMyTeachings(query, user.id);
   }
 
   @Get()

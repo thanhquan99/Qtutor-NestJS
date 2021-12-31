@@ -84,8 +84,9 @@ export class StudentsService extends BaseServiceCRUD<Student> {
     query,
     userId: string,
   ): Promise<{ results: Student[]; total }> {
-    const builder =
-      Student.queryBuilder<Student>(query).modify('defaultSelect');
+    const builder = Student.queryBuilder<Student>(query).modify(
+      'defaultSelect',
+    );
     if (userId) {
       builder.andWhere('userId', '!=', userId);
     }
