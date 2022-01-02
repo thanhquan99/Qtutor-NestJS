@@ -3,6 +3,7 @@ import BaseModel from './BaseModel';
 
 export default class Subject extends BaseModel {
   name: string;
+  image: string;
 
   static get tableName() {
     return 'subject';
@@ -19,7 +20,7 @@ export default class Subject extends BaseModel {
 
   static modifiers = {
     defaultSelect(qb: QueryBuilder<BaseModel>) {
-      qb.select('subject.name', 'subject.id');
+      qb.select('subject.name', 'subject.id', 'subject.image');
     },
   };
 }

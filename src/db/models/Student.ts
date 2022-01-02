@@ -5,6 +5,7 @@ import BaseModel from './BaseModel';
 
 export default class Student extends BaseModel {
   description: string;
+  isSpecial: string;
 
   userId: string;
 
@@ -58,7 +59,7 @@ export default class Student extends BaseModel {
 
   static modifiers = {
     defaultSelect(qb: QueryBuilder<BaseModel>) {
-      qb.select('id', 'description').withGraphFetched(
+      qb.select('id', 'description', 'isSpecial').withGraphFetched(
         '[profile(defaultSelect), subjects(defaultSelect)]',
       );
     },

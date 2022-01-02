@@ -7,6 +7,7 @@ export default class Tutor extends BaseModel {
   description: string;
   isPublished: boolean;
   minimumSalary: number;
+  isSpecial: boolean;
 
   userId: string;
 
@@ -68,9 +69,12 @@ export default class Tutor extends BaseModel {
 
   static modifiers = {
     defaultSelect(qb: QueryBuilder<BaseModel>) {
-      qb.select('id', 'description', 'minimumSalary').withGraphFetched(
-        '[profile(defaultSelect), subjects(defaultSelect)]',
-      );
+      qb.select(
+        'id',
+        'description',
+        'minimumSalary',
+        'isSpecial',
+      ).withGraphFetched('[profile(defaultSelect), subjects(defaultSelect)]');
     },
     selectInGetOne(qb: QueryBuilder<BaseModel>) {
       qb.modify('defaultSelect').withGraphFetched(
