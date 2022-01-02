@@ -21,7 +21,13 @@ export class SchedulesService extends BaseServiceCRUD<Schedule> {
     payload: CreateScheduleDto,
     userId: string,
   ): Promise<ISchedule> {
-    const { startTimeDate, endTimeDate, tutorStudentId, description } = payload;
+    const {
+      startTimeDate,
+      endTimeDate,
+      tutorStudentId,
+      description,
+      isFreeTime,
+    } = payload;
     const startTime = new Date(
       DefaultDate.YEAR,
       DefaultDate.MONTH,
@@ -65,6 +71,7 @@ export class SchedulesService extends BaseServiceCRUD<Schedule> {
         userId,
         tutorStudentId,
         description,
+        isFreeTime,
       })
       .modify('defaultSelect');
 

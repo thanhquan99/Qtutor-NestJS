@@ -11,6 +11,7 @@ import {
   ValidateNested,
   IsEnum,
   IsIn,
+  IsBoolean,
 } from 'class-validator';
 import { DaysOfWeek } from 'src/constant';
 
@@ -41,6 +42,11 @@ export class CreateScheduleDto {
   @IsOptional()
   @IsString()
   description: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  isFreeTime: boolean;
 
   @ApiPropertyOptional()
   @IsNotEmpty()

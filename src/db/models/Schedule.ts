@@ -7,6 +7,7 @@ export default class Schedule extends BaseModel {
   duration: string;
   startTime: Date;
   endTime: Date;
+  isFreeTime: boolean;
 
   userId: string;
   tutorStudentId: string;
@@ -48,6 +49,7 @@ export default class Schedule extends BaseModel {
         'endTime',
         'userId',
         'tutorStudentId',
+        'isFreeTime',
       ).withGraphFetched('tutorStudent(defaultSelect)');
     },
   };
