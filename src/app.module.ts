@@ -16,6 +16,7 @@ import { StudentsModule } from './students/students.module';
 import { TutorStudentsModule } from './tutor-students/tutor-students.module';
 import { NotificationModule } from './notification/notification.module';
 import { SchedulesModule } from './schedules/schedules.module';
+import { AppConfigModule } from './app-config/app-config.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { SchedulesModule } from './schedules/schedules.module';
     TutorStudentsModule,
     NotificationModule,
     SchedulesModule,
+    AppConfigModule,
   ],
   providers: [
     {

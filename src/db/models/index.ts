@@ -12,6 +12,7 @@ import TeachingPrice from './TeachingPrice';
 import TutorStudent from './TutorStudent';
 import Notification from './Notification';
 import Schedule from './Schedule';
+import AppConfig from './AppConfig';
 
 export {
   knex,
@@ -28,4 +29,5 @@ export {
   TutorStudent,
   Notification,
   Schedule,
+  AppConfig,
 };
