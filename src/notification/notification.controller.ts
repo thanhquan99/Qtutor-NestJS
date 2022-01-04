@@ -18,7 +18,7 @@ import { Role } from 'src/guards/role.decorator';
 import { UpdateNotificationDto } from './dto';
 import { NotificationService } from './notification.service';
 
-@Controller('notification')
+@Controller('notifications')
 export class NotificationController {
   public readonly service = new NotificationService();
 
