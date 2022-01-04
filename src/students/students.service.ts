@@ -6,12 +6,14 @@ import {
   TutorStudentStatus,
 } from 'src/constant';
 import {
+  knex,
   Notification,
   Profile,
   Student,
   Subject,
   Tutor,
   TutorStudent,
+  TutorSubject,
 } from 'src/db/models';
 import { CreateStudentDto, RegisterStudyDto } from './dto/index';
 import { customFilterInStudents } from './utils';
@@ -84,9 +86,8 @@ export class StudentsService extends BaseServiceCRUD<Student> {
     query,
     userId: string,
   ): Promise<{ results: Student[]; total }> {
-    const builder = Student.queryBuilder<Student>(query).modify(
-      'defaultSelect',
-    );
+    const builder =
+      Student.queryBuilder<Student>(query).modify('defaultSelect');
     if (userId) {
       builder.andWhere('userId', '!=', userId);
     }
@@ -111,6 +112,35 @@ export class StudentsService extends BaseServiceCRUD<Student> {
         TutorStudentStatus.ARCHIVED,
       ]);
 
+    return await this.paginate(builder, query);
+  }
+
+  async getSuggestion(
+    query,
+    userId: string,
+  ): Promise<{ results: Tutor[]; total }> {
+    const student = await Student.query()
+      .modify('defaultSelect')
+      .findOne({ userId });
+    if (!student) {
+      throw new BadRequestException(`You are not student`);
+    }
+
+    const tutorSubjectBuilder = TutorSubject.query()
+      .select(knex.raw('DISTINCT "tutorId"'))
+      .whereIn(
+        'subjectId',
+        student.subjects.map((e) => e.id),
+      );
+    const profileBuilder = Profile.query().select('userId').where({
+      cityId: student.profile.cityId,
+    });
+
+    const builder = Tutor.queryBuilder(query)
+      .modify('selectInSuggestion')
+      .whereIn('id', knex.raw(tutorSubjectBuilder.toKnexQuery().toQuery()))
+      .whereIn('userId', profileBuilder)
+      .andWhere('userId', '!=', userId);
     return await this.paginate(builder, query);
   }
 }

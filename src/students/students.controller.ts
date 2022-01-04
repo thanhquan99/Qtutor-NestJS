@@ -39,6 +39,25 @@ export class StudentsController {
     return this.service.getMe(user.id);
   }
 
+  @Get('/my-suggestion')
+  @ApiBearerAuth()
+  @Role(ROLE.CUSTOMER)
+  @UsePipes(ValidationPipe)
+  getSuggestion(
+    @Query() query: QueryParams,
+    @GetUser() user: User,
+  ): Promise<{ results: Tutor[]; total }> {
+    if (query.filter) {
+      query.filter = JSON.parse(query.filter);
+    }
+    if (query.orderBy) {
+      query.orderBy = JSON.parse(query.orderBy);
+    }
+    query.page = query.page || 1;
+    query.perPage = query.perPage || 10;
+    return this.service.getSuggestion(query, user.id);
+  }
+
   @Post('/me/tutor-students')
   @UsePipes(ValidationPipe)
   @ApiBearerAuth()

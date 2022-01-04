@@ -61,6 +61,7 @@ export default class Profile extends BaseModel {
         'additionalInformation',
         'isMale',
         'workLocation',
+        'cityId',
       ).withGraphFetched('city(defaultSelect)');
     },
     selectCityName(qb: QueryBuilder<BaseModel>) {

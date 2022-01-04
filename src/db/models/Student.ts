@@ -10,6 +10,7 @@ export default class Student extends BaseModel {
   userId: string;
 
   profile?: ModelFields<Profile>;
+  subjects?: ModelFields<Subject>[];
 
   static get tableName() {
     return 'student';

@@ -12,6 +12,7 @@ export default class Tutor extends BaseModel {
   userId: string;
 
   profile?: ModelFields<Profile>;
+  subjects?: ModelFields<Subject>[];
 
   static get tableName() {
     return 'tutor';
@@ -83,6 +84,14 @@ export default class Tutor extends BaseModel {
     },
     selectInTutorStudent(qb: QueryBuilder<BaseModel>) {
       qb.select('id', 'userId').withGraphFetched('[profile(defaultSelect)]');
+    },
+    selectInSuggestion(qb: QueryBuilder<BaseModel>) {
+      qb.select(
+        'id',
+        'description',
+        'minimumSalary',
+        'isSpecial',
+      ).withGraphFetched('profile(defaultSelect)');
     },
   };
 }

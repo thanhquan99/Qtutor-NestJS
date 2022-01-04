@@ -1,19 +1,20 @@
-import { TutorStudentStatus } from './../constant/index';
-import { CreateTutorDto } from './dto/index';
-import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
-import Tutor from 'src/db/models/Tutor';
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
 import {
   knex,
+  Profile,
   Student,
   StudentSubject,
   TutorStudent,
   TutorSubject,
 } from 'src/db/models';
+import Tutor from 'src/db/models/Tutor';
+import { TutorStudentStatus } from './../constant/index';
+import { CreateTutorDto } from './dto/index';
 import { customFilterInTutors } from './utils';
 
 @Injectable()
@@ -56,24 +57,28 @@ export class TutorsService extends BaseServiceCRUD<Tutor> {
   async getSuggestion(
     query,
     userId: string,
-  ): Promise<{ results: Tutor[]; total }> {
-    const student = await Student.query().findOne({ userId });
-    if (!student) {
+  ): Promise<{ results: Student[]; total }> {
+    const tutor = await Tutor.query()
+      .modify('defaultSelect')
+      .findOne({ userId });
+    if (!tutor) {
       throw new BadRequestException(`You are not student`);
     }
 
     const studentSubjectBuilder = StudentSubject.query()
-      .select('subjectId')
-      .where({ studentId: student.id });
-    const tutorSubjectBuilder = TutorSubject.query()
-      .select(knex.raw('DISTINCT "tutorId"'))
-      .whereRaw(
-        `"subjectId" = ANY(${studentSubjectBuilder.toKnexQuery().toQuery()})`,
+      .select(knex.raw('DISTINCT "studentId"'))
+      .whereIn(
+        'subjectId',
+        tutor.subjects.map((e) => e.id),
       );
+    const profileBuilder = Profile.query().select('userId').where({
+      cityId: tutor.profile.cityId,
+    });
 
-    const builder = Tutor.queryBuilder(query)
-      .modify('defaultSelect')
-      .whereIn('id', knex.raw(tutorSubjectBuilder.toKnexQuery().toQuery()))
+    const builder = Student.queryBuilder(query)
+      .modify('selectInTutorStudent')
+      .whereIn('id', knex.raw(studentSubjectBuilder.toKnexQuery().toQuery()))
+      .whereIn('userId', profileBuilder)
       .andWhere('userId', '!=', userId);
     return await this.paginate(builder, query);
   }
