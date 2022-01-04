@@ -58,7 +58,7 @@ export class StudentsController {
     return this.service.getSuggestion(query, user.id);
   }
 
-  @Post('/me/tutor-students')
+  @Post('/my-courses')
   @UsePipes(ValidationPipe)
   @ApiBearerAuth()
   @Role(ROLE.CUSTOMER)

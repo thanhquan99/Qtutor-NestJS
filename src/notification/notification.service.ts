@@ -83,4 +83,22 @@ export class NotificationService extends BaseServiceCRUD<Notification> {
 
     return notification;
   }
+
+  async getMyNotification(userId: string, query: any) {
+    const builder = Notification.queryBuilder(query)
+      .modify('defaultSelect')
+      .where({ userId });
+    return await this.paginate(builder, query);
+  }
+
+  async getMyNotificationSummary(userId: string): Promise<{
+    total: string;
+    totalUnread: string;
+  }> {
+    const [{ count: total }, { count: totalUnread }] = await Promise.all([
+      Notification.query().where({ userId }).count().first(),
+      Notification.query().where({ userId, isRead: false }).count().first(),
+    ]);
+    return { total, totalUnread };
+  }
 }

@@ -6,7 +6,7 @@ import {
 import * as bcrypt from 'bcrypt';
 import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
 import { ROLE } from 'src/constant';
-import { Notification, Profile, Role, User } from 'src/db/models';
+import { Profile, Role, User } from 'src/db/models';
 import { SALT } from './../constant/index';
 import { CreateUserDto, UpdateMeDto } from './dto/index';
 
@@ -33,24 +33,6 @@ export class UsersService extends BaseServiceCRUD<User> {
       .modify('adminSelect')
       .whereNot({ id: adminId });
     return await this.paginate(builder, query);
-  }
-
-  async getMyNotification(userId: string, query: any) {
-    const builder = Notification.queryBuilder(query)
-      .modify('defaultSelect')
-      .where({ userId });
-    return await this.paginate(builder, query);
-  }
-
-  async getMyNotificationSummary(userId: string): Promise<{
-    total: string;
-    totalUnread: string;
-  }> {
-    const [{ count: total }, { count: totalUnread }] = await Promise.all([
-      Notification.query().where({ userId }).count().first(),
-      Notification.query().where({ userId, isRead: false }).count().first(),
-    ]);
-    return { total, totalUnread };
   }
 
   async getOne(id: string): Promise<User> {

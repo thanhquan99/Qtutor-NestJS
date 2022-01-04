@@ -11,7 +11,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { TutorStudent, User } from 'src/db/models';
+import { User } from 'src/db/models';
 import { GetUser } from './../auth/get-user.decorator';
 import { QueryParams } from './../base/dto/query-params.dto';
 import { IdParam } from './../base/params/index';
@@ -38,32 +38,6 @@ export class UsersController {
   @Role(ROLE.CUSTOMER)
   updateMe(@GetUser() user: User, @Body() payload: UpdateMeDto): Promise<User> {
     return this.service.updateMe(user.id, payload);
-  }
-
-  @Get('/me/notifications')
-  @UsePipes(ValidationPipe)
-  @ApiBearerAuth()
-  @Role(ROLE.CUSTOMER)
-  getMyNotification(@GetUser() user: User, @Query() query: QueryParams) {
-    if (query.filter) {
-      query.filter = JSON.parse(query.filter);
-    }
-    if (query.orderBy) {
-      query.orderBy = JSON.parse(query.orderBy);
-    }
-    query.page = query.page || 1;
-    query.perPage = query.perPage || 10;
-    return this.service.getMyNotification(user.id, query);
-  }
-
-  @Get('/me/notifications/summary')
-  @UsePipes(ValidationPipe)
-  @ApiBearerAuth()
-  @Role(ROLE.CUSTOMER)
-  getMyNotificationSummary(
-    @GetUser() user: User,
-  ): Promise<{ total: string; totalUnread: string }> {
-    return this.service.getMyNotificationSummary(user.id);
   }
 
   @Get()
