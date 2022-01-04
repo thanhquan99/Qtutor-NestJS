@@ -47,7 +47,8 @@ export class SchedulesService extends BaseServiceCRUD<Schedule> {
     }
 
     const [overlapSchedule] = await Schedule.query()
-      .where({ userId })
+      .select('id')
+      .where({ userId, isFreeTime: false })
       .andWhereRaw(`(?, ?) OVERLAPS ("startTime", "endTime")`, [
         startTime.toISOString(),
         endTime.toISOString(),
@@ -58,24 +59,81 @@ export class SchedulesService extends BaseServiceCRUD<Schedule> {
     }
 
     if (tutorStudentId) {
-      const tutorStudent = await TutorStudent.query().findById(tutorStudentId);
+      const tutorStudent = await TutorStudent.query()
+        .modify('defaultSelect')
+        .findById(tutorStudentId);
       if (!tutorStudent) {
         throw new NotFoundException('Tutor Student not found');
       }
+
+      // Check overlap date for student
+      const [overlapSchedule] = await Schedule.query()
+        .select('id')
+        .where({ userId: tutorStudent.student?.userId, isFreeTime: false })
+        .andWhereRaw(`(?, ?) OVERLAPS ("startTime", "endTime")`, [
+          startTime.toISOString(),
+          endTime.toISOString(),
+        ])
+        .limit(1);
+      if (overlapSchedule) {
+        throw new BadRequestException(`Overlap date in student's schedule`);
+      }
     }
 
-    const schedule = await Schedule.query()
-      .insertAndFetch({
-        startTime,
-        endTime,
-        userId,
-        tutorStudentId,
-        description,
-        isFreeTime,
-      })
-      .modify('defaultSelect');
+    const trx = await Schedule.startTransaction();
+    try {
+      const schedule = await Schedule.query(trx)
+        .insertAndFetch({
+          startTime,
+          endTime,
+          userId,
+          tutorStudentId,
+          description,
+          isFreeTime,
+        })
+        .modify('defaultSelect');
 
-    return await modifySchedule(schedule);
+      // Remove Overlap Free time
+      await Schedule.query(trx)
+        .where({ userId, isFreeTime: true })
+        .andWhereRaw(`(?, ?) OVERLAPS ("startTime", "endTime")`, [
+          startTime.toISOString(),
+          endTime.toISOString(),
+        ])
+        .andWhere('id', '!=', schedule.id)
+        .delete();
+
+      // Insert Schedule and Remove Overlap Free time for student
+      if (schedule.tutorStudent?.student?.userId) {
+        const studentSchedule = await Schedule.query(trx)
+          .insertAndFetch({
+            startTime,
+            endTime,
+            userId: schedule.tutorStudent.student.userId,
+            tutorStudentId,
+            description,
+            isFreeTime,
+          })
+          .modify('defaultSelect');
+
+        await Schedule.query(trx)
+          .where({
+            userId: studentSchedule.userId,
+            isFreeTime: true,
+          })
+          .andWhereRaw(`(?, ?) OVERLAPS ("startTime", "endTime")`, [
+            startTime.toISOString(),
+            endTime.toISOString(),
+          ])
+          .andWhere('id', '!=', studentSchedule.id)
+          .delete();
+      }
+
+      await trx.commit();
+      return await modifySchedule(schedule);
+    } catch (error) {
+      await trx.rollback();
+    }
   }
 
   async getMySchedules(userId: string): Promise<ISchedule[]> {
