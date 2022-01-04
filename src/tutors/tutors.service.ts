@@ -7,10 +7,10 @@ import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
 import {
   knex,
   Profile,
+  Schedule,
   Student,
   StudentSubject,
   TutorStudent,
-  TutorSubject,
 } from 'src/db/models';
 import Tutor from 'src/db/models/Tutor';
 import { TutorStudentStatus } from './../constant/index';
@@ -80,6 +80,28 @@ export class TutorsService extends BaseServiceCRUD<Tutor> {
       .whereIn('id', knex.raw(studentSubjectBuilder.toKnexQuery().toQuery()))
       .whereIn('userId', profileBuilder)
       .andWhere('userId', '!=', userId);
+
+    const freeTimeSchedules = await Schedule.query().where({
+      userId: tutor.userId,
+      isFreeTime: true,
+    });
+    if (freeTimeSchedules?.length) {
+      const invalidScheduleBuilder = Schedule.query()
+        .select(knex.raw('DISTINCT "userId"'))
+        .where({
+          isFreeTime: false,
+        });
+
+      freeTimeSchedules.forEach((e) => {
+        invalidScheduleBuilder.andWhereRaw(
+          `(?, ?) OVERLAPS ("startTime", "endTime")`,
+          [e.startTime.toISOString(), e.endTime.toISOString()],
+        );
+      });
+
+      builder.whereNotIn('userId', invalidScheduleBuilder);
+    }
+
     return await this.paginate(builder, query);
   }
 

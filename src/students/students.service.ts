@@ -9,6 +9,7 @@ import {
   knex,
   Notification,
   Profile,
+  Schedule,
   Student,
   Subject,
   Tutor,
@@ -141,6 +142,27 @@ export class StudentsService extends BaseServiceCRUD<Student> {
       .whereIn('id', knex.raw(tutorSubjectBuilder.toKnexQuery().toQuery()))
       .whereIn('userId', profileBuilder)
       .andWhere('userId', '!=', userId);
+
+    const freeTimeSchedules = await Schedule.query().where({
+      userId: student.userId,
+      isFreeTime: true,
+    });
+    if (freeTimeSchedules?.length) {
+      const invalidScheduleBuilder = Schedule.query()
+        .select(knex.raw('DISTINCT "userId"'))
+        .where({
+          isFreeTime: false,
+        });
+
+      freeTimeSchedules.forEach((e) => {
+        invalidScheduleBuilder.andWhereRaw(
+          `(?, ?) OVERLAPS ("startTime", "endTime")`,
+          [e.startTime.toISOString(), e.endTime.toISOString()],
+        );
+      });
+
+      builder.whereNotIn('userId', invalidScheduleBuilder);
+    }
     return await this.paginate(builder, query);
   }
 }

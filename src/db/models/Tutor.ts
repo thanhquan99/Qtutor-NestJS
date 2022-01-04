@@ -75,6 +75,7 @@ export default class Tutor extends BaseModel {
         'description',
         'minimumSalary',
         'isSpecial',
+        'userId',
       ).withGraphFetched('[profile(defaultSelect), subjects(defaultSelect)]');
     },
     selectInGetOne(qb: QueryBuilder<BaseModel>) {

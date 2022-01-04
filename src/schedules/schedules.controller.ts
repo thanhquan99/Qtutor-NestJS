@@ -32,6 +32,9 @@ export class SchedulesController {
     if (_.isEmpty(payload.description) === _.isEmpty(payload.tutorStudentId)) {
       throw new BadRequestException('Bad request check body again');
     }
+    if (payload.tutorStudentId && payload.isFreeTime) {
+      throw new BadRequestException('Bad request check body again');
+    }
 
     return this.service.createSchedule(payload, user.id);
   }

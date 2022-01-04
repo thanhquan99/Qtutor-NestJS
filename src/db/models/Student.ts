@@ -60,7 +60,7 @@ export default class Student extends BaseModel {
 
   static modifiers = {
     defaultSelect(qb: QueryBuilder<BaseModel>) {
-      qb.select('id', 'description', 'isSpecial').withGraphFetched(
+      qb.select('id', 'description', 'isSpecial', 'userId').withGraphFetched(
         '[profile(defaultSelect), subjects(defaultSelect)]',
       );
     },
