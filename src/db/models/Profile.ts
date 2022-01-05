@@ -71,5 +71,8 @@ export default class Profile extends BaseModel {
         ),
       );
     },
+    basicInfo(qb: QueryBuilder<BaseModel>) {
+      qb.select('name', 'avatar');
+    },
   };
 }

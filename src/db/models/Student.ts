@@ -69,5 +69,8 @@ export default class Student extends BaseModel {
         'profile(defaultSelect)',
       );
     },
+    basicInfo(qb: QueryBuilder<BaseModel>) {
+      qb.select('id', 'userId').withGraphFetched('profile(basicInfo)');
+    },
   };
 }

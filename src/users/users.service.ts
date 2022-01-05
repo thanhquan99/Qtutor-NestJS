@@ -6,8 +6,8 @@ import {
 import * as bcrypt from 'bcrypt';
 import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
 import { ROLE } from 'src/constant';
-import { Profile, Role, User } from 'src/db/models';
-import { SALT } from './../constant/index';
+import { Profile, Role, Tutor, User, TutorStudent, knex } from 'src/db/models';
+import { SALT, TutorStudentStatus } from './../constant/index';
 import { CreateUserDto, UpdateMeDto } from './dto/index';
 
 @Injectable()
@@ -17,7 +17,18 @@ export class UsersService extends BaseServiceCRUD<User> {
   }
 
   async getMe(id: string): Promise<User> {
-    return await User.query().modify('defaultSelect').findById(id);
+    const user = await User.query().modify('selectInGetMe').findById(id);
+    if (user.isTutor) {
+      const tutorBuilder = Tutor.query()
+        .select('id')
+        .findOne({ userId: user.id });
+      user.teachings = await TutorStudent.query()
+        .modify('selectInGetTeaching')
+        .where('tutorId', '=', tutorBuilder)
+        .andWhere({ status: TutorStudentStatus.ACCEPTED });
+    }
+
+    return user;
   }
 
   async updateMe(id: string, payload: UpdateMeDto): Promise<User> {

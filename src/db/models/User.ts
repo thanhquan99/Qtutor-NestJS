@@ -1,3 +1,4 @@
+import { knex, TutorStudent } from 'src/db/models';
 import { QueryBuilder } from 'objection';
 import Role from './Role';
 import BaseModel, { ModelFields } from './BaseModel';
@@ -14,6 +15,9 @@ export default class User extends BaseModel {
 
   role?: ModelFields<Role>;
   profile?: ModelFields<Profile>;
+  teachings?: ModelFields<TutorStudent>[];
+
+  isTutor?: boolean;
 
   static get tableName() {
     return 'users';
@@ -62,6 +66,15 @@ export default class User extends BaseModel {
       qb.select('id', 'email', 'isActive', 'createdAt').withGraphFetched(
         'profile(defaultSelect)',
       );
+    },
+    selectInGetMe(qb: QueryBuilder<BaseModel>) {
+      qb.select(
+        'id',
+        'email',
+        knex.raw(
+          '((Select "userId" from tutor where "userId" = users.id) is not NULL) as "isTutor"',
+        ),
+      ).withGraphFetched('[profile(defaultSelect)]');
     },
   };
 }

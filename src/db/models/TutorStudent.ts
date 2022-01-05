@@ -71,7 +71,7 @@ export default class TutorStudent extends BaseModel {
     },
     selectInGetTeaching(qb: QueryBuilder<BaseModel>) {
       qb.select('id', 'salary', 'status').withGraphFetched(
-        '[student(selectInTutorStudent), subject(defaultSelect)]',
+        '[student(basicInfo), subject(defaultSelect)]',
       );
     },
   };
