@@ -29,18 +29,14 @@ export class SchedulesService extends BaseServiceCRUD<Schedule> {
       isFreeTime,
     } = payload;
     const startTime = new Date(
-      DefaultDate.YEAR,
-      DefaultDate.MONTH,
-      ScheduleDays[startTimeDate.dayOfWeek],
-      startTimeDate.hour,
-      startTimeDate.minute,
+      `${DefaultDate.YEAR}-${DefaultDate.MONTH}-${
+        ScheduleDays[startTimeDate.dayOfWeek]
+      } ${startTimeDate.hour}:${startTimeDate.minute}:00+07`,
     );
     const endTime = new Date(
-      DefaultDate.YEAR,
-      DefaultDate.MONTH,
-      ScheduleDays[endTimeDate.dayOfWeek],
-      endTimeDate.hour,
-      endTimeDate.minute,
+      `${DefaultDate.YEAR}-${DefaultDate.MONTH}-${
+        ScheduleDays[endTimeDate.dayOfWeek]
+      } ${endTimeDate.hour}:${endTimeDate.minute}:00+07`,
     );
     if (startTime >= endTime) {
       throw new BadRequestException('Invalid date');
