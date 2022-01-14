@@ -12,14 +12,15 @@ export const modifySchedule = (schedule: Schedule): ISchedule => {
     const { tutorStudent } = schedule;
 
     if (tutorStudent.student.userId === schedule.userId) {
-      title = `Teacher ${tutorStudent.tutor.profile.name} - ${tutorStudent.subject.name}`;
+      title = `Study ${tutorStudent.subject.name} - Teacher ${tutorStudent.tutor.profile.name}`;
     }
     if (tutorStudent.tutor.userId === schedule.userId) {
-      title = `Student ${tutorStudent.student.profile.name} - ${tutorStudent.subject.name}`;
+      title = `Teach ${tutorStudent.subject.name} - Student ${tutorStudent.student.profile.name}`;
     }
   }
 
   return {
+    id: schedule.id,
     title,
     startDate: schedule.startTime,
     endDate: schedule.endTime,
