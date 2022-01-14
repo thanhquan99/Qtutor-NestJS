@@ -32,18 +32,18 @@ export enum NotificationType {
 }
 
 export enum ScheduleDays {
-  SUNDAY = 24,
-  MONDAY = 25,
-  TUESDAY = 26,
-  WEDNESDAY = 27,
-  THURSDAY = 28,
-  FRIDAY = 29,
-  SATURDAY = 30,
+  SUNDAY = 2,
+  MONDAY = 3,
+  TUESDAY = 4,
+  WEDNESDAY = 5,
+  THURSDAY = 6,
+  FRIDAY = 7,
+  SATURDAY = 8,
 }
 
 export enum DefaultDate {
-  YEAR = 2018,
-  MONTH = 5,
+  YEAR = 2022,
+  MONTH = 1,
 }
 
 export enum DaysOfWeek {
