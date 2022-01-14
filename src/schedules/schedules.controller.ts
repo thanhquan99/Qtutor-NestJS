@@ -1,3 +1,4 @@
+import { IdParam } from './../base/params/index';
 import { SchedulesService } from './schedules.service';
 import {
   Controller,
@@ -7,6 +8,8 @@ import {
   Body,
   BadRequestException,
   Get,
+  Delete,
+  Param,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { GetUser } from 'src/auth/get-user.decorator';
@@ -45,5 +48,16 @@ export class SchedulesController {
   @UsePipes(ValidationPipe)
   getMySchedules(@GetUser() user: User): Promise<ISchedule[]> {
     return this.service.getMySchedules(user.id);
+  }
+
+  @Delete('/:id')
+  @ApiBearerAuth()
+  @Role(ROLE.CUSTOMER)
+  @UsePipes(ValidationPipe)
+  deleteSchedule(
+    @GetUser() user: User,
+    @Param() params: IdParam,
+  ): Promise<{ message: string }> {
+    return this.service.deleteSchedule(user.id, params.id);
   }
 }

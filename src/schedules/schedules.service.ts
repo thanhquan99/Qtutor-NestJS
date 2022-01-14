@@ -139,4 +139,30 @@ export class SchedulesService extends BaseServiceCRUD<Schedule> {
 
     return schedules.map((schedule) => modifySchedule(schedule));
   }
+
+  async deleteSchedule(
+    userId: string,
+    id: string,
+  ): Promise<{ message: string }> {
+    const schedule = await Schedule.query()
+      .findOne({ userId, id })
+      .modify('defaultSelect');
+    if (schedule) {
+      if (schedule.tutorStudentId) {
+        if (schedule.tutorStudent.tutor.userId !== userId) {
+          throw new BadRequestException('Only tutor can delete this');
+        }
+        await Schedule.query()
+          .where({
+            tutorStudentId: schedule.tutorStudentId,
+            startTime: schedule.startTime,
+            endTime: schedule.endTime,
+          })
+          .delete();
+      }
+      await schedule.$query().delete();
+    }
+
+    return { message: 'Delete successfully' };
+  }
 }
