@@ -11,6 +11,7 @@ import {
   Profile,
   Schedule,
   Student,
+  StudentSubject,
   Subject,
   Tutor,
   TutorStudent,
@@ -119,32 +120,32 @@ export class StudentsService extends BaseServiceCRUD<Student> {
   async getSuggestion(
     query,
     userId: string,
-  ): Promise<{ results: Tutor[]; total }> {
-    const student = await Student.query()
+  ): Promise<{ results: Student[]; total }> {
+    const tutor = await Tutor.query()
       .modify('defaultSelect')
       .findOne({ userId });
-    if (!student) {
+    if (!tutor) {
       throw new BadRequestException(`You are not student`);
     }
 
-    const tutorSubjectBuilder = TutorSubject.query()
-      .select(knex.raw('DISTINCT "tutorId"'))
+    const studentSubjectBuilder = StudentSubject.query()
+      .select(knex.raw('DISTINCT "studentId"'))
       .whereIn(
         'subjectId',
-        student.subjects.map((e) => e.id),
+        tutor.subjects.map((e) => e.id),
       );
     const profileBuilder = Profile.query().select('userId').where({
-      cityId: student.profile.cityId,
+      cityId: tutor.profile.cityId,
     });
 
-    const builder = Tutor.queryBuilder(query)
-      .modify('selectInSuggestion')
-      .whereIn('id', knex.raw(tutorSubjectBuilder.toKnexQuery().toQuery()))
+    const builder = Student.queryBuilder(query)
+      .modify('selectInTutorStudent')
+      .whereIn('id', knex.raw(studentSubjectBuilder.toKnexQuery().toQuery()))
       .whereIn('userId', profileBuilder)
       .andWhere('userId', '!=', userId);
 
     const freeTimeSchedules = await Schedule.query().where({
-      userId: student.userId,
+      userId: tutor.userId,
       isFreeTime: true,
     });
     if (freeTimeSchedules?.length) {
@@ -163,6 +164,7 @@ export class StudentsService extends BaseServiceCRUD<Student> {
 
       builder.whereNotIn('userId', invalidScheduleBuilder);
     }
+
     return await this.paginate(builder, query);
   }
 }

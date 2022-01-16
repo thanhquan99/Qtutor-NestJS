@@ -3,6 +3,7 @@ import { QueryBuilder } from 'objection';
 import Role from './Role';
 import BaseModel, { ModelFields } from './BaseModel';
 import { Profile } from '.';
+import Tutor from './Tutor';
 
 export default class User extends BaseModel {
   roleId: string;
@@ -16,6 +17,7 @@ export default class User extends BaseModel {
   role?: ModelFields<Role>;
   profile?: ModelFields<Profile>;
   teachings?: ModelFields<TutorStudent>[];
+  tutor?: ModelFields<Tutor>;
 
   isTutor?: boolean;
 
@@ -48,6 +50,14 @@ export default class User extends BaseModel {
         join: {
           from: 'users.id',
           to: 'profile.userId',
+        },
+      },
+      tutor: {
+        relation: BaseModel.HasOneRelation,
+        modelClass: Tutor,
+        join: {
+          from: 'users.id',
+          to: 'tutor.userId',
         },
       },
     };

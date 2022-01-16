@@ -8,11 +8,13 @@ export default class Tutor extends BaseModel {
   isPublished: boolean;
   minimumSalary: number;
   isSpecial: boolean;
+  yearsExperience: number;
 
   userId: string;
 
   profile?: ModelFields<Profile>;
   subjects?: ModelFields<Subject>[];
+  tutorSubjects?: ModelFields<TutorSubject>[];
 
   static get tableName() {
     return 'tutor';

@@ -15,21 +15,14 @@ export class ITutorSubject {
   @IsNotEmpty()
   @IsString()
   subjectId: string;
-}
-
-export class ITeachingPrice {
-  @ApiPropertyOptional()
-  @IsNotEmpty()
-  @IsString()
-  subjectId: string;
 
   @ApiPropertyOptional()
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   sessionsOfWeek: number;
 
   @ApiPropertyOptional()
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   price: number;
 }
@@ -51,13 +44,6 @@ export class CreateTutorDto {
   @ValidateNested({ each: true })
   @Type(() => ITutorSubject)
   tutorSubjects: ITutorSubject[];
-
-  @ApiPropertyOptional()
-  @IsArray()
-  @ArrayMinSize(1)
-  @ValidateNested({ each: true })
-  @Type(() => ITeachingPrice)
-  teachingPrices: ITeachingPrice[];
 }
 
 export class UpdateTutorDto {

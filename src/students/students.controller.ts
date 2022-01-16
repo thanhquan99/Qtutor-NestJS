@@ -39,14 +39,14 @@ export class StudentsController {
     return this.service.getMe(user.id);
   }
 
-  @Get('/my-suggestion')
+  @Get('/my-suggestions')
   @ApiBearerAuth()
   @Role(ROLE.CUSTOMER)
   @UsePipes(ValidationPipe)
   getSuggestion(
     @Query() query: QueryParams,
     @GetUser() user: User,
-  ): Promise<{ results: Tutor[]; total }> {
+  ): Promise<{ results: Student[]; total }> {
     if (query.filter) {
       query.filter = JSON.parse(query.filter);
     }

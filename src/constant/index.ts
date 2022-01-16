@@ -9,9 +9,8 @@ export const SALT = '$2b$10$leL65eC89pj8mWzejdSVbe';
 export enum AcademicLevel {
   STUDENT = 'Student',
   COLLEGE_STUDENT = 'College Student',
+  UNIVERSITY_STUDENT = 'University Student',
   TEACHER = 'Teacher',
-  MASTER = 'Master',
-  PROFESSOR = 'Professor',
 }
 
 export enum TutorStudentStatus {
