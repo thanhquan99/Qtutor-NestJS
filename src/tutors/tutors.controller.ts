@@ -33,7 +33,7 @@ export class TutorsController {
     return this.service.getMe(user.id);
   }
 
-  @Get('/my-suggestion')
+  @Get('/my-suggestions')
   @ApiBearerAuth()
   @Role(ROLE.CUSTOMER)
   @UsePipes(ValidationPipe)
