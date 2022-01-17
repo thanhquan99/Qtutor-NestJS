@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
 import {
   NotificationExtraType,
@@ -42,7 +46,12 @@ export class StudentsService extends BaseServiceCRUD<Student> {
   }
 
   async getOne(id: string): Promise<Student> {
-    return await Student.query().findById(id).modify('defaultSelect');
+    const student = await Student.query().findById(id).modify('defaultSelect');
+    if (!student) {
+      throw new NotFoundException('Student not found');
+    }
+
+    return student;
   }
 
   async registerStudy(
