@@ -1,4 +1,4 @@
-import { SALT } from './../constant/index';
+import { SALT, DEFAULT_EMAIL } from './../constant/index';
 import {
   VerifyEmailDto,
   ForgotPasswordDto,
@@ -47,7 +47,7 @@ export class AuthService {
     });
 
     await this.mailerService.sendMail({
-      to: registerUserDto.email, // list of receivers
+      to: DEFAULT_EMAIL || registerUserDto.email, // list of receivers
       subject: 'Verify your email', // Subject line
       html: `<b>Your verify code is : ${verifyEmailCode} </b>`, // HTML body content
     });
