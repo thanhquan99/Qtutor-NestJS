@@ -32,9 +32,23 @@ const processData = async () => {
     'Có nhiều năm kinh nghiệm làm gia sư',
     'Chuyên dạy luyện thi đại học',
   ];
+
+  const studentDescriptions = [
+    'Hiểu hơi chậm, cần gia sư có tính kiên nhẫn',
+    'Chăm chỉ, hiểu bài nhanh',
+    'Cần gia sư chuyên dạy luyện thi vào lớp 10',
+    'Cần gia sư có nhiều năm kinh nghiệm luyện thi đại học',
+    'Yêu cầu gia sư nữ',
+  ];
   const yearsExperiences = [1, 2, 3, 4, 5];
 
   const tutorSubjects = subjects.map((subject) => ({
+    subjectId: subject.id,
+    sessionsOfWeek: _.sample(sessionsOfWeeks),
+    price: _.sample(prices),
+  }));
+
+  const studentSubjects = subjects.map((subject) => ({
     subjectId: subject.id,
     sessionsOfWeek: _.sample(sessionsOfWeeks),
     price: _.sample(prices),
@@ -62,6 +76,10 @@ const processData = async () => {
         minimumSalary: _.sample(prices),
         yearsExperience: _.sample(yearsExperiences),
         tutorSubjects: _.sampleSize(tutorSubjects, _.random(1, 5)),
+      },
+      student: {
+        description: _.sample(studentDescriptions),
+        studentSubjects: _.sampleSize(studentSubjects, _.random(1, 5)),
       },
     }),
   );

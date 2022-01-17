@@ -11,6 +11,7 @@ export default class Student extends BaseModel {
 
   profile?: ModelFields<Profile>;
   subjects?: ModelFields<Subject>[];
+  studentSubjects?: ModelFields<StudentSubject>[];
 
   static get tableName() {
     return 'student';

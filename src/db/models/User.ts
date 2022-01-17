@@ -4,6 +4,7 @@ import Role from './Role';
 import BaseModel, { ModelFields } from './BaseModel';
 import { Profile } from '.';
 import Tutor from './Tutor';
+import Student from './Student';
 
 export default class User extends BaseModel {
   roleId: string;
@@ -18,6 +19,7 @@ export default class User extends BaseModel {
   profile?: ModelFields<Profile>;
   teachings?: ModelFields<TutorStudent>[];
   tutor?: ModelFields<Tutor>;
+  student?: ModelFields<Student>;
 
   isTutor?: boolean;
 
@@ -58,6 +60,14 @@ export default class User extends BaseModel {
         join: {
           from: 'users.id',
           to: 'tutor.userId',
+        },
+      },
+      student: {
+        relation: BaseModel.HasOneRelation,
+        modelClass: Student,
+        join: {
+          from: 'users.id',
+          to: 'student.userId',
         },
       },
     };
