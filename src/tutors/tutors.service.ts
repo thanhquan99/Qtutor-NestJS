@@ -1,3 +1,4 @@
+import { MailerService } from '@nestjs-modules/mailer';
 import {
   BadRequestException,
   Injectable,
@@ -6,21 +7,29 @@ import {
 import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
 import {
   knex,
+  Notification,
   Profile,
   Schedule,
   Student,
   StudentSubject,
+  Subject,
   TutorStudent,
   TutorSubject,
 } from 'src/db/models';
 import Tutor from 'src/db/models/Tutor';
-import { TutorStudentStatus } from './../constant/index';
-import { CreateTutorDto } from './dto/index';
+import {
+  DEFAULT_EMAIL,
+  DEFAULT_WEB_CLIENT_URL,
+  NotificationExtraType,
+  NotificationType,
+  TutorStudentStatus,
+} from './../constant/index';
+import { CreateTutorDto, RegisterTeachingDto } from './dto/index';
 import { customFilterInTutors } from './utils';
 
 @Injectable()
 export class TutorsService extends BaseServiceCRUD<Tutor> {
-  constructor() {
+  constructor(public readonly mailService: MailerService) {
     super(Tutor, 'Tutor');
   }
 
@@ -123,5 +132,58 @@ export class TutorsService extends BaseServiceCRUD<Tutor> {
       ]);
 
     return await this.paginate(tutorStudentBuilder, query);
+  }
+
+  async registerTeaching(
+    payload: RegisterTeachingDto,
+    student: Student,
+    tutor: Tutor,
+  ): Promise<TutorStudent> {
+    const existTutorStudent = await TutorStudent.query().findOne({
+      studentId: student.id,
+      tutorId: tutor.id,
+      subjectId: payload.subjectId,
+    });
+    if (existTutorStudent) {
+      throw new BadRequestException('You already register this subject');
+    }
+
+    const tutorStudent = await TutorStudent.query().insertGraphAndFetch({
+      ...payload,
+      tutorId: tutor.id,
+      status: TutorStudentStatus.WAITING_STUDENT_ACCEPT,
+    });
+
+    const profile = await Profile.query().findOne({ userId: tutor.userId });
+    const subject = await Subject.query().findById(payload.subjectId);
+    const sendNotificationFunc = Notification.query().insertGraphAndFetch({
+      message: `<b>${profile.name}</b> want to teach <b>${
+        subject.name
+      }</b> course for <b>${new Intl.NumberFormat().format(
+        payload.salary,
+      )}</b> with <b>${payload.sessionsOfWeek}</b> lessons/week.`,
+      type: NotificationType.EDIT,
+      url: `tutors/${tutor.id}`,
+      userId: student.userId,
+      senderId: tutor.userId,
+      extraId: tutorStudent.id,
+      extraType: NotificationExtraType.TUTOR_STUDENT,
+    });
+
+    const sendMailFunc = this.mailService.sendMail({
+      to: DEFAULT_EMAIL, // list of receivers
+      subject: 'A TUTOR WANT TO TEACH YOU', // Subject line
+      html: `<b>${profile.name}</b> want to teach <b>${
+        subject.name
+      }</b> course for <b>${new Intl.NumberFormat().format(
+        payload.salary,
+      )}</b> with <b>${payload.sessionsOfWeek}</b> lessons/week.
+      <br/>
+      Go to <a href="${DEFAULT_WEB_CLIENT_URL}">QTutor</a> to check it
+      `, // HTML body content
+    });
+    await Promise.all([sendNotificationFunc, sendMailFunc]);
+
+    return tutorStudent;
   }
 }

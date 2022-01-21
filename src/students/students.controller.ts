@@ -28,8 +28,10 @@ import { Role } from 'src/guards/role.decorator';
 
 @Controller('students')
 export class StudentsController {
-  public readonly service = new StudentsService();
-  public readonly tutorStudentService = new TutorStudentsService();
+  constructor(
+    public readonly service: StudentsService,
+    public readonly tutorStudentService: TutorStudentsService,
+  ) {}
 
   @Get('/me')
   @ApiBearerAuth()

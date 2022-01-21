@@ -58,3 +58,5 @@ export enum DaysOfWeek {
 export const HOURS_OF_DAY = [...Array(16).keys()].map((i) => i + 7);
 export const MINUTES_OF_HOUR = [0, 15, 30, 45];
 export const DEFAULT_EMAIL = 'qtutor2021@gmail.com';
+export const DEFAULT_WEB_CLIENT_URL =
+  'https://qtutor-web-client.herokuapp.com/';

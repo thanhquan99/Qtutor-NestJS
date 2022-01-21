@@ -1,3 +1,5 @@
+import { DEFAULT_EMAIL, DEFAULT_WEB_CLIENT_URL } from './../constant/index';
+import { MailerService } from '@nestjs-modules/mailer';
 import {
   BadRequestException,
   Injectable,
@@ -26,7 +28,7 @@ import { customFilterInStudents } from './utils';
 
 @Injectable()
 export class StudentsService extends BaseServiceCRUD<Student> {
-  constructor() {
+  constructor(private readonly mailerService: MailerService) {
     super(Student, 'Student');
   }
 
@@ -76,12 +78,12 @@ export class StudentsService extends BaseServiceCRUD<Student> {
 
     const profile = await Profile.query().findOne({ userId: student.userId });
     const subject = await Subject.query().findById(payload.subjectId);
-    await Notification.query().insertGraphAndFetch({
+    const sendNotificationFunc = Notification.query().insertGraphAndFetch({
       message: `<b>${profile.name}</b> want to register for <b>${
         subject.name
       }</b> course for <b>${new Intl.NumberFormat().format(
         payload.salary,
-      )}</b>.`,
+      )}</b> with <b>${payload.sessionsOfWeek}</b> lessons/week.`,
       type: NotificationType.EDIT,
       url: `students/${student.id}`,
       userId: tutor.userId,
@@ -89,6 +91,19 @@ export class StudentsService extends BaseServiceCRUD<Student> {
       extraId: tutorStudent.id,
       extraType: NotificationExtraType.TUTOR_STUDENT,
     });
+    const sendMailFunc = this.mailerService.sendMail({
+      to: DEFAULT_EMAIL, // list of receivers
+      subject: 'A STUDENT REGISTER YOUR COURSE', // Subject line
+      html: `<b>${profile.name}</b> want to register for <b>${
+        subject.name
+      }</b> course for <b>${new Intl.NumberFormat().format(
+        payload.salary,
+      )}</b> with <b>${payload.sessionsOfWeek}</b> lessons/week.
+      <br/>
+      Go to <a href="${DEFAULT_WEB_CLIENT_URL}">QTutor</a> to check it
+      `, // HTML body content
+    });
+    await Promise.all([sendNotificationFunc, sendMailFunc]);
 
     return tutorStudent;
   }

@@ -39,6 +39,11 @@ export class CreateTutorDto {
   minimumSalary: number;
 
   @ApiPropertyOptional()
+  @IsNotEmpty()
+  @IsNumber()
+  yearsExperience: number;
+
+  @ApiPropertyOptional()
   @IsArray()
   @ArrayMinSize(1)
   @ValidateNested({ each: true })
@@ -56,4 +61,26 @@ export class UpdateTutorDto {
   @IsOptional()
   @IsNumber()
   minimumSalary: number;
+}
+
+export class RegisterTeachingDto {
+  @ApiPropertyOptional()
+  @IsNotEmpty()
+  @IsNumber()
+  salary: number;
+
+  @ApiPropertyOptional()
+  @IsNotEmpty()
+  @IsString()
+  studentId: string;
+
+  @ApiPropertyOptional()
+  @IsNotEmpty()
+  @IsString()
+  subjectId: string;
+
+  @ApiPropertyOptional()
+  @IsNotEmpty()
+  @IsNumber()
+  sessionsOfWeek: number;
 }

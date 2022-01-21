@@ -7,6 +7,7 @@ import Tutor from './Tutor';
 export default class TutorStudent extends BaseModel {
   salary: number;
   status: string;
+  sessionsOfWeek: number;
 
   tutorId: string;
   studentId: string;

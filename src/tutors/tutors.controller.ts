@@ -1,6 +1,10 @@
 import { ROLE } from './../constant/index';
 import { GetUser } from './../auth/get-user.decorator';
-import { CreateTutorDto, UpdateTutorDto } from './dto/index';
+import {
+  CreateTutorDto,
+  UpdateTutorDto,
+  RegisterTeachingDto,
+} from './dto/index';
 import { QueryParams } from 'src/base/dto/query-params.dto';
 import { TutorsService } from './tutors.service';
 import {
@@ -14,6 +18,7 @@ import {
   Delete,
   UsePipes,
   ValidationPipe,
+  NotFoundException,
 } from '@nestjs/common';
 import Tutor from 'src/db/models/Tutor';
 import { IdParam } from 'src/base/params';
@@ -23,7 +28,7 @@ import { Role } from 'src/guards/role.decorator';
 
 @Controller('tutors')
 export class TutorsController {
-  public readonly service = new TutorsService();
+  constructor(public readonly service: TutorsService) {}
 
   @Get('/me')
   @ApiBearerAuth()
@@ -50,6 +55,29 @@ export class TutorsController {
     query.page = query.page || 1;
     query.perPage = query.perPage || 10;
     return this.service.getSuggestion(query, user.id);
+  }
+
+  @Post('/my-teachings')
+  @UsePipes(ValidationPipe)
+  @ApiBearerAuth()
+  @Role(ROLE.CUSTOMER)
+  async registerTeaching(
+    @Body() payload: RegisterTeachingDto,
+    @GetUser() user: User,
+  ): Promise<TutorStudent> {
+    const tutor = await Tutor.query().findOne({ userId: user.id });
+    if (!tutor) {
+      throw new NotFoundException(
+        'You are not a tutor. Please register to be a tutor',
+      );
+    }
+
+    const student = await Student.query().findById(payload.studentId);
+    if (!student) {
+      throw new NotFoundException('Student not found');
+    }
+
+    return this.service.registerTeaching(payload, student, tutor);
   }
 
   @Get('/my-teachings')

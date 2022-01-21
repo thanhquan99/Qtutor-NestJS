@@ -55,4 +55,9 @@ export class RegisterStudyDto {
   @IsNotEmpty()
   @IsString()
   subjectId: string;
+
+  @ApiPropertyOptional()
+  @IsNotEmpty()
+  @IsNumber()
+  sessionsOfWeek: number;
 }
