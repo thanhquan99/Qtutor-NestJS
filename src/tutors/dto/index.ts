@@ -84,3 +84,15 @@ export class RegisterTeachingDto {
   @IsNumber()
   sessionsOfWeek: number;
 }
+
+export class CreateTutorRatingDto {
+  @ApiPropertyOptional()
+  @IsNotEmpty()
+  @IsNumber()
+  rating: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  comment: string;
+}

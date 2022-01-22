@@ -13,6 +13,7 @@ import TutorStudent from './TutorStudent';
 import Notification from './Notification';
 import Schedule from './Schedule';
 import AppConfig from './AppConfig';
+import TutorRating from './TutorRating';
 
 export {
   knex,
@@ -30,4 +31,5 @@ export {
   Notification,
   Schedule,
   AppConfig,
+  TutorRating,
 };

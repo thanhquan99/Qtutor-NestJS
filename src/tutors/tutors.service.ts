@@ -11,8 +11,8 @@ import {
   Profile,
   Schedule,
   Student,
-  StudentSubject,
   Subject,
+  TutorRating,
   TutorStudent,
   TutorSubject,
 } from 'src/db/models';
@@ -24,6 +24,7 @@ import {
   NotificationType,
   TutorStudentStatus,
 } from './../constant/index';
+import { ModelFields } from './../db/models/BaseModel';
 import { CreateTutorDto, RegisterTeachingDto } from './dto/index';
 import { customFilterInTutors } from './utils';
 
@@ -206,5 +207,46 @@ export class TutorsService extends BaseServiceCRUD<Tutor> {
     await Promise.all([sendNotificationFunc, sendMailFunc]);
 
     return tutorStudent;
+  }
+
+  async createTutorRating(
+    id: string,
+    payload: ModelFields<TutorRating>,
+    reviewerId: string,
+  ): Promise<TutorRating> {
+    const tutor = await Tutor.query().findById(id);
+    if (!tutor) {
+      throw new NotFoundException('Tutor not found');
+    }
+
+    const student = await Student.query().findOne({ userId: reviewerId });
+    if (!student) {
+      throw new NotFoundException('Student not found');
+    }
+
+    const tutorStudent = await TutorStudent.query()
+      .where({ tutorId: tutor.id, studentId: student.id })
+      .whereIn('status', [
+        TutorStudentStatus.ACCEPTED,
+        TutorStudentStatus.ARCHIVED,
+      ])
+      .limit(1);
+    if (!tutorStudent?.length) {
+      throw new BadRequestException('You are not student of this tutor');
+    }
+
+    return await TutorRating.query()
+      .insertAndFetch({ ...payload, tutorId: tutor.id, reviewerId })
+      .modify('defaultSelect');
+  }
+
+  async getRatings(
+    tutorId: string,
+    query: any,
+  ): Promise<{ results: any[]; total: number }> {
+    const builder = TutorRating.query()
+      .modify('defaultSelect')
+      .where({ tutorId });
+    return await this.paginate(builder, query);
   }
 }

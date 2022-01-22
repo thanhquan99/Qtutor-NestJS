@@ -4,6 +4,7 @@ import {
   CreateTutorDto,
   UpdateTutorDto,
   RegisterTeachingDto,
+  CreateTutorRatingDto,
 } from './dto/index';
 import { QueryParams } from 'src/base/dto/query-params.dto';
 import { TutorsService } from './tutors.service';
@@ -23,7 +24,7 @@ import {
 import Tutor from 'src/db/models/Tutor';
 import { IdParam } from 'src/base/params';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { Student, TutorStudent, User } from 'src/db/models';
+import { Student, TutorStudent, User, TutorRating } from 'src/db/models';
 import { Role } from 'src/guards/role.decorator';
 
 @Controller('tutors')
@@ -150,5 +151,34 @@ export class TutorsController {
   @UsePipes(ValidationPipe)
   deleteOne(@Param() params: IdParam): Promise<{ message: string }> {
     return this.service.deleteOne(params.id);
+  }
+
+  @Get('/:id/rating')
+  @UsePipes(ValidationPipe)
+  getRatings(
+    @Param() params: IdParam,
+    @Query() query: QueryParams,
+  ): Promise<{ results: any[]; total: number }> {
+    if (query.filter) {
+      query.filter = JSON.parse(query.filter);
+    }
+    if (query.orderBy) {
+      query.orderBy = JSON.parse(query.orderBy);
+    }
+    query.page = query.page || 1;
+    query.perPage = query.perPage || 10;
+    return this.service.getRatings(params.id, query);
+  }
+
+  @Post('/:id/rating')
+  @UsePipes(ValidationPipe)
+  @ApiBearerAuth()
+  @Role(ROLE.CUSTOMER)
+  createTutorRating(
+    @Body() payload: CreateTutorRatingDto,
+    @GetUser() user: User,
+    @Param() params: IdParam,
+  ): Promise<TutorRating> {
+    return this.service.createTutorRating(params.id, payload, user.id);
   }
 }

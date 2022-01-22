@@ -1,5 +1,12 @@
 import { QueryBuilder } from 'objection';
-import { Subject, TutorSubject, Profile, Student, knex } from 'src/db/models';
+import {
+  Subject,
+  TutorSubject,
+  Profile,
+  Student,
+  knex,
+  TutorRating,
+} from 'src/db/models';
 import { TutorStudentStatus } from '../../constant';
 import BaseModel, { ModelFields } from './BaseModel';
 import TeachingPrice from './TeachingPrice';
@@ -68,6 +75,14 @@ export default class Tutor extends BaseModel {
         join: {
           from: 'tutor.id',
           to: 'teaching_price.tutorId',
+        },
+      },
+      ratings: {
+        relation: BaseModel.HasManyRelation,
+        modelClass: TutorRating,
+        join: {
+          from: 'tutor.id',
+          to: 'tutor_rating.tutorId',
         },
       },
     };
