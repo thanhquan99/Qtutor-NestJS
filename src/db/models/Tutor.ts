@@ -17,7 +17,7 @@ export default class Tutor extends BaseModel {
   profile?: ModelFields<Profile>;
   subjects?: ModelFields<Subject>[];
   tutorSubjects?: ModelFields<TutorSubject>[];
-  aboutClient?: { isStudent: boolean; isStudentOfTutor: boolean };
+  aboutClient?: { isStudentOfTutor: boolean };
 
   static get tableName() {
     return 'tutor';

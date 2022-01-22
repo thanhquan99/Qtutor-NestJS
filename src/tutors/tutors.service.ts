@@ -61,11 +61,10 @@ export class TutorsService extends BaseServiceCRUD<Tutor> {
       throw new NotFoundException(`Tutor not found`);
     }
 
-    const aboutClient = { isStudent: false, isStudentOfTutor: false };
+    const aboutClient = { isStudentOfTutor: false };
     if (userId) {
       const student = await Student.query().findOne({ userId });
       if (student) {
-        aboutClient.isStudent = true;
         const tutorStudent = await TutorStudent.query()
           .where({
             tutorId: tutor.id,

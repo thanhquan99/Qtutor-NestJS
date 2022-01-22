@@ -94,6 +94,9 @@ export default class User extends BaseModel {
         knex.raw(
           '((Select "userId" from tutor where "userId" = users.id) is not NULL) as "isTutor"',
         ),
+        knex.raw(
+          '((Select "userId" from student where "userId" = users.id) is not NULL) as "isStudent"',
+        ),
       ).withGraphFetched('[profile(defaultSelect)]');
     },
   };
