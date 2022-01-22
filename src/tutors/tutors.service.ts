@@ -55,12 +55,34 @@ export class TutorsService extends BaseServiceCRUD<Tutor> {
     return await this.paginate(builder, query);
   }
 
-  async getOne(id: string): Promise<Tutor> {
+  async getTutor(id: string, userId: string): Promise<Tutor> {
     const tutor = await Tutor.query().modify('selectInGetOne').findById(id);
     if (!tutor) {
       throw new NotFoundException(`Tutor not found`);
     }
 
+    const aboutClient = { isStudent: false, isStudentOfTutor: false };
+    if (userId) {
+      const student = await Student.query().findOne({ userId });
+      if (student) {
+        aboutClient.isStudent = true;
+        const tutorStudent = await TutorStudent.query()
+          .where({
+            tutorId: tutor.id,
+            studentId: student.id,
+          })
+          .whereIn('status', [
+            TutorStudentStatus.ACCEPTED,
+            TutorStudentStatus.ARCHIVED,
+          ])
+          .limit(1);
+        if (tutorStudent?.length) {
+          aboutClient.isStudentOfTutor = true;
+        }
+      }
+    }
+
+    tutor.aboutClient = aboutClient;
     return tutor;
   }
 

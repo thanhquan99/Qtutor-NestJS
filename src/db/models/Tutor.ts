@@ -1,7 +1,9 @@
 import { QueryBuilder } from 'objection';
-import { Subject, TutorSubject, Profile } from 'src/db/models';
+import { Subject, TutorSubject, Profile, Student, knex } from 'src/db/models';
+import { TutorStudentStatus } from '../../constant';
 import BaseModel, { ModelFields } from './BaseModel';
 import TeachingPrice from './TeachingPrice';
+import TutorStudent from './TutorStudent';
 
 export default class Tutor extends BaseModel {
   description: string;
@@ -15,6 +17,7 @@ export default class Tutor extends BaseModel {
   profile?: ModelFields<Profile>;
   subjects?: ModelFields<Subject>[];
   tutorSubjects?: ModelFields<TutorSubject>[];
+  aboutClient?: { isStudent: boolean; isStudentOfTutor: boolean };
 
   static get tableName() {
     return 'tutor';
@@ -78,11 +81,47 @@ export default class Tutor extends BaseModel {
         'minimumSalary',
         'isSpecial',
         'userId',
+        'yearsExperience',
       ).withGraphFetched('[profile(defaultSelect), subjects(defaultSelect)]');
     },
+    getTotalStudents(qb: QueryBuilder<BaseModel>) {
+      const tutorStudentBuilder = TutorStudent.query()
+        .select(knex.raw('DISTINCT("studentId")'))
+        .whereRaw('"tutorId" = "tutor".id')
+        .whereIn('status', [
+          TutorStudentStatus.ACCEPTED,
+          TutorStudentStatus.ARCHIVED,
+        ]);
+      const totalStudentsBuilder = Student.query()
+        .select(knex.raw('count(id)'))
+        .whereIn('id', tutorStudentBuilder);
+
+      qb.select(
+        knex.raw(
+          `(${totalStudentsBuilder
+            .toKnexQuery()
+            .toQuery()}) as "totalStudents"`,
+        ),
+      );
+    },
     selectInGetOne(qb: QueryBuilder<BaseModel>) {
-      qb.modify('defaultSelect').withGraphFetched(
-        '[teachingPrices(defaultSelect)]',
+      qb.modify([
+        'defaultSelect',
+        'getTotalStudents',
+        'getTotalCourses',
+      ]).withGraphFetched('[teachingPrices(defaultSelect)]');
+    },
+    getTotalCourses(qb: QueryBuilder<BaseModel>) {
+      const totalCourses = TutorStudent.query()
+        .select(knex.raw('count(id)'))
+        .whereRaw('"tutorId" = "tutor".id')
+        .whereIn('status', [
+          TutorStudentStatus.ACCEPTED,
+          TutorStudentStatus.ARCHIVED,
+        ]);
+
+      qb.select(
+        knex.raw(`(${totalCourses.toKnexQuery().toQuery()}) as "totalCourses"`),
       );
     },
     selectInTutorStudent(qb: QueryBuilder<BaseModel>) {
