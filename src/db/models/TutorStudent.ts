@@ -61,7 +61,15 @@ export default class TutorStudent extends BaseModel {
 
   static modifiers = {
     defaultSelect(qb: QueryBuilder<BaseModel>) {
-      qb.select('id', 'salary', 'status').withGraphFetched(
+      qb.select(
+        'id',
+        'salary',
+        'status',
+        'sessionsOfWeek',
+        'tutorId',
+        'studentId',
+        'subjectId',
+      ).withGraphFetched(
         '[tutor(selectInTutorStudent), student(selectInTutorStudent), subject(defaultSelect)]',
       );
     },
