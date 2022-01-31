@@ -14,6 +14,7 @@ import Notification from './Notification';
 import Schedule from './Schedule';
 import AppConfig from './AppConfig';
 import TutorRating from './TutorRating';
+import Transaction from './Transaction';
 
 export {
   knex,
@@ -32,4 +33,5 @@ export {
   Schedule,
   AppConfig,
   TutorRating,
+  Transaction,
 };

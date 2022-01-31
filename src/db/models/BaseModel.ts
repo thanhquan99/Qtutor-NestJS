@@ -27,7 +27,7 @@ export default class BaseModel extends Model {
     const builder = buildFilter(this, trx, options).build({
       where: query.filter || {},
     });
-    return (builder as unknown) as QueryBuilder<T, T[]>;
+    return builder as any as QueryBuilder<T, T[]>;
   }
 }
 

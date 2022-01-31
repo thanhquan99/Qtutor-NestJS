@@ -1,3 +1,4 @@
+import { CronJobsModule } from './cron-job/cron-jobs.module';
 import { RoleGuard } from './guards/role.guard';
 import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 import { MailerModule } from '@nestjs-modules/mailer';
@@ -56,6 +57,7 @@ import { AppConfigModule } from './app-config/app-config.module';
     NotificationModule,
     SchedulesModule,
     AppConfigModule,
+    CronJobsModule,
   ],
   providers: [
     {
