@@ -9,7 +9,7 @@ import { Schedule, Transaction } from '../db/models';
 export class CronJobsService {
   constructor(public readonly mailService: MailerService) {}
 
-  @Cron('0 */10 * * * *')
+  @Cron('0 */30 * * * *')
   async handleCron() {
     const now = new Date();
     const lastSunday = new Date(now.setDate(now.getDate() - now.getDay()));
@@ -30,8 +30,12 @@ export class CronJobsService {
 
     const sendMailFuncs = schedulePlans.map((schedule) => {
       let content: string;
-      const startTime = new Date(schedule.startTime);
-      const endTime = new Date(schedule.endTime);
+      const startTime = new Date(
+        new Date(schedule.startTime).getTime() + 1000 * 60 * 60 * 7,
+      );
+      const endTime = new Date(
+        new Date(schedule.endTime).getTime() + 1000 * 60 * 60 * 7,
+      );
 
       if (schedule.tutorStudent?.student?.userId === schedule.userId) {
         content = `You have a <b>${
@@ -91,13 +95,5 @@ export class CronJobsService {
         }),
       );
     await Transaction.query().insert(transactions);
-
-    await this.mailService.sendMail({
-      to: DEFAULT_EMAIL,
-      subject: 'Schedule Announcement',
-      html: `${compareDate.toISOString()} ,,, ${new Date(
-        new Date().getTime() - distance,
-      ).toISOString()} ,,, ${JSON.stringify(schedulePlans)}`, // HTML body content
-    });
   }
 }
