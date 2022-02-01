@@ -18,6 +18,7 @@ import { TutorStudentsModule } from './tutor-students/tutor-students.module';
 import { NotificationModule } from './notification/notification.module';
 import { SchedulesModule } from './schedules/schedules.module';
 import { AppConfigModule } from './app-config/app-config.module';
+import { TransactionsModule } from './transactions/transactions.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { AppConfigModule } from './app-config/app-config.module';
     SchedulesModule,
     AppConfigModule,
     CronJobsModule,
+    TransactionsModule,
   ],
   providers: [
     {
