@@ -173,20 +173,20 @@ export class StudentsService extends BaseServiceCRUD<Student> {
       isFreeTime: true,
     });
     if (freeTimeSchedules?.length) {
-      const invalidScheduleBuilder = Schedule.query()
+      const validScheduleBuilder = Schedule.query()
         .select(knex.raw('DISTINCT "userId"'))
         .where({
-          isFreeTime: false,
+          isFreeTime: true,
         });
 
       freeTimeSchedules.forEach((e) => {
-        invalidScheduleBuilder.andWhereRaw(
+        validScheduleBuilder.andWhereRaw(
           `(?, ?) OVERLAPS ("startTime", "endTime")`,
           [e.startTime.toISOString(), e.endTime.toISOString()],
         );
       });
 
-      builder.whereNotIn('userId', invalidScheduleBuilder);
+      builder.whereIn('userId', validScheduleBuilder);
     }
 
     return await this.paginate(builder, query);
