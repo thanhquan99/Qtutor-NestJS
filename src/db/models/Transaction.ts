@@ -7,6 +7,8 @@ export default class Transaction extends BaseModel {
   price: number;
   payType: string;
   isPaid: boolean;
+  startTime: string;
+  endTime: string;
 
   tutorUserId: string;
   studentUserId: string;
@@ -71,7 +73,7 @@ export default class Transaction extends BaseModel {
   static modifiers = {
     defaultSelect(qb: QueryBuilder<BaseModel>) {
       qb.select('*').withGraphFetched(
-        '[tutorUser(defaultSelect), studentUser(defaultSelect), subject(defaultSelect), modifiedBy(defaultSelect)]',
+        '[tutorUser(defaultSelect), studentUser(defaultSelect), subject(defaultSelect), modifiedUser(defaultSelect)]',
       );
     },
   };

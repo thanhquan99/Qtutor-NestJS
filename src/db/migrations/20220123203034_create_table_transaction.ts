@@ -11,6 +11,8 @@ export async function up(knex: Knex): Promise<void> {
       "payType" VARCHAR(255),
       "isPaid" BOOLEAN NOT NULL DEFAULT FALSE,
       "modifiedBy" BIGINT,
+      "startTime" TIMESTAMP WITH TIME ZONE,
+      "endTime" TIMESTAMP WITH TIME ZONE,
       "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
       "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     
