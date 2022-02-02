@@ -60,3 +60,15 @@ export const MINUTES_OF_HOUR = [0, 15, 30, 45];
 export const DEFAULT_EMAIL = 'qtutor2021@gmail.com';
 export const DEFAULT_WEB_CLIENT_URL =
   'https://qtutor-web-client.herokuapp.com/';
+
+export enum TransactionPayType {
+  PAYPAL = 'Paypal',
+  TRANSFER = 'Transfer',
+  CASH = 'Cash',
+}
+
+export enum TransactionStatus {
+  UNPAID = 'Unpaid',
+  PENDING = 'Pending',
+  PAID = 'Paid',
+}

@@ -2,7 +2,7 @@ import { ModelFields } from 'src/db/models/BaseModel';
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
-import { DEFAULT_EMAIL } from '../constant';
+import { DEFAULT_EMAIL, TransactionStatus } from '../constant';
 import { Schedule, Transaction } from '../db/models';
 
 @Injectable()
@@ -74,6 +74,7 @@ export class CronJobsService {
       .map(
         (e): ModelFields<Transaction> => ({
           price: e.tutorStudent?.salary,
+          status: TransactionStatus.UNPAID,
           isPaid: false,
           tutorUserId: e.tutorStudent.tutor?.userId,
           studentUserId: e.tutorStudent?.student?.userId,

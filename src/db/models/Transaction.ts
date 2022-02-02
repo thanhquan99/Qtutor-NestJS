@@ -6,6 +6,7 @@ import User from './User';
 export default class Transaction extends BaseModel {
   price: number;
   payType: string;
+  status: string;
   isPaid: boolean;
   startTime: string;
   endTime: string;
@@ -19,6 +20,10 @@ export default class Transaction extends BaseModel {
   studentUser?: ModelFields<User>;
   subject?: ModelFields<Subject>;
   modifiedUser?: ModelFields<User>;
+
+  paypalPaymentUrl?: string;
+  isEdit?: boolean;
+  isCanPay?: boolean;
 
   static get tableName() {
     return 'transaction';
