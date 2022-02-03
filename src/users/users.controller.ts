@@ -22,7 +22,7 @@ import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
-  public readonly service = new UsersService();
+  constructor(public readonly service: UsersService) {}
 
   @Get('/me')
   @UsePipes(ValidationPipe)

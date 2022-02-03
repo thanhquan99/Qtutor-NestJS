@@ -51,6 +51,11 @@ export class UpdateMeDto {
   @IsOptional()
   @IsString()
   workLocation: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  paypalEmail: string;
 }
 
 export class CreateUserDto {

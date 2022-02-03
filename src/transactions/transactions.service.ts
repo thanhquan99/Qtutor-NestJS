@@ -1,15 +1,24 @@
+import { MailerService } from '@nestjs-modules/mailer';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { BaseServiceCRUD } from '../base/base-service-CRUD';
+import {
+  DEFAULT_EMAIL,
+  TransactionPayType,
+  TransactionStatus,
+} from '../constant';
+import { Transaction, User } from '../db/models';
+import paypalService from '../service/paypal';
+import { QueryParams } from './../base/dto/query-params.dto';
 import { ModelFields } from './../db/models/BaseModel';
 import { ExecutePaypalPaymentDto, UpdateTransactionDto } from './dto/index';
-import { QueryParams } from './../base/dto/query-params.dto';
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { BaseServiceCRUD } from '../base/base-service-CRUD';
-import { Transaction } from '../db/models';
-import { TransactionPayType, TransactionStatus } from '../constant';
-import paypalService from '../service/paypal';
 
 @Injectable()
 export class TransactionsService extends BaseServiceCRUD<Transaction> {
-  constructor() {
+  constructor(private readonly mailerService: MailerService) {
     super(Transaction, 'Transaction');
   }
 
@@ -41,45 +50,51 @@ export class TransactionsService extends BaseServiceCRUD<Transaction> {
     payload: UpdateTransactionDto,
     userId: string,
   ): Promise<Transaction> {
-    const [transaction] = await Transaction.query()
-      .where({ id })
-      .andWhere((qs) => {
-        qs.orWhere({ studentUserId: userId }).orWhere({ tutorUserId: userId });
-      })
-      .limit(1);
+    const transaction = await Transaction.query().findOne({
+      id,
+      tutorUserId: userId,
+    });
     if (!transaction) {
       throw new NotFoundException('Transaction not found');
     }
-
-    if (transaction.tutorUserId === userId) {
-      if (
-        [TransactionPayType.CASH, TransactionPayType.TRANSFER].includes(
-          payload.payType as TransactionPayType,
-        )
-      ) {
-        await transaction.$query().patch({
-          payType: payload.payType,
-          status: TransactionStatus.PAID,
-          modifiedBy: userId,
-        });
-      }
+    if (transaction.status !== TransactionStatus.UNPAID) {
+      throw new BadRequestException('Can not update this transaction');
     }
 
-    if (transaction.studentUserId === userId) {
-      if (payload.payType === TransactionPayType.PAYPAL) {
-        const paypalPaymentUrl = await paypalService.createPayment([
-          transaction,
-        ]);
-        await transaction.$query().patch({
-          payType: payload.payType,
-          status: TransactionStatus.PENDING,
-          modifiedBy: userId,
-        });
-        transaction.paypalPaymentUrl = paypalPaymentUrl;
-      }
-    }
+    await transaction.$query().patch({
+      payType: payload.payType,
+      status: TransactionStatus.PAID,
+      modifiedBy: userId,
+    });
 
     return transaction;
+  }
+
+  async createPayment(
+    id: string,
+    userId: string,
+  ): Promise<{ paypalPaymentUrl: string }> {
+    const transaction = await Transaction.query()
+      .modify('defaultSelect')
+      .findOne({
+        id,
+        studentUserId: userId,
+      });
+    if (!transaction) {
+      throw new NotFoundException('Transaction not found');
+    }
+    if (transaction.status !== TransactionStatus.UNPAID) {
+      throw new BadRequestException('This transaction is not unpaid');
+    }
+
+    const paypalPaymentUrl = await paypalService.createPayment([transaction]);
+
+    await transaction.$query().patch({
+      payType: TransactionPayType.PAYPAL,
+      status: TransactionStatus.PENDING,
+      modifiedBy: userId,
+    });
+    return { paypalPaymentUrl };
   }
 
   async executePayment(
@@ -87,16 +102,36 @@ export class TransactionsService extends BaseServiceCRUD<Transaction> {
     payload: ExecutePaypalPaymentDto,
     userId: string,
   ): Promise<Transaction> {
-    const transaction = await Transaction.query().findOne({
-      id,
-      studentUserId: userId,
-    });
+    const transaction = await Transaction.query()
+      .modify('defaultSelect')
+      .findOne({
+        id,
+        studentUserId: userId,
+      });
     if (!transaction) {
       throw new NotFoundException('Transaction not found');
     }
+    if (transaction.status !== TransactionStatus.PENDING) {
+      throw new BadRequestException('Only pending transaction can execute');
+    }
 
     await paypalService.executePayment(payload.paymentId, payload.payerId);
-    await transaction.$query().patch({ status: TransactionStatus.PAID });
+
+    const tutorUser = await User.query().findById(transaction.tutorUserId);
+    if (tutorUser.paypalEmail) {
+      await paypalService.createPayout(
+        [transaction],
+        tutorUser.paypalEmail,
+        this.mailerService,
+      );
+    } else {
+      await this.mailerService.sendMail({
+        to: DEFAULT_EMAIL,
+        subject: 'Paypal Announcement',
+        html: 'You have a tuition payment. Please update your paypal email', // HTML body content
+      });
+    }
+
     return transaction;
   }
 }

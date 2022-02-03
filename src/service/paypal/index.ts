@@ -1,6 +1,12 @@
 import { ModelFields } from './../../db/models/BaseModel';
 import { Transaction } from '../../db/models';
 import request from 'request-promise';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import { MailerService } from '@nestjs-modules/mailer';
+import { DEFAULT_EMAIL, TransactionStatus } from '../../constant';
 
 class PaypalService {
   readonly clientId: string;
@@ -56,14 +62,18 @@ class PaypalService {
       },
       body: create_payment_json,
       json: true,
-    }).promise();
+    })
+      .promise()
+      .catch((err) => {
+        throw new InternalServerErrorException(err);
+      });
 
     const redirectUrl = res.links?.find((e) => e.method === 'REDIRECT')?.href;
     return redirectUrl;
   }
 
   async executePayment(paymentId: string, payerId: string): Promise<void> {
-    const res = await request({
+    await request({
       method: 'post',
       uri: `https://api.sandbox.paypal.com/v1/payments/payment/${paymentId}/execute`,
       auth: {
@@ -74,8 +84,69 @@ class PaypalService {
         payer_id: payerId,
       },
       json: true,
-    }).promise();
-    console.log(res);
+    })
+      .promise()
+      .catch((err) => {
+        throw new BadRequestException(err);
+      });
+  }
+
+  async createPayout(
+    transactions: ModelFields<Transaction>[],
+    receiverEmail: string,
+    mailService?: MailerService,
+  ) {
+    const message = transactions
+      .map(
+        (e) => `${e.subject?.name} - Student ${e.studentUser?.profile?.name}`,
+      )
+      .join(',');
+    const payoutBody = {
+      sender_batch_header: {
+        sender_batch_id: transactions[0].id,
+        recipient_type: 'EMAIL',
+        email_subject: 'You have money!',
+        email_message: `You received your tuition payment. ${message}`,
+      },
+      items: [
+        {
+          amount: {
+            value: (
+              transactions.reduce((a, b) => a + b.price, 0) / 20000
+            ).toString(),
+            currency: 'USD',
+          },
+          recipient_wallet: 'PAYPAL',
+          receiver: receiverEmail,
+        },
+      ],
+    };
+    await request({
+      method: 'post',
+      uri: 'https://api.sandbox.paypal.com/v1/payments/payouts',
+      auth: {
+        username: this.clientId,
+        password: this.clientSecret,
+      },
+      body: payoutBody,
+      json: true,
+    })
+      .promise()
+      .catch(async (err) => {
+        await mailService.sendMail({
+          to: DEFAULT_EMAIL,
+          subject: 'Paypal Announcement',
+          html: 'Your paypal email is not correct. Please update your paypal email', // HTML body content
+        });
+        throw new BadRequestException(err);
+      });
+
+    await Transaction.query()
+      .whereIn(
+        'id',
+        transactions.map((e) => e.id),
+      )
+      .update({ status: TransactionStatus.PAID });
   }
 }
 

@@ -14,6 +14,7 @@ export default class User extends BaseModel {
   isActive: boolean;
   verifyEmailCode: string;
   forgotPasswordCode: string;
+  paypalEmail: string;
 
   role?: ModelFields<Role>;
   profile?: ModelFields<Profile>;
@@ -91,6 +92,7 @@ export default class User extends BaseModel {
       qb.select(
         'id',
         'email',
+        'paypalEmail',
         knex.raw(
           '((Select "userId" from tutor where "userId" = users.id) is not NULL) as "isTutor"',
         ),

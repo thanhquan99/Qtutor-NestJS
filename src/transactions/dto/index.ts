@@ -5,7 +5,7 @@ import { TransactionPayType } from '../../constant';
 export class UpdateTransactionDto {
   @ApiPropertyOptional()
   @IsOptional()
-  @IsIn(Object.values(TransactionPayType))
+  @IsIn([TransactionPayType.CASH, TransactionPayType.TRANSFER])
   payType: string;
 }
 

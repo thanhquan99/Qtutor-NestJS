@@ -1,3 +1,4 @@
+import { MailerService } from '@nestjs-modules/mailer';
 import {
   BadRequestException,
   Injectable,
@@ -5,14 +6,22 @@ import {
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
-import { ROLE } from 'src/constant';
-import { Profile, Role, Tutor, User, TutorStudent, knex } from 'src/db/models';
+import { ROLE, TransactionStatus } from 'src/constant';
+import {
+  Profile,
+  Role,
+  Tutor,
+  User,
+  TutorStudent,
+  Transaction,
+} from 'src/db/models';
+import paypalService from '../service/paypal';
 import { SALT, TutorStudentStatus } from './../constant/index';
 import { CreateUserDto, UpdateMeDto } from './dto/index';
 
 @Injectable()
 export class UsersService extends BaseServiceCRUD<User> {
-  constructor() {
+  constructor(private readonly mailerService: MailerService) {
     super(User, 'User');
   }
 
@@ -32,7 +41,29 @@ export class UsersService extends BaseServiceCRUD<User> {
   }
 
   async updateMe(id: string, payload: UpdateMeDto): Promise<User> {
+    const { paypalEmail } = payload;
+    delete payload.paypalEmail;
+
     await Profile.query().where({ userId: id }).update(payload);
+
+    //Payout
+    if (paypalEmail) {
+      await User.query().where({ id }).update({ paypalEmail });
+      const transactions = await Transaction.query()
+        .modify('defaultSelect')
+        .where({
+          tutorUserId: id,
+          status: TransactionStatus.PENDING,
+        });
+      if (transactions?.length) {
+        await paypalService.createPayout(
+          transactions,
+          paypalEmail,
+          this.mailerService,
+        );
+      }
+    }
+
     return await this.getMe(id);
   }
 

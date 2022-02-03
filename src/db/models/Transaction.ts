@@ -21,7 +21,6 @@ export default class Transaction extends BaseModel {
   subject?: ModelFields<Subject>;
   modifiedUser?: ModelFields<User>;
 
-  paypalPaymentUrl?: string;
   isEdit?: boolean;
   isCanPay?: boolean;
 

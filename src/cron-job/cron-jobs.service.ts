@@ -9,7 +9,7 @@ import { Schedule, Transaction } from '../db/models';
 export class CronJobsService {
   constructor(public readonly mailService: MailerService) {}
 
-  @Cron('0 */30 * * * *')
+  @Cron('0 */10 * * * *')
   async handleCron() {
     const now = new Date();
     const lastSunday = new Date(now.setDate(now.getDate() - now.getDay()));
@@ -17,10 +17,10 @@ export class CronJobsService {
     const sundayInDB = new Date('2022/01/09').getTime();
     const distance = lastSundayMidNight - sundayInDB;
 
-    const compareDate = new Date(Date.now() - distance + 1000 * 60 * 30);
+    const compareDate = new Date(Date.now() - distance + 1000 * 60 * 10);
     const schedulePlans = await Schedule.query()
       .whereNotNull('tutorStudentId')
-      .andWhere('startTime', '<=', compareDate.toISOString())
+      .andWhere('startTime', '<', compareDate.toISOString())
       .andWhere(
         'startTime',
         '>=',
@@ -30,12 +30,8 @@ export class CronJobsService {
 
     const sendMailFuncs = schedulePlans.map((schedule) => {
       let content: string;
-      const startTime = new Date(
-        new Date(schedule.startTime).getTime() + 1000 * 60 * 60 * 7,
-      );
-      const endTime = new Date(
-        new Date(schedule.endTime).getTime() + 1000 * 60 * 60 * 7,
-      );
+      const startTime = new Date(new Date(schedule.startTime).getTime());
+      const endTime = new Date(new Date(schedule.endTime).getTime());
 
       if (schedule.tutorStudent?.student?.userId === schedule.userId) {
         content = `You have a <b>${

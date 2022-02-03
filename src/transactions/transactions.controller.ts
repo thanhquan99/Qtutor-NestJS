@@ -67,4 +67,14 @@ export class TransactionsController {
   ): Promise<Transaction> {
     return this.service.executePayment(params.id, payload, user.id);
   }
+
+  @Post('/:id/paypal/payment')
+  @ApiBearerAuth()
+  @Role(ROLE.CUSTOMER)
+  createPayment(
+    @Param() params: IdParam,
+    @GetUser() user: User,
+  ): Promise<{ paypalPaymentUrl: string }> {
+    return this.service.createPayment(params.id, user.id);
+  }
 }
