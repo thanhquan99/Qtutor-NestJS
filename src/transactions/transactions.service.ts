@@ -14,7 +14,11 @@ import { Transaction, User } from '../db/models';
 import paypalService from '../service/paypal';
 import { QueryParams } from './../base/dto/query-params.dto';
 import { ModelFields } from './../db/models/BaseModel';
-import { ExecutePaypalPaymentDto, UpdateTransactionDto } from './dto/index';
+import {
+  CreatePaypalPaymentDto,
+  ExecutePaypalPaymentDto,
+  UpdateTransactionDto,
+} from './dto/index';
 
 @Injectable()
 export class TransactionsService extends BaseServiceCRUD<Transaction> {
@@ -36,7 +40,8 @@ export class TransactionsService extends BaseServiceCRUD<Transaction> {
 
     return {
       results: results.map((e: ModelFields<Transaction>): Transaction => {
-        const isEdit = e.tutorUserId === userId;
+        const isEdit =
+          e.tutorUserId === userId && e.status === TransactionStatus.UNPAID;
         const isCanPay =
           e.studentUserId === userId && e.status === TransactionStatus.UNPAID;
         return { ...e, isEdit, isCanPay } as Transaction;
@@ -72,6 +77,7 @@ export class TransactionsService extends BaseServiceCRUD<Transaction> {
 
   async createPayment(
     id: string,
+    payload: CreatePaypalPaymentDto,
     userId: string,
   ): Promise<{ paypalPaymentUrl: string }> {
     const transaction = await Transaction.query()
@@ -87,7 +93,10 @@ export class TransactionsService extends BaseServiceCRUD<Transaction> {
       throw new BadRequestException('This transaction is not unpaid');
     }
 
-    const paypalPaymentUrl = await paypalService.createPayment([transaction]);
+    const paypalPaymentUrl = await paypalService.createPayment([transaction], {
+      returnUrl: payload.returnUrl,
+      cancelUrl: payload.cancelUrl,
+    });
 
     await transaction.$query().patch({
       payType: TransactionPayType.PAYPAL,

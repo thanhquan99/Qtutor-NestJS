@@ -21,6 +21,7 @@ class PaypalService {
 
   async createPayment(
     transactions: ModelFields<Transaction>[],
+    redirectUrls: { returnUrl: string; cancelUrl: string },
   ): Promise<string> {
     const create_payment_json = {
       intent: 'sale',
@@ -28,8 +29,8 @@ class PaypalService {
         payment_method: 'paypal',
       },
       redirect_urls: {
-        return_url: 'https://qtutor-web-client.herokuapp.com/transactions',
-        cancel_url: 'https://qtutor-web-client.herokuapp.com/transactions',
+        return_url: redirectUrls.returnUrl,
+        cancel_url: redirectUrls.cancelUrl,
       },
       transactions: [
         {

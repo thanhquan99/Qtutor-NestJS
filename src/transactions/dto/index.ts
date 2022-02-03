@@ -20,3 +20,15 @@ export class ExecutePaypalPaymentDto {
   @IsString()
   payerId: string;
 }
+
+export class CreatePaypalPaymentDto {
+  @ApiPropertyOptional()
+  @IsNotEmpty()
+  @IsString()
+  returnUrl: string;
+
+  @ApiPropertyOptional()
+  @IsNotEmpty()
+  @IsString()
+  cancelUrl: string;
+}

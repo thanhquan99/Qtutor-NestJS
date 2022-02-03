@@ -16,7 +16,11 @@ import { IdParam } from '../base/params';
 import { ROLE } from '../constant';
 import { Transaction, User } from '../db/models';
 import { Role } from '../guards/role.decorator';
-import { ExecutePaypalPaymentDto, UpdateTransactionDto } from './dto';
+import {
+  CreatePaypalPaymentDto,
+  ExecutePaypalPaymentDto,
+  UpdateTransactionDto,
+} from './dto';
 import { TransactionsService } from './transactions.service';
 
 @Controller('transactions')
@@ -74,7 +78,8 @@ export class TransactionsController {
   createPayment(
     @Param() params: IdParam,
     @GetUser() user: User,
+    @Body() payload: CreatePaypalPaymentDto,
   ): Promise<{ paypalPaymentUrl: string }> {
-    return this.service.createPayment(params.id, user.id);
+    return this.service.createPayment(params.id, payload, user.id);
   }
 }
