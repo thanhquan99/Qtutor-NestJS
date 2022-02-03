@@ -56,10 +56,12 @@ export class TransactionsService extends BaseServiceCRUD<Transaction> {
     payload: UpdateTransactionDto,
     userId: string,
   ): Promise<ModelFields<Transaction>> {
-    const transaction = await Transaction.query().findOne({
-      id,
-      tutorUserId: userId,
-    });
+    const transaction = await Transaction.query()
+      .modify('defaultSelect')
+      .findOne({
+        id,
+        tutorUserId: userId,
+      });
     if (!transaction) {
       throw new NotFoundException('Transaction not found');
     }
