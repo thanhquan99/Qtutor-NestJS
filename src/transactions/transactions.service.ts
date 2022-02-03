@@ -19,6 +19,7 @@ import {
   ExecutePaypalPaymentDto,
   UpdateTransactionDto,
 } from './dto/index';
+import { modifyTransaction } from './helper';
 
 @Injectable()
 export class TransactionsService extends BaseServiceCRUD<Transaction> {
@@ -54,7 +55,7 @@ export class TransactionsService extends BaseServiceCRUD<Transaction> {
     id: string,
     payload: UpdateTransactionDto,
     userId: string,
-  ): Promise<Transaction> {
+  ): Promise<ModelFields<Transaction>> {
     const transaction = await Transaction.query().findOne({
       id,
       tutorUserId: userId,
@@ -72,7 +73,7 @@ export class TransactionsService extends BaseServiceCRUD<Transaction> {
       modifiedBy: userId,
     });
 
-    return transaction;
+    return modifyTransaction(transaction, userId);
   }
 
   async createPayment(
@@ -110,7 +111,7 @@ export class TransactionsService extends BaseServiceCRUD<Transaction> {
     id: string,
     payload: ExecutePaypalPaymentDto,
     userId: string,
-  ): Promise<Transaction> {
+  ): Promise<ModelFields<Transaction>> {
     const transaction = await Transaction.query()
       .modify('defaultSelect')
       .findOne({
@@ -141,6 +142,6 @@ export class TransactionsService extends BaseServiceCRUD<Transaction> {
       });
     }
 
-    return transaction;
+    return modifyTransaction(transaction, userId);
   }
 }

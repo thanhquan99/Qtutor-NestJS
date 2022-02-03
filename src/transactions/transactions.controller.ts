@@ -15,6 +15,7 @@ import { QueryParams } from '../base/dto/query-params.dto';
 import { IdParam } from '../base/params';
 import { ROLE } from '../constant';
 import { Transaction, User } from '../db/models';
+import { ModelFields } from '../db/models/BaseModel';
 import { Role } from '../guards/role.decorator';
 import {
   CreatePaypalPaymentDto,
@@ -57,7 +58,7 @@ export class TransactionsController {
     @Param() params: IdParam,
     @Body() payload: UpdateTransactionDto,
     @GetUser() user: User,
-  ): Promise<Transaction> {
+  ): Promise<ModelFields<Transaction>> {
     return this.service.updateTransaction(params.id, payload, user.id);
   }
 
@@ -68,7 +69,7 @@ export class TransactionsController {
     @Param() params: IdParam,
     @Body() payload: ExecutePaypalPaymentDto,
     @GetUser() user: User,
-  ): Promise<Transaction> {
+  ): Promise<ModelFields<Transaction>> {
     return this.service.executePayment(params.id, payload, user.id);
   }
 
