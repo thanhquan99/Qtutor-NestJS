@@ -30,8 +30,12 @@ export class CronJobsService {
 
     const sendMailFuncs = schedulePlans.map((schedule) => {
       let content: string;
-      const startTime = new Date(new Date(schedule.startTime).getTime());
-      const endTime = new Date(new Date(schedule.endTime).getTime());
+      const startTime = new Date(
+        new Date(schedule.startTime).getTime() + 1000 * 60 * 60 * 7,
+      );
+      const endTime = new Date(
+        new Date(schedule.endTime).getTime() + 1000 * 60 * 60 * 7,
+      );
 
       if (schedule.tutorStudent?.student?.userId === schedule.userId) {
         content = `You have a <b>${
