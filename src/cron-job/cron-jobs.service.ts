@@ -65,6 +65,7 @@ export class CronJobsService {
     });
     await Promise.all(sendMailFuncs);
 
+    const current = new Date();
     const transactions = schedulePlans
       .filter(
         (value, index, self) =>
@@ -80,16 +81,16 @@ export class CronJobsService {
           studentUserId: e.tutorStudent?.student?.userId,
           subjectId: e.tutorStudent?.subjectId,
           startTime: new Date(
-            now.getFullYear(),
-            now.getMonth(),
-            now.getDay(),
+            current.getFullYear(),
+            current.getMonth(),
+            current.getDay(),
             new Date(e.startTime).getHours(),
             new Date(e.startTime).getMinutes(),
           ).toISOString(),
           endTime: new Date(
-            now.getFullYear(),
-            now.getMonth(),
-            now.getDay(),
+            current.getFullYear(),
+            current.getMonth(),
+            current.getDay(),
             new Date(e.endTime).getHours(),
             new Date(e.endTime).getMinutes(),
           ).toISOString(),
