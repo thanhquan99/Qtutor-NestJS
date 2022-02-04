@@ -31,7 +31,7 @@ export class TransactionsService extends BaseServiceCRUD<Transaction> {
     userId: string,
     query: QueryParams,
   ): Promise<{ results: Transaction[]; total }> {
-    const builder = Transaction.query()
+    const builder = Transaction.queryBuilder(query)
       .modify('defaultSelect')
       .where((qs) => {
         qs.orWhere({ tutorUserId: userId }).orWhere({ studentUserId: userId });
