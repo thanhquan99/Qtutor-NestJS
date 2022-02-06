@@ -28,7 +28,7 @@ export class AuthService {
   ) {}
 
   async register(registerUserDto: RegisterUserDto) {
-    const { email, name, password } = registerUserDto;
+    const { email, password } = registerUserDto;
     const user = await User.query().findOne({ email });
     if (user) {
       throw new BadRequestException('Email is already exist');
@@ -42,7 +42,10 @@ export class AuthService {
       roleId: role.id,
       verifyEmailCode,
       profile: {
-        name: name,
+        name: registerUserDto.name,
+        academicLevel: registerUserDto.academicLevel,
+        cityId: registerUserDto.cityId,
+        isMale: registerUserDto.isMale,
       },
     });
 

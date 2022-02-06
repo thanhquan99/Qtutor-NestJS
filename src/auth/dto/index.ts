@@ -1,13 +1,15 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsBoolean,
   IsEmail,
+  IsIn,
   IsNotEmpty,
-  IsNumber,
-  IsOptional,
+  IsNumberString,
   IsString,
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { AcademicLevel } from '../../constant';
 
 export class VerifyEmailDto {
   @ApiProperty()
@@ -68,6 +70,21 @@ export class RegisterUserDto {
   @IsNotEmpty()
   @IsString()
   name: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsBoolean()
+  isMale: boolean;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsNumberString()
+  cityId: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsIn(Object.values(AcademicLevel))
+  academicLevel: string;
 }
 
 export class LoginUserDto {

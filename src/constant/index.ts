@@ -10,7 +10,9 @@ export enum AcademicLevel {
   STUDENT = 'Student',
   COLLEGE_STUDENT = 'College Student',
   UNIVERSITY_STUDENT = 'University Student',
-  TEACHER = 'Teacher',
+  BACHELOR = 'Bachelor',
+  MASTER = 'Master',
+  PROFESSOR = 'Professor',
 }
 
 export enum TutorStudentStatus {
