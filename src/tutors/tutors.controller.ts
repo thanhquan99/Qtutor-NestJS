@@ -153,7 +153,7 @@ export class TutorsController {
     return this.service.deleteOne(params.id);
   }
 
-  @Get('/:id/rating')
+  @Get('/:id/ratings')
   @UsePipes(ValidationPipe)
   getRatings(
     @Param() params: IdParam,
@@ -170,7 +170,7 @@ export class TutorsController {
     return this.service.getRatings(params.id, query);
   }
 
-  @Post('/:id/rating')
+  @Post('/:id/ratings')
   @UsePipes(ValidationPipe)
   @ApiBearerAuth()
   @Role(ROLE.CUSTOMER)
