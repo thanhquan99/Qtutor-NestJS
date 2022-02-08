@@ -17,6 +17,16 @@ export class IStudentSubject {
   @IsNotEmpty()
   @IsString()
   subjectId: string;
+
+  @ApiPropertyOptional()
+  @IsNotEmpty()
+  @IsNumber()
+  sessionsOfWeek: number;
+
+  @ApiPropertyOptional()
+  @IsNotEmpty()
+  @IsNumber()
+  price: number;
 }
 
 export class CreateStudentDto {

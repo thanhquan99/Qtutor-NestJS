@@ -25,6 +25,7 @@ import {
 } from 'src/db/models';
 import { CreateStudentDto, RegisterStudyDto } from './dto/index';
 import { customFilterInStudents } from './utils';
+import { ModelFields } from '../db/models/BaseModel';
 
 @Injectable()
 export class StudentsService extends BaseServiceCRUD<Student> {
@@ -32,7 +33,7 @@ export class StudentsService extends BaseServiceCRUD<Student> {
     super(Student, 'Student');
   }
 
-  async createStudent(payload: CreateStudentDto, userId): Promise<Student> {
+  async createStudent(payload: ModelFields<Student>, userId): Promise<Student> {
     const student = await Student.query().findOne({ userId });
     if (student) {
       throw new BadRequestException('You are already a student');
