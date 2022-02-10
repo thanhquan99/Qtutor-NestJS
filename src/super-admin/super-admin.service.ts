@@ -1,17 +1,13 @@
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { User } from '../../db/models';
-import { SALoginDto } from './dto';
-import * as bcrypt from 'bcrypt';
-import { ROLE, SALT } from '../../constant';
-import { JwtPayload } from '../../service/jwt/jwt-payload.interface';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+import { ROLE, SALT } from '../constant';
+import { User } from '../db/models';
+import { JwtPayload } from '../service/jwt/jwt-payload.interface';
+import { SALoginDto } from './dto';
 
 @Injectable()
-export class SAAuthService {
+export class SuperAdminService {
   constructor(private jwtService: JwtService) {}
 
   async login(body: SALoginDto): Promise<{ user: User; accessToken: string }> {

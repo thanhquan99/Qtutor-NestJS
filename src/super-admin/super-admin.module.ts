@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from '../../service/jwt/jwt.strategy';
-import { SAAuthController } from './SAAuth.controller';
-import { SAAuthService } from './SAAuth.service';
+import { JwtStrategy } from '../service/jwt/jwt.strategy';
+import { SuperAdminController } from './super-admin.controller';
+import { SuperAdminService } from './super-admin.service';
 
 @Module({
   imports: [
@@ -15,7 +15,7 @@ import { SAAuthService } from './SAAuth.service';
       },
     }),
   ],
-  controllers: [SAAuthController],
-  providers: [SAAuthService, JwtStrategy],
+  controllers: [SuperAdminController],
+  providers: [SuperAdminService, JwtStrategy],
 })
-export class SAAuthModule {}
+export class SuperAdminModule {}

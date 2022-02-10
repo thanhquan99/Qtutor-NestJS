@@ -19,7 +19,7 @@ import { NotificationModule } from './notification/notification.module';
 import { SchedulesModule } from './schedules/schedules.module';
 import { AppConfigModule } from './app-config/app-config.module';
 import { TransactionsModule } from './transactions/transactions.module';
-import { SAAuthModule } from './super-admin-api/saauth/SAAuth.module';
+import { SuperAdminModule } from './super-admin/super-admin.module';
 
 @Module({
   imports: [
@@ -61,7 +61,7 @@ import { SAAuthModule } from './super-admin-api/saauth/SAAuth.module';
     AppConfigModule,
     CronJobsModule,
     TransactionsModule,
-    SAAuthModule,
+    SuperAdminModule,
   ],
   providers: [
     {

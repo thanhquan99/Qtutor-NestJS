@@ -6,17 +6,17 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { User } from '../../db/models';
+import { User } from '../db/models';
 import { SALoginDto } from './dto';
-import { SAAuthService } from './SAAuth.service';
+import { SuperAdminService } from './super-admin.service';
 
-@Controller('super-admin/auth')
+@Controller('super-admin')
 @UsePipes(ValidationPipe)
-@ApiTags('Super Admin Auth')
-export class SAAuthController {
-  constructor(public readonly service: SAAuthService) {}
+@ApiTags('Super Admin')
+export class SuperAdminController {
+  constructor(public readonly service: SuperAdminService) {}
 
-  @Post('/login')
+  @Post('/auth/login')
   login(
     @Body() payload: SALoginDto,
   ): Promise<{ user: User; accessToken: string }> {
