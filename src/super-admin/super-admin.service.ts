@@ -1,3 +1,4 @@
+import { Student, Tutor, Subject } from 'src/db/models';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -35,5 +36,31 @@ export class SuperAdminService {
     const accessToken = this.jwtService.sign(payload);
     delete user.password;
     return { accessToken, user };
+  }
+
+  async getDashboard(): Promise<{
+    totalUsers: string;
+    totalStudents: string;
+    totalTutors: string;
+    totalSubjects: string;
+  }> {
+    const [
+      { count: totalUsers },
+      { count: totalStudents },
+      { count: totalTutors },
+      { count: totalSubjects },
+    ] = await Promise.all([
+      User.query().count('id').first(),
+      Student.query().count('id').first(),
+      Tutor.query().count('id').first(),
+      Subject.query().count('id').first(),
+    ]);
+
+    return {
+      totalStudents,
+      totalTutors,
+      totalUsers,
+      totalSubjects,
+    };
   }
 }
