@@ -26,7 +26,7 @@ export class SuperAdminController {
     return this.service.login(payload);
   }
 
-  @Get('system-dashboard')
+  @Get('/system-dashboard')
   @ApiBearerAuth()
   @Role(ROLE.SUPER_ADMIN)
   getDashboard(): Promise<{

@@ -46,6 +46,7 @@ export class AuthService {
         academicLevel: registerUserDto.academicLevel,
         cityId: registerUserDto.cityId,
         isMale: registerUserDto.isMale,
+        avatar: registerUserDto.avatar,
       },
     });
 
