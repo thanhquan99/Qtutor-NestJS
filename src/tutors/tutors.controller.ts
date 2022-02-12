@@ -183,7 +183,7 @@ export class TutorsController {
     return this.service.createTutorRating(params.id, payload, user.id);
   }
 
-  @Post('/:id/rated-examination')
+  @Get('/:id/rated-examination')
   @UsePipes(ValidationPipe)
   @ApiBearerAuth()
   @Role(ROLE.CUSTOMER)
