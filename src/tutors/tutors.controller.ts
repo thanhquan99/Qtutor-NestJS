@@ -23,11 +23,12 @@ import {
 } from '@nestjs/common';
 import Tutor from 'src/db/models/Tutor';
 import { IdParam } from 'src/base/params';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Student, TutorStudent, User, TutorRating } from 'src/db/models';
 import { Role } from 'src/guards/role.decorator';
 
 @Controller('tutors')
+@ApiTags('Tutor')
 export class TutorsController {
   constructor(public readonly service: TutorsService) {}
 
@@ -180,5 +181,16 @@ export class TutorsController {
     @Param() params: IdParam,
   ): Promise<TutorRating> {
     return this.service.createTutorRating(params.id, payload, user.id);
+  }
+
+  @Post('/:id/rated-examination')
+  @UsePipes(ValidationPipe)
+  @ApiBearerAuth()
+  @Role(ROLE.CUSTOMER)
+  checkRated(
+    @GetUser() user: User,
+    @Param() params: IdParam,
+  ): Promise<{ canRating: boolean }> {
+    return this.service.checkRated(user.id, params.id);
   }
 }

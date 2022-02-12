@@ -250,4 +250,23 @@ export class TutorsService extends BaseServiceCRUD<Tutor> {
       .where({ tutorId });
     return await this.paginate(builder, query);
   }
+
+  async checkRated(userId: string, tutorId): Promise<{ canRating: boolean }> {
+    const student = await Student.query().findOne({ userId });
+    let canRating = false;
+    if (student) {
+      const tutorStudent = await TutorStudent.query().findOne({
+        tutorId,
+        studentId: student.id,
+      });
+      if (tutorStudent) {
+        const rating = await TutorRating.query().findOne({
+          reviewerId: userId,
+          tutorId,
+        });
+        canRating = rating ? false : true;
+      }
+    }
+    return { canRating };
+  }
 }
