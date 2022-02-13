@@ -175,7 +175,7 @@ export default class Tutor extends BaseModel {
     },
     getAverageRating(qb: QueryBuilder<BaseModel>) {
       const totalRatingBuilder = TutorRating.query()
-        .select(knex.raw('AVG(rating)::numeric(10,1)'))
+        .select(knex.raw('COALESCE(AVG(rating)::numeric(10,1), 0)'))
         .whereRaw('"tutorId" = "tutor".id');
 
       qb.select(
