@@ -125,10 +125,9 @@ export class TutorsController {
 
   @Get('/:id')
   @ApiBearerAuth()
-  @Role(ROLE.OPTIONAL)
   @UsePipes(ValidationPipe)
-  getTutor(@Param() params: IdParam, @GetUser() user: User): Promise<Tutor> {
-    return this.service.getTutor(params.id, user?.id);
+  getTutor(@Param() params: IdParam): Promise<Tutor> {
+    return this.service.getTutor(params.id);
   }
 
   @Post()

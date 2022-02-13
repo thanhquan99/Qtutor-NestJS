@@ -25,7 +25,6 @@ export default class Tutor extends BaseModel {
   profile?: ModelFields<Profile>;
   subjects?: ModelFields<Subject>[];
   tutorSubjects?: ModelFields<TutorSubject>[];
-  aboutClient?: { isStudentOfTutor: boolean };
 
   static get tableName() {
     return 'tutor';
@@ -133,6 +132,8 @@ export default class Tutor extends BaseModel {
         'defaultSelect',
         'getTotalStudents',
         'getTotalCourses',
+        'getTotalRatings',
+        'getAverageRating',
       ]).withGraphFetched(
         '[tutorSubjects(defaultSelect), schedules(getFreeTime)]',
       );
@@ -160,6 +161,28 @@ export default class Tutor extends BaseModel {
         'minimumSalary',
         'isSpecial',
       ).withGraphFetched('profile(defaultSelect)');
+    },
+    getTotalRatings(qb: QueryBuilder<BaseModel>) {
+      const totalRatingBuilder = TutorRating.query()
+        .select(knex.raw('count(id)'))
+        .whereRaw('"tutorId" = "tutor".id');
+
+      qb.select(
+        knex.raw(
+          `(${totalRatingBuilder.toKnexQuery().toQuery()}) as "totalRatings"`,
+        ),
+      );
+    },
+    getAverageRating(qb: QueryBuilder<BaseModel>) {
+      const totalRatingBuilder = TutorRating.query()
+        .select(knex.raw('AVG(rating)::numeric(10,1)'))
+        .whereRaw('"tutorId" = "tutor".id');
+
+      qb.select(
+        knex.raw(
+          `(${totalRatingBuilder.toKnexQuery().toQuery()}) as "averageRating"`,
+        ),
+      );
     },
   };
 }
