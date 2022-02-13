@@ -83,14 +83,14 @@ export class CronJobsService {
           startTime: new Date(
             current.getFullYear(),
             current.getMonth(),
-            current.getDay(),
+            current.getDate(),
             new Date(e.startTime).getHours(),
             new Date(e.startTime).getMinutes(),
           ).toISOString(),
           endTime: new Date(
             current.getFullYear(),
             current.getMonth(),
-            current.getDay(),
+            current.getDate(),
             new Date(e.endTime).getHours(),
             new Date(e.endTime).getMinutes(),
           ).toISOString(),
