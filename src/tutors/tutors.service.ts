@@ -15,6 +15,7 @@ import {
   TutorRating,
   TutorStudent,
   TutorSubject,
+  TutorView,
 } from 'src/db/models';
 import Tutor from 'src/db/models/Tutor';
 import {
@@ -47,8 +48,12 @@ export class TutorsService extends BaseServiceCRUD<Tutor> {
     return await Tutor.query().findOne({ userId }).modify('selectInGetOne');
   }
 
-  async getTutors(query, userId: string): Promise<{ results: Tutor[]; total }> {
-    const builder = Tutor.queryBuilder<Tutor>(query).modify('defaultSelect');
+  async getTutors(
+    query,
+    userId: string,
+  ): Promise<{ results: TutorView[]; total }> {
+    const builder =
+      TutorView.queryBuilder<TutorView>(query).modify('defaultSelect');
     if (userId) {
       builder.andWhere('userId', '!=', userId);
     }

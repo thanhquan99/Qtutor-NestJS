@@ -24,7 +24,13 @@ import {
 import Tutor from 'src/db/models/Tutor';
 import { IdParam } from 'src/base/params';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { Student, TutorStudent, User, TutorRating } from 'src/db/models';
+import {
+  Student,
+  TutorStudent,
+  User,
+  TutorRating,
+  TutorView,
+} from 'src/db/models';
 import { Role } from 'src/guards/role.decorator';
 
 @Controller('tutors')
@@ -108,7 +114,7 @@ export class TutorsController {
   getMany(
     @Query() query: QueryParams,
     @GetUser() user: User,
-  ): Promise<{ results: Tutor[]; total }> {
+  ): Promise<{ results: TutorView[]; total }> {
     if (query.filter) {
       query.filter = JSON.parse(query.filter);
     }
