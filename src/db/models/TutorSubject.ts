@@ -1,3 +1,5 @@
+import { QueryBuilder } from 'objection';
+import { Subject } from '.';
 import BaseModel from './BaseModel';
 
 export default class TutorSubject extends BaseModel {
@@ -18,4 +20,29 @@ export default class TutorSubject extends BaseModel {
   $beforeUpdate() {
     this.updatedAt = new Date().toISOString();
   }
+
+  static get relationMappings() {
+    return {
+      subject: {
+        relation: BaseModel.BelongsToOneRelation,
+        modelClass: Subject,
+        join: {
+          from: 'tutor_subject.subjectId',
+          to: 'subject.id',
+        },
+      },
+    };
+  }
+
+  static modifiers = {
+    defaultSelect(qb: QueryBuilder<BaseModel>) {
+      qb.select(
+        'id',
+        'tutorId',
+        'subjectId',
+        'sessionsOfWeek',
+        'price',
+      ).withGraphFetched('[subject(defaultSelect)]');
+    },
+  };
 }

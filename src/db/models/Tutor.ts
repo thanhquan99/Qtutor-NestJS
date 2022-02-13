@@ -124,7 +124,7 @@ export default class Tutor extends BaseModel {
         'defaultSelect',
         'getTotalStudents',
         'getTotalCourses',
-      ]).withGraphFetched('[teachingPrices(defaultSelect)]');
+      ]).withGraphFetched('[tutorSubjects(defaultSelect)]');
     },
     getTotalCourses(qb: QueryBuilder<BaseModel>) {
       const totalCourses = TutorStudent.query()
