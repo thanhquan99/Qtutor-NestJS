@@ -9,6 +9,7 @@ import {
 } from 'src/db/models';
 import { TutorStudentStatus } from '../../constant';
 import BaseModel, { ModelFields } from './BaseModel';
+import Schedule from './Schedule';
 import TeachingPrice from './TeachingPrice';
 import TutorStudent from './TutorStudent';
 
@@ -85,6 +86,14 @@ export default class Tutor extends BaseModel {
           to: 'tutor_rating.tutorId',
         },
       },
+      schedules: {
+        relation: BaseModel.HasManyRelation,
+        modelClass: Schedule,
+        join: {
+          from: 'tutor.userId',
+          to: 'schedule.userId',
+        },
+      },
     };
   }
 
@@ -124,7 +133,9 @@ export default class Tutor extends BaseModel {
         'defaultSelect',
         'getTotalStudents',
         'getTotalCourses',
-      ]).withGraphFetched('[tutorSubjects(defaultSelect)]');
+      ]).withGraphFetched(
+        '[tutorSubjects(defaultSelect), schedules(getFreeTime)]',
+      );
     },
     getTotalCourses(qb: QueryBuilder<BaseModel>) {
       const totalCourses = TutorStudent.query()

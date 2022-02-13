@@ -52,5 +52,10 @@ export default class Schedule extends BaseModel {
         'isFreeTime',
       ).withGraphFetched('tutorStudent(defaultSelect)');
     },
+    getFreeTime(qb: QueryBuilder<BaseModel>) {
+      qb.select('id', 'startTime', 'endTime', 'userId', 'isFreeTime').where({
+        isFreeTime: true,
+      });
+    },
   };
 }
