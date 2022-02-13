@@ -20,6 +20,7 @@ import { SchedulesModule } from './schedules/schedules.module';
 import { AppConfigModule } from './app-config/app-config.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { SuperAdminModule } from './super-admin/super-admin.module';
+import { TutorSubjectsModule } from './tutor-subjects/tutor-subjects.module';
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import { SuperAdminModule } from './super-admin/super-admin.module';
     CronJobsModule,
     TransactionsModule,
     SuperAdminModule,
+    TutorSubjectsModule,
   ],
   providers: [
     {
