@@ -93,6 +93,14 @@ export default class Tutor extends BaseModel {
           to: 'schedule.userId',
         },
       },
+      teachings: {
+        relation: BaseModel.HasManyRelation,
+        modelClass: TutorStudent,
+        join: {
+          from: 'tutor.id',
+          to: 'tutor_student.tutorId',
+        },
+      },
     };
   }
 
@@ -182,6 +190,11 @@ export default class Tutor extends BaseModel {
         knex.raw(
           `(${totalRatingBuilder.toKnexQuery().toQuery()}) as "averageRating"`,
         ),
+      );
+    },
+    selectInGetMe(qb: QueryBuilder<BaseModel>) {
+      qb.modify(['defaultSelect']).withGraphFetched(
+        '[tutorSubjects(defaultSelect), teachings(distinctSubject)]',
       );
     },
   };

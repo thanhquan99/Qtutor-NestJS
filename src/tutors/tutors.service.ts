@@ -45,7 +45,7 @@ export class TutorsService extends BaseServiceCRUD<Tutor> {
   }
 
   async getMe(userId: string): Promise<Tutor> {
-    return await Tutor.query().findOne({ userId }).modify('selectInGetOne');
+    return await Tutor.query().findOne({ userId }).modify('selectInGetMe');
   }
 
   async getTutors(
