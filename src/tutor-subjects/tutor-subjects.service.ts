@@ -13,10 +13,12 @@ export class TutorSubjectsService {
       throw new NotFoundException('Tutor not found');
     }
 
-    return await TutorSubject.query().insertAndFetch({
-      ...payload,
-      tutorId: tutor.id,
-    });
+    return await TutorSubject.query()
+      .insertAndFetch({
+        ...payload,
+        tutorId: tutor.id,
+      })
+      .modify('defaultSelect');
   }
 
   async updateOne(
@@ -29,10 +31,12 @@ export class TutorSubjectsService {
       throw new NotFoundException('Tutor not found');
     }
 
-    const tutorSubject = await TutorSubject.query().findOne({
-      tutorId: tutor.id,
-      id,
-    });
+    const tutorSubject = await TutorSubject.query()
+      .findOne({
+        tutorId: tutor.id,
+        id,
+      })
+      .modify('defaultSelect');
     if (!tutorSubject) {
       throw new NotFoundException('Tutor Subject not found');
     }
