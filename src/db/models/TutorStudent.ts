@@ -1,5 +1,5 @@
 import { QueryBuilder } from 'objection';
-import { Subject } from 'src/db/models';
+import { Subject, knex } from 'src/db/models';
 import { TutorStudentStatus } from '../../constant';
 import BaseModel, { ModelFields } from './BaseModel';
 import Student from './Student';
@@ -80,9 +80,14 @@ export default class TutorStudent extends BaseModel {
       );
     },
     selectInGetTeaching(qb: QueryBuilder<BaseModel>) {
-      qb.select('id', 'salary', 'status').withGraphFetched(
-        '[student(basicInfo), subject(defaultSelect)]',
-      );
+      qb.select(
+        'id',
+        'salary',
+        'status',
+        knex.raw(
+          `(status = '${TutorStudentStatus.WAITING_TUTOR_ACCEPT}') as "isEdit"`,
+        ),
+      ).withGraphFetched('[student(basicInfo), subject(defaultSelect)]');
     },
     distinctSubject(qb: QueryBuilder<BaseModel>) {
       qb.select('id', 'status')

@@ -132,11 +132,7 @@ export class TutorsService extends BaseServiceCRUD<Tutor> {
 
     const tutorStudentBuilder = TutorStudent.query()
       .modify('selectInGetTeaching')
-      .where({ tutorId: tutor.id })
-      .whereIn('status', [
-        TutorStudentStatus.ACCEPTED,
-        TutorStudentStatus.ARCHIVED,
-      ]);
+      .where({ tutorId: tutor.id });
 
     return await this.paginate(tutorStudentBuilder, query);
   }
