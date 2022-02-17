@@ -4,7 +4,7 @@ import { Model } from './config';
 
 export default class BaseModel extends Model {
   count?: string;
-  sum?: number;
+  sum?: string;
   min?: number;
   max?: number;
   avg?: number;

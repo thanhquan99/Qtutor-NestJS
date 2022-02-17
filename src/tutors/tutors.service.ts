@@ -16,6 +16,7 @@ import {
   TutorStudent,
   TutorSubject,
   TutorView,
+  Transaction,
 } from 'src/db/models';
 import Tutor from 'src/db/models/Tutor';
 import {
@@ -23,6 +24,7 @@ import {
   DEFAULT_WEB_CLIENT_URL,
   NotificationExtraType,
   NotificationType,
+  TransactionStatus,
   TutorStudentStatus,
 } from './../constant/index';
 import { ModelFields } from './../db/models/BaseModel';
@@ -248,5 +250,74 @@ export class TutorsService extends BaseServiceCRUD<Tutor> {
       }
     }
     return { canRating };
+  }
+
+  async getDetailTeachings(
+    tutorStudentId: string,
+    userId: string,
+  ): Promise<{
+    totalLessons: string;
+    totalMoney: string;
+    schedules: Schedule[];
+    totalPaid: string;
+    totalUnpaid: string;
+  }> {
+    const tutorStudent = await TutorStudent.query().findById(tutorStudentId);
+    if (!tutorStudent) {
+      throw new NotFoundException('Teaching not found');
+    }
+    const student = await Student.query().findById(tutorStudent.studentId);
+
+    const [
+      { count: totalLessons },
+      { sum: totalMoney },
+      { sum: totalPaid },
+      { sum: totalUnpaid },
+      schedules,
+    ] = await Promise.all([
+      Transaction.query()
+        .where({
+          tutorUserId: userId,
+          studentUserId: student.userId,
+          subjectId: tutorStudent.subjectId,
+        })
+        .count()
+        .first(),
+      Transaction.query()
+        .select(knex.raw('COALESCE(SUM(price), 0) as "sum"'))
+        .where({
+          tutorUserId: userId,
+          studentUserId: student.userId,
+          subjectId: tutorStudent.subjectId,
+        })
+        .first(),
+      Transaction.query()
+        .select(knex.raw('COALESCE(SUM(price), 0) as "sum"'))
+        .where({
+          tutorUserId: userId,
+          studentUserId: student.userId,
+          subjectId: tutorStudent.subjectId,
+          status: TransactionStatus.PAID,
+        })
+        .first(),
+      Transaction.query()
+        .select(knex.raw('COALESCE(SUM(price), 0) as "sum"'))
+        .where({
+          tutorUserId: userId,
+          studentUserId: student.userId,
+          subjectId: tutorStudent.subjectId,
+          status: TransactionStatus.UNPAID,
+        })
+        .first(),
+      Schedule.query().where({ userId, tutorStudentId }),
+    ]);
+
+    return {
+      totalLessons,
+      totalMoney,
+      totalPaid,
+      totalUnpaid,
+      schedules: schedules,
+    };
   }
 }

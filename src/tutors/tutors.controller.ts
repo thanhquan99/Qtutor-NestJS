@@ -30,18 +30,19 @@ import {
   User,
   TutorRating,
   TutorView,
+  Schedule,
 } from 'src/db/models';
 import { Role } from 'src/guards/role.decorator';
 
 @Controller('tutors')
 @ApiTags('Tutor')
+@UsePipes(ValidationPipe)
 export class TutorsController {
   constructor(public readonly service: TutorsService) {}
 
   @Get('/me')
   @ApiBearerAuth()
   @Role(ROLE.CUSTOMER)
-  @UsePipes(ValidationPipe)
   getMe(@GetUser() user: User): Promise<Tutor> {
     return this.service.getMe(user.id);
   }
@@ -49,7 +50,6 @@ export class TutorsController {
   @Get('/my-suggestions')
   @ApiBearerAuth()
   @Role(ROLE.CUSTOMER)
-  @UsePipes(ValidationPipe)
   getSuggestion(
     @Query() query: QueryParams,
     @GetUser() user: User,
@@ -66,7 +66,6 @@ export class TutorsController {
   }
 
   @Post('/my-teachings')
-  @UsePipes(ValidationPipe)
   @ApiBearerAuth()
   @Role(ROLE.CUSTOMER)
   async registerTeaching(
@@ -91,7 +90,6 @@ export class TutorsController {
   @Get('/my-teachings')
   @ApiBearerAuth()
   @Role(ROLE.CUSTOMER)
-  @UsePipes(ValidationPipe)
   getMyTeachings(
     @GetUser() user: User,
     @Query() query: QueryParams,
@@ -108,7 +106,6 @@ export class TutorsController {
   }
 
   @Get()
-  @UsePipes(ValidationPipe)
   @ApiBearerAuth()
   @Role(ROLE.OPTIONAL)
   getMany(
@@ -131,13 +128,11 @@ export class TutorsController {
 
   @Get('/:id')
   @ApiBearerAuth()
-  @UsePipes(ValidationPipe)
   getTutor(@Param() params: IdParam): Promise<Tutor> {
     return this.service.getTutor(params.id);
   }
 
   @Post()
-  @UsePipes(ValidationPipe)
   @ApiBearerAuth()
   @Role(ROLE.CUSTOMER)
   createOne(@Body() payload: CreateTutorDto, @GetUser() user: User) {
@@ -145,7 +140,6 @@ export class TutorsController {
   }
 
   @Patch('/:id')
-  @UsePipes(ValidationPipe)
   updateOne(
     @Body() payload: UpdateTutorDto,
     @Param() params: IdParam,
@@ -154,13 +148,11 @@ export class TutorsController {
   }
 
   @Delete('/:id')
-  @UsePipes(ValidationPipe)
   deleteOne(@Param() params: IdParam): Promise<{ message: string }> {
     return this.service.deleteOne(params.id);
   }
 
   @Get('/:id/ratings')
-  @UsePipes(ValidationPipe)
   getRatings(
     @Param() params: IdParam,
     @Query() query: QueryParams,
@@ -177,7 +169,6 @@ export class TutorsController {
   }
 
   @Post('/:id/ratings')
-  @UsePipes(ValidationPipe)
   @ApiBearerAuth()
   @Role(ROLE.CUSTOMER)
   createTutorRating(
@@ -189,7 +180,6 @@ export class TutorsController {
   }
 
   @Get('/:id/rated-examination')
-  @UsePipes(ValidationPipe)
   @ApiBearerAuth()
   @Role(ROLE.CUSTOMER)
   checkRated(
@@ -197,5 +187,21 @@ export class TutorsController {
     @Param() params: IdParam,
   ): Promise<{ canRating: boolean }> {
     return this.service.checkRated(user.id, params.id);
+  }
+
+  @Get('/my-teachings/:id/detail')
+  @ApiBearerAuth()
+  @Role(ROLE.CUSTOMER)
+  getDetailTeachings(
+    @GetUser() user: User,
+    @Param() params: IdParam,
+  ): Promise<{
+    totalLessons: string;
+    totalMoney: string;
+    schedules: Schedule[];
+    totalPaid: string;
+    totalUnpaid: string;
+  }> {
+    return this.service.getDetailTeachings(params.id, user.id);
   }
 }
