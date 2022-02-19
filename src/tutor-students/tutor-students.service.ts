@@ -21,7 +21,7 @@ export class TutorStudentsService extends BaseServiceCRUD<TutorStudent> {
       .modify('defaultSelect')
       .findById(id);
     if (!tutorStudent) {
-      throw new BadRequestException('Not found');
+      throw new BadRequestException('Data not found');
     }
 
     const notification = await Notification.query()
