@@ -2,6 +2,7 @@ import { QueryBuilder } from 'objection';
 import { Subject, knex } from 'src/db/models';
 import { TutorStudentStatus } from '../../constant';
 import BaseModel, { ModelFields } from './BaseModel';
+import Notification from './Notification';
 import Student from './Student';
 import Tutor from './Tutor';
 
@@ -17,6 +18,7 @@ export default class TutorStudent extends BaseModel {
   tutor?: ModelFields<Tutor>;
   student?: ModelFields<Student>;
   subject?: ModelFields<Subject>;
+  notification?: ModelFields<Notification>;
 
   static get tableName() {
     return 'tutor_student';

@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { BaseServiceCRUD } from 'src/base/base-service-CRUD';
 import { TutorStudent, Notification } from 'src/db/models';
 import { NotificationType, TutorStudentStatus } from '../constant';
+import { ModelFields } from '../db/models/BaseModel';
 import { UpdateTutorStudentDto } from './dto';
 
 @Injectable()
@@ -14,7 +15,7 @@ export class TutorStudentsService extends BaseServiceCRUD<TutorStudent> {
     id: string,
     userId: string,
     payload: UpdateTutorStudentDto,
-  ): Promise<TutorStudent | { message: string }> {
+  ): Promise<ModelFields<TutorStudent>> {
     const { status } = payload;
     const tutorStudent = await TutorStudent.query()
       .modify('defaultSelect')
@@ -65,7 +66,7 @@ export class TutorStudentsService extends BaseServiceCRUD<TutorStudent> {
 
         //Delete tutor-student
         await tutorStudent.$query().delete();
-        return { message: 'success' };
+        return { notification };
       }
 
       //Update type and read notification
@@ -111,7 +112,7 @@ export class TutorStudentsService extends BaseServiceCRUD<TutorStudent> {
 
         //Delete tutor-student
         await tutorStudent.$query().delete();
-        return { message: 'success' };
+        return { notification };
       }
 
       //Update type and read notification
@@ -122,6 +123,6 @@ export class TutorStudentsService extends BaseServiceCRUD<TutorStudent> {
       });
     }
 
-    return tutorStudent;
+    return { ...tutorStudent, notification };
   }
 }

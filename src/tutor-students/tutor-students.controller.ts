@@ -10,6 +10,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { IdParam } from '../base/params';
 import { ROLE } from '../constant';
 import { TutorStudent, User } from '../db/models';
+import { ModelFields } from '../db/models/BaseModel';
 import { Role } from '../guards/role.decorator';
 import { GetUser } from './../auth/get-user.decorator';
 import { UpdateTutorStudentDto } from './dto';
@@ -28,7 +29,7 @@ export class TutorStudentsController {
     @GetUser() user: User,
     @Param() params: IdParam,
     @Body() payload: UpdateTutorStudentDto,
-  ): Promise<TutorStudent | { message: string }> {
+  ): Promise<ModelFields<TutorStudent>> {
     return this.service.updateTutorStudent(params.id, user.id, payload);
   }
 }
