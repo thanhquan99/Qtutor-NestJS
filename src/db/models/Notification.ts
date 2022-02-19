@@ -49,6 +49,7 @@ export default class Notification extends BaseModel {
         'type',
         'url',
         'createdAt',
+        'extraId',
       ).withGraphFetched('[sender(defaultSelect)]');
     },
   };

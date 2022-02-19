@@ -24,9 +24,11 @@ export class TutorStudentsService extends BaseServiceCRUD<TutorStudent> {
       throw new BadRequestException('Not found');
     }
 
-    const notification = await Notification.query().findOne({
-      extraId: tutorStudent.id,
-    });
+    const notification = await Notification.query()
+      .findOne({
+        extraId: tutorStudent.id,
+      })
+      .modify('defaultSelect');
     if (!notification) {
       throw new BadRequestException('Something went wrong. Contact admin');
     }
