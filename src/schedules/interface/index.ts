@@ -6,6 +6,7 @@ export interface ISchedule {
   title: string;
   startDate: Date;
   endDate: Date;
+  isFreeTime: boolean;
   tutor: ModelFields<Tutor>;
   student: ModelFields<Student>;
 }

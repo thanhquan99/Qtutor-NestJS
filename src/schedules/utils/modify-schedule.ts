@@ -30,5 +30,6 @@ export const modifySchedule = (schedule: Schedule): ISchedule => {
     endDate: schedule.endTime,
     tutor,
     student,
+    isFreeTime: schedule.isFreeTime,
   };
 };
