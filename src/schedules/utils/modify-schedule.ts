@@ -3,6 +3,8 @@ import { ISchedule } from '../interface';
 
 export const modifySchedule = (schedule: Schedule): ISchedule => {
   let title = 'Default title';
+  let tutor;
+  let student;
 
   if (schedule.description) {
     title = schedule.description;
@@ -13,9 +15,11 @@ export const modifySchedule = (schedule: Schedule): ISchedule => {
 
     if (tutorStudent.student.userId === schedule.userId) {
       title = `Study ${tutorStudent.subject.name} - Teacher ${tutorStudent.tutor.profile.name}`;
+      tutor = schedule.tutorStudent?.tutor;
     }
     if (tutorStudent.tutor.userId === schedule.userId) {
       title = `Teach ${tutorStudent.subject.name} - Student ${tutorStudent.student.profile.name}`;
+      student = schedule.tutorStudent?.student;
     }
   }
 
@@ -24,5 +28,7 @@ export const modifySchedule = (schedule: Schedule): ISchedule => {
     title,
     startDate: schedule.startTime,
     endDate: schedule.endTime,
+    tutor,
+    student,
   };
 };
