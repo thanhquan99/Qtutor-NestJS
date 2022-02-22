@@ -74,6 +74,17 @@ export class UsersService extends BaseServiceCRUD<User> {
     const builder = User.queryBuilder(query)
       .modify('adminSelect')
       .whereNot({ id: adminId });
+
+    if (query.customFilter) {
+      const customFilter = JSON.parse(query.customFilter);
+      if (customFilter.name) {
+        const getUserByNameBuilder = Profile.query()
+          .select('userId')
+          .andWhere('name', 'ilike', `%${customFilter.name}%`);
+        builder.whereIn('id', getUserByNameBuilder);
+      }
+    }
+
     return await this.paginate(builder, query);
   }
 
