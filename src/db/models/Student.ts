@@ -2,6 +2,7 @@ import { ModelFields } from 'src/db/models/BaseModel';
 import { QueryBuilder } from 'objection';
 import { Profile, StudentSubject, Subject } from 'src/db/models';
 import BaseModel from './BaseModel';
+import Schedule from './Schedule';
 
 export default class Student extends BaseModel {
   description: string;
@@ -12,6 +13,7 @@ export default class Student extends BaseModel {
   profile?: ModelFields<Profile>;
   subjects?: ModelFields<Subject>[];
   studentSubjects?: ModelFields<StudentSubject>[];
+  schedules?: ModelFields<Schedule>[];
 
   static get tableName() {
     return 'student';
@@ -56,6 +58,14 @@ export default class Student extends BaseModel {
           to: 'profile.userId',
         },
       },
+      schedules: {
+        relation: BaseModel.HasManyRelation,
+        modelClass: Schedule,
+        join: {
+          from: 'student.userId',
+          to: 'schedule.userId',
+        },
+      },
     };
   }
 
@@ -72,6 +82,11 @@ export default class Student extends BaseModel {
     },
     basicInfo(qb: QueryBuilder<BaseModel>) {
       qb.select('id', 'userId').withGraphFetched('profile(basicInfo)');
+    },
+    selectInGetOne(qb: QueryBuilder<BaseModel>) {
+      qb.select('id', 'description', 'isSpecial', 'userId').withGraphFetched(
+        '[studentSubjects(defaultSelect), schedules(getFreeTime), profile(defaultSelect)]',
+      );
     },
   };
 }

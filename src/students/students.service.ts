@@ -49,7 +49,7 @@ export class StudentsService extends BaseServiceCRUD<Student> {
   }
 
   async getOne(id: string): Promise<Student> {
-    const student = await Student.query().findById(id).modify('defaultSelect');
+    const student = await Student.query().findById(id).modify('selectInGetOne');
     if (!student) {
       throw new NotFoundException('Student not found');
     }
