@@ -21,6 +21,7 @@ import { AppConfigModule } from './app-config/app-config.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { SuperAdminModule } from './super-admin/super-admin.module';
 import { TutorSubjectsModule } from './tutor-subjects/tutor-subjects.module';
+import { StudentSubjectsModule } from './student-subjects/student-subjects.module';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { TutorSubjectsModule } from './tutor-subjects/tutor-subjects.module';
     TransactionsModule,
     SuperAdminModule,
     TutorSubjectsModule,
+    StudentSubjectsModule,
   ],
   providers: [
     {
