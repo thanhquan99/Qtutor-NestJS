@@ -3,6 +3,7 @@ import { QueryBuilder } from 'objection';
 import { Profile, StudentSubject, Subject } from 'src/db/models';
 import BaseModel from './BaseModel';
 import Schedule from './Schedule';
+import TutorStudent from './TutorStudent';
 
 export default class Student extends BaseModel {
   description: string;
@@ -64,6 +65,14 @@ export default class Student extends BaseModel {
         join: {
           from: 'student.userId',
           to: 'schedule.userId',
+        },
+      },
+      learnings: {
+        relation: BaseModel.HasManyRelation,
+        modelClass: TutorStudent,
+        join: {
+          from: 'student.id',
+          to: 'tutor_student.studentId',
         },
       },
     };

@@ -45,7 +45,9 @@ export class StudentsService extends BaseServiceCRUD<Student> {
   async getMe(userId: string): Promise<Student> {
     return await Student.query()
       .findOne({ userId })
-      .withGraphFetched('[profile(defaultSelect), subjects(defaultSelect)]');
+      .withGraphFetched(
+        '[profile(defaultSelect), studentSubjects(defaultSelect), learnings(distinctSubject)]',
+      );
   }
 
   async getOne(id: string): Promise<Student> {
