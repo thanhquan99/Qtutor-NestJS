@@ -77,7 +77,14 @@ export default class TutorStudent extends BaseModel {
       );
     },
     selectInGetCourse(qb: QueryBuilder<BaseModel>) {
-      qb.select('id', 'salary', 'status').withGraphFetched(
+      qb.select(
+        'id',
+        'salary',
+        'status',
+        knex.raw(
+          `(status = '${TutorStudentStatus.WAITING_STUDENT_ACCEPT}') as "isEdit"`,
+        ),
+      ).withGraphFetched(
         '[tutor(selectInTutorStudent), subject(defaultSelect)]',
       );
     },
