@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  Param,
+  Patch,
   Post,
   Query,
   UsePipes,
@@ -10,10 +12,11 @@ import {
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GetUser } from '../auth/get-user.decorator';
 import { QueryParams } from '../base/dto/query-params.dto';
+import { IdParam } from '../base/params';
 import { ROLE } from '../constant';
 import { Student, Tutor, User } from '../db/models';
 import { Role } from '../guards/role.decorator';
-import { SALoginDto } from './dto';
+import { SALoginDto, SAUpdateTutorDto } from './dto';
 import { SuperAdminService } from './super-admin.service';
 
 @Controller('super-admin')
@@ -82,5 +85,25 @@ export class SuperAdminController {
     query.perPage = query.perPage || 10;
 
     return this.service.getStudents(query);
+  }
+
+  @Patch('/tutors/:id')
+  @ApiBearerAuth()
+  @Role(ROLE.SUPER_ADMIN)
+  updateOneTutor(
+    @Body() payload: SAUpdateTutorDto,
+    @Param() params: IdParam,
+  ): Promise<Tutor> {
+    return this.service.updateOneTutor(params.id, payload);
+  }
+
+  @Patch('/students/:id')
+  @ApiBearerAuth()
+  @Role(ROLE.SUPER_ADMIN)
+  updateOneStudent(
+    @Body() payload: SAUpdateTutorDto,
+    @Param() params: IdParam,
+  ): Promise<Student> {
+    return this.service.updateOneStudent(params.id, payload);
   }
 }

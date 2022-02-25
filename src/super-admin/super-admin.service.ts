@@ -1,11 +1,15 @@
 import { Student, Tutor, Subject, TutorStudent } from 'src/db/models';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { ROLE, SALT, TutorStudentStatus } from '../constant';
 import { User } from '../db/models';
 import { JwtPayload } from '../service/jwt/jwt-payload.interface';
-import { SALoginDto } from './dto';
+import { SALoginDto, SAUpdateTutorDto } from './dto';
 import { customFilterInTutors } from '../tutors/utils';
 import { BaseServiceCRUD } from '../base/base-service-CRUD';
 import { customFilterInStudents } from '../students/utils';
@@ -89,5 +93,33 @@ export class SuperAdminService extends BaseServiceCRUD<Tutor> {
 
     customFilterInStudents(builder, query.customFilter);
     return await this.paginate(builder, query);
+  }
+
+  async updateOneTutor(
+    tutorId: string,
+    payload: SAUpdateTutorDto,
+  ): Promise<Tutor> {
+    const tutor = await Tutor.query().modify('defaultSelect').findById(tutorId);
+    if (!tutor) {
+      throw new NotFoundException('Tutor not found');
+    }
+
+    await tutor.$query().patch(payload);
+    return tutor;
+  }
+
+  async updateOneStudent(
+    studentId: string,
+    payload: SAUpdateTutorDto,
+  ): Promise<Student> {
+    const student = await Student.query()
+      .modify('defaultSelect')
+      .findById(studentId);
+    if (!student) {
+      throw new NotFoundException('Student not found');
+    }
+
+    await student.$query().patch(payload);
+    return student;
   }
 }
