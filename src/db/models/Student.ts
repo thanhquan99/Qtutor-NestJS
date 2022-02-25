@@ -87,6 +87,8 @@ export default class Student extends BaseModel {
         'isSpecial',
         'userId',
         'isActive',
+        'createdAt',
+        'updatedAt',
       ).withGraphFetched('[profile(defaultSelect), subjects(defaultSelect)]');
     },
     selectInTutorStudent(qb: QueryBuilder<BaseModel>) {

@@ -115,6 +115,8 @@ export default class Tutor extends BaseModel {
         'userId',
         'yearsExperience',
         'isActive',
+        'createdAt',
+        'updatedAt',
       ).withGraphFetched('[profile(defaultSelect), subjects(defaultSelect)]');
     },
     getTotalStudents(qb: QueryBuilder<BaseModel>) {
