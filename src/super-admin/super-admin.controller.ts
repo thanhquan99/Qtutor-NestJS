@@ -37,6 +37,7 @@ export class SuperAdminController {
     totalStudents: string;
     totalTutors: string;
     totalSubjects: string;
+    totalCourses: string;
   }> {
     return this.service.getDashboard();
   }

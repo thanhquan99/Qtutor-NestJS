@@ -1,8 +1,8 @@
-import { Student, Tutor, Subject } from 'src/db/models';
+import { Student, Tutor, Subject, TutorStudent } from 'src/db/models';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { ROLE, SALT } from '../constant';
+import { ROLE, SALT, TutorStudentStatus } from '../constant';
 import { User } from '../db/models';
 import { JwtPayload } from '../service/jwt/jwt-payload.interface';
 import { SALoginDto } from './dto';
@@ -48,17 +48,23 @@ export class SuperAdminService extends BaseServiceCRUD<Tutor> {
     totalStudents: string;
     totalTutors: string;
     totalSubjects: string;
+    totalCourses: string;
   }> {
     const [
       { count: totalUsers },
       { count: totalStudents },
       { count: totalTutors },
       { count: totalSubjects },
+      { count: totalCourses },
     ] = await Promise.all([
       User.query().count('id').first(),
       Student.query().count('id').first(),
       Tutor.query().count('id').first(),
       Subject.query().count('id').first(),
+      TutorStudent.query()
+        .where({ status: TutorStudentStatus.ACCEPTED })
+        .count('id')
+        .first(),
     ]);
 
     return {
@@ -66,6 +72,7 @@ export class SuperAdminService extends BaseServiceCRUD<Tutor> {
       totalTutors,
       totalUsers,
       totalSubjects,
+      totalCourses,
     };
   }
 
