@@ -6,6 +6,11 @@ export class CreateSubjectDto {
   @IsNotEmpty()
   @IsString()
   name: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  image: string;
 }
 
 export class UpdateSubjectDto {
@@ -13,4 +18,9 @@ export class UpdateSubjectDto {
   @IsOptional()
   @IsString()
   name: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  image: string;
 }
