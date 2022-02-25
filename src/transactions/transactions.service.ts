@@ -146,4 +146,17 @@ export class TransactionsService extends BaseServiceCRUD<Transaction> {
 
     return modifyTransaction(transaction, userId);
   }
+
+  async getMySummary(userId: string): Promise<{ totalUnpaidCount: string }> {
+    const { count: totalUnpaidCount } = await Transaction.query()
+      .where({
+        status: TransactionStatus.UNPAID,
+      })
+      .andWhere((qb) => {
+        qb.orWhere({ tutorUserId: userId }).orWhere({ studentUserId: userId });
+      })
+      .count()
+      .first();
+    return { totalUnpaidCount };
+  }
 }

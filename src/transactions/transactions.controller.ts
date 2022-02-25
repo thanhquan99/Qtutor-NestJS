@@ -51,6 +51,13 @@ export class TransactionsController {
     return this.service.getMe(user.id, query);
   }
 
+  @Get('/my-summary')
+  @ApiBearerAuth()
+  @Role(ROLE.CUSTOMER)
+  getMySummary(@GetUser() user: User): Promise<{ totalUnpaidCount: string }> {
+    return this.service.getMySummary(user.id);
+  }
+
   @Patch('/:id')
   @ApiBearerAuth()
   @Role(ROLE.CUSTOMER)
