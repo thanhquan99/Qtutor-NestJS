@@ -9,4 +9,5 @@ export interface ISchedule {
   isFreeTime: boolean;
   tutor: ModelFields<Tutor>;
   student: ModelFields<Student>;
+  isEdit: boolean;
 }

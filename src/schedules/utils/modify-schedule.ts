@@ -5,6 +5,7 @@ export const modifySchedule = (schedule: Schedule): ISchedule => {
   let title = 'Default title';
   let tutor;
   let student;
+  let isEdit = true;
 
   if (schedule.description) {
     title = schedule.description;
@@ -14,11 +15,12 @@ export const modifySchedule = (schedule: Schedule): ISchedule => {
     const { tutorStudent } = schedule;
 
     if (tutorStudent.student.userId === schedule.userId) {
-      title = `Study ${tutorStudent.subject.name} - Teacher ${tutorStudent.tutor.profile.name}`;
+      title = `Study ${tutorStudent.subject.name}`;
       tutor = schedule.tutorStudent?.tutor;
+      isEdit = false;
     }
     if (tutorStudent.tutor.userId === schedule.userId) {
-      title = `Teach ${tutorStudent.subject.name} - Student ${tutorStudent.student.profile.name}`;
+      title = `Teach ${tutorStudent.subject.name}`;
       student = schedule.tutorStudent?.student;
     }
   }
@@ -31,5 +33,6 @@ export const modifySchedule = (schedule: Schedule): ISchedule => {
     tutor,
     student,
     isFreeTime: schedule.isFreeTime,
+    isEdit,
   };
 };
