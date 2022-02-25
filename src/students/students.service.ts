@@ -1,4 +1,8 @@
-import { DEFAULT_EMAIL, DEFAULT_WEB_CLIENT_URL } from './../constant/index';
+import {
+  DEFAULT_EMAIL,
+  DEFAULT_WEB_CLIENT_URL,
+  TransactionStatus,
+} from './../constant/index';
 import { MailerService } from '@nestjs-modules/mailer';
 import {
   BadRequestException,
@@ -21,7 +25,7 @@ import {
   Subject,
   Tutor,
   TutorStudent,
-  TutorSubject,
+  Transaction,
 } from 'src/db/models';
 import { CreateStudentDto, RegisterStudyDto } from './dto/index';
 import { customFilterInStudents } from './utils';
@@ -189,5 +193,74 @@ export class StudentsService extends BaseServiceCRUD<Student> {
     }
 
     return await this.paginate(builder, query);
+  }
+
+  async getDetailLearnings(
+    tutorStudentId: string,
+    userId: string,
+  ): Promise<{
+    totalLessons: string;
+    totalMoney: string;
+    schedules: Schedule[];
+    totalPaid: string;
+    totalUnpaid: string;
+  }> {
+    const tutorStudent = await TutorStudent.query().findById(tutorStudentId);
+    if (!tutorStudent) {
+      throw new NotFoundException('Teaching not found');
+    }
+    const tutor = await Tutor.query().findById(tutorStudent.tutorId);
+
+    const [
+      { count: totalLessons },
+      { sum: totalMoney },
+      { sum: totalPaid },
+      { sum: totalUnpaid },
+      schedules,
+    ] = await Promise.all([
+      Transaction.query()
+        .where({
+          tutorUserId: tutor.userId,
+          studentUserId: userId,
+          subjectId: tutorStudent.subjectId,
+        })
+        .count()
+        .first(),
+      Transaction.query()
+        .select(knex.raw('COALESCE(SUM(price), 0) as "sum"'))
+        .where({
+          tutorUserId: tutor.userId,
+          studentUserId: userId,
+          subjectId: tutorStudent.subjectId,
+        })
+        .first(),
+      Transaction.query()
+        .select(knex.raw('COALESCE(SUM(price), 0) as "sum"'))
+        .where({
+          tutorUserId: tutor.userId,
+          studentUserId: userId,
+          subjectId: tutorStudent.subjectId,
+          status: TransactionStatus.PAID,
+        })
+        .first(),
+      Transaction.query()
+        .select(knex.raw('COALESCE(SUM(price), 0) as "sum"'))
+        .where({
+          tutorUserId: tutor.userId,
+          studentUserId: userId,
+          subjectId: tutorStudent.subjectId,
+          status: TransactionStatus.UNPAID,
+        })
+        .first(),
+      Schedule.query().where({ userId, tutorStudentId }),
+    ]);
+
+    return {
+      totalLessons,
+      totalMoney,
+      totalPaid,
+      totalUnpaid,
+      schedules: schedules,
+    };
   }
 }

@@ -6,7 +6,7 @@ import {
 } from './dto/index';
 import { IdParam } from './../base/params/index';
 import { QueryParams } from './../base/dto/query-params.dto';
-import { User, Student, Tutor, TutorStudent } from 'src/db/models';
+import { User, Student, Tutor, TutorStudent, Schedule } from 'src/db/models';
 import { GetUser } from './../auth/get-user.decorator';
 import { ROLE } from './../constant/index';
 import { ApiBearerAuth } from '@nestjs/swagger';
@@ -155,5 +155,21 @@ export class StudentsController {
   @UsePipes(ValidationPipe)
   deleteOne(@Param() params: IdParam): Promise<{ message: string }> {
     return this.service.deleteOne(params.id);
+  }
+
+  @Get('/my-learnings/:id/detail')
+  @ApiBearerAuth()
+  @Role(ROLE.CUSTOMER)
+  getDetailLearnings(
+    @GetUser() user: User,
+    @Param() params: IdParam,
+  ): Promise<{
+    totalLessons: string;
+    totalMoney: string;
+    schedules: Schedule[];
+    totalPaid: string;
+    totalUnpaid: string;
+  }> {
+    return this.service.getDetailLearnings(params.id, user.id);
   }
 }
