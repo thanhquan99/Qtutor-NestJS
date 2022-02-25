@@ -19,6 +19,7 @@ import {
   Transaction,
 } from 'src/db/models';
 import Tutor from 'src/db/models/Tutor';
+import { QueryBuilder } from 'typeorm';
 import {
   DEFAULT_EMAIL,
   DEFAULT_WEB_CLIENT_URL,
@@ -54,8 +55,9 @@ export class TutorsService extends BaseServiceCRUD<Tutor> {
     query,
     userId: string,
   ): Promise<{ results: TutorView[]; total }> {
-    const builder =
-      TutorView.queryBuilder<TutorView>(query).modify('defaultSelect');
+    const builder = TutorView.queryBuilder<TutorView>(query)
+      .andWhere({ isActive: true })
+      .modify('defaultSelect');
     if (userId) {
       builder.andWhere('userId', '!=', userId);
     }
@@ -97,6 +99,7 @@ export class TutorsService extends BaseServiceCRUD<Tutor> {
       .modify('selectInSuggestion')
       .whereIn('id', knex.raw(tutorSubjectBuilder.toKnexQuery().toQuery()))
       .whereIn('userId', profileBuilder)
+      .andWhere({ isActive: true })
       .andWhere('userId', '!=', userId);
 
     const freeTimeSchedules = await Schedule.query().where({

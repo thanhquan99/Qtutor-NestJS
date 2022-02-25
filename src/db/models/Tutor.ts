@@ -19,6 +19,7 @@ export default class Tutor extends BaseModel {
   minimumSalary: number;
   isSpecial: boolean;
   yearsExperience: number;
+  isActive: boolean;
 
   userId: string;
 
@@ -113,6 +114,7 @@ export default class Tutor extends BaseModel {
         'isSpecial',
         'userId',
         'yearsExperience',
+        'isActive',
       ).withGraphFetched('[profile(defaultSelect), subjects(defaultSelect)]');
     },
     getTotalStudents(qb: QueryBuilder<BaseModel>) {

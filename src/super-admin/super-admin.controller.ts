@@ -3,12 +3,15 @@ import {
   Controller,
   Get,
   Post,
+  Query,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { GetUser } from '../auth/get-user.decorator';
+import { QueryParams } from '../base/dto/query-params.dto';
 import { ROLE } from '../constant';
-import { User } from '../db/models';
+import { Student, Tutor, User } from '../db/models';
 import { Role } from '../guards/role.decorator';
 import { SALoginDto } from './dto';
 import { SuperAdminService } from './super-admin.service';
@@ -36,5 +39,47 @@ export class SuperAdminController {
     totalSubjects: string;
   }> {
     return this.service.getDashboard();
+  }
+
+  @Get('/tutors')
+  @ApiBearerAuth()
+  @Role(ROLE.SUPER_ADMIN)
+  getTutors(
+    @Query() query: QueryParams,
+  ): Promise<{ results: Tutor[]; total: number }> {
+    if (query.filter) {
+      query.filter = JSON.parse(query.filter);
+    }
+    if (query.orderBy) {
+      query.orderBy = JSON.parse(query.orderBy);
+    }
+    if (query.customFilter) {
+      query.customFilter = JSON.parse(query.customFilter);
+    }
+    query.page = query.page || 1;
+    query.perPage = query.perPage || 10;
+
+    return this.service.getTutors(query);
+  }
+
+  @Get('/students')
+  @ApiBearerAuth()
+  @Role(ROLE.SUPER_ADMIN)
+  getStudents(
+    @Query() query: QueryParams,
+  ): Promise<{ results: Student[]; total: number }> {
+    if (query.filter) {
+      query.filter = JSON.parse(query.filter);
+    }
+    if (query.orderBy) {
+      query.orderBy = JSON.parse(query.orderBy);
+    }
+    if (query.customFilter) {
+      query.customFilter = JSON.parse(query.customFilter);
+    }
+    query.page = query.page || 1;
+    query.perPage = query.perPage || 10;
+
+    return this.service.getStudents(query);
   }
 }

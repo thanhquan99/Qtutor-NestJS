@@ -8,6 +8,7 @@ import TutorStudent from './TutorStudent';
 export default class Student extends BaseModel {
   description: string;
   isSpecial: string;
+  isActive: boolean;
 
   userId: string;
 
@@ -80,9 +81,13 @@ export default class Student extends BaseModel {
 
   static modifiers = {
     defaultSelect(qb: QueryBuilder<BaseModel>) {
-      qb.select('id', 'description', 'isSpecial', 'userId').withGraphFetched(
-        '[profile(defaultSelect), subjects(defaultSelect)]',
-      );
+      qb.select(
+        'id',
+        'description',
+        'isSpecial',
+        'userId',
+        'isActive',
+      ).withGraphFetched('[profile(defaultSelect), subjects(defaultSelect)]');
     },
     selectInTutorStudent(qb: QueryBuilder<BaseModel>) {
       qb.select('id', 'description', 'userId').withGraphFetched(

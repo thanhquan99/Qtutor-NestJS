@@ -119,8 +119,9 @@ export class StudentsService extends BaseServiceCRUD<Student> {
     query,
     userId: string,
   ): Promise<{ results: Student[]; total }> {
-    const builder =
-      Student.queryBuilder<Student>(query).modify('defaultSelect');
+    const builder = Student.queryBuilder<Student>(query)
+      .andWhere({ isActive: true })
+      .modify('defaultSelect');
     if (userId) {
       builder.andWhere('userId', '!=', userId);
     }
@@ -169,6 +170,7 @@ export class StudentsService extends BaseServiceCRUD<Student> {
       .modify('selectInTutorStudent')
       .whereIn('id', knex.raw(studentSubjectBuilder.toKnexQuery().toQuery()))
       .whereIn('userId', profileBuilder)
+      .andWhere({ isActive: true })
       .andWhere('userId', '!=', userId);
 
     const freeTimeSchedules = await Schedule.query().where({

@@ -6,10 +6,15 @@ import { ROLE, SALT } from '../constant';
 import { User } from '../db/models';
 import { JwtPayload } from '../service/jwt/jwt-payload.interface';
 import { SALoginDto } from './dto';
+import { customFilterInTutors } from '../tutors/utils';
+import { BaseServiceCRUD } from '../base/base-service-CRUD';
+import { customFilterInStudents } from '../students/utils';
 
 @Injectable()
-export class SuperAdminService {
-  constructor(private jwtService: JwtService) {}
+export class SuperAdminService extends BaseServiceCRUD<Tutor> {
+  constructor(private jwtService: JwtService) {
+    super(Tutor, 'Tutor');
+  }
 
   async login(body: SALoginDto): Promise<{ user: User; accessToken: string }> {
     const { email, password } = body;
@@ -62,5 +67,20 @@ export class SuperAdminService {
       totalUsers,
       totalSubjects,
     };
+  }
+
+  async getTutors(query): Promise<{ results: Tutor[]; total: number }> {
+    const builder = Tutor.queryBuilder<Tutor>(query).modify('defaultSelect');
+
+    customFilterInTutors(builder, query.customFilter);
+    return await this.paginate(builder, query);
+  }
+
+  async getStudents(query): Promise<{ results: Student[]; total }> {
+    const builder =
+      Student.queryBuilder<Student>(query).modify('defaultSelect');
+
+    customFilterInStudents(builder, query.customFilter);
+    return await this.paginate(builder, query);
   }
 }
