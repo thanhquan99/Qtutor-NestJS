@@ -210,6 +210,8 @@ export default class Tutor extends BaseModel {
         'defaultSelect',
         'getTotalStudents',
         'getTotalCourses',
+        'getAverageRating',
+        'getTotalRatings',
       ]).withGraphFetched(
         '[tutorSubjects(defaultSelect), teachings(distinctSubject), experiences, schedules(getFreeTime)]',
       );
