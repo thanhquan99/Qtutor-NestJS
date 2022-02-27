@@ -16,6 +16,7 @@ import AppConfig from './AppConfig';
 import TutorRating from './TutorRating';
 import Transaction from './Transaction';
 import TutorView from './TutorView';
+import TutorExperience from './TutorExperience';
 
 export {
   knex,
@@ -36,4 +37,5 @@ export {
   TutorRating,
   Transaction,
   TutorView,
+  TutorExperience,
 };

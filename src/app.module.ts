@@ -22,6 +22,7 @@ import { TransactionsModule } from './transactions/transactions.module';
 import { SuperAdminModule } from './super-admin/super-admin.module';
 import { TutorSubjectsModule } from './tutor-subjects/tutor-subjects.module';
 import { StudentSubjectsModule } from './student-subjects/student-subjects.module';
+import { TutorExperiencesModule } from './tutor-experiences/tutor-experiences.module';
 
 @Module({
   imports: [
@@ -66,6 +67,7 @@ import { StudentSubjectsModule } from './student-subjects/student-subjects.modul
     SuperAdminModule,
     TutorSubjectsModule,
     StudentSubjectsModule,
+    TutorExperiencesModule,
   ],
   providers: [
     {

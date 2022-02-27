@@ -11,6 +11,7 @@ import { TutorStudentStatus } from '../../constant';
 import BaseModel, { ModelFields } from './BaseModel';
 import Schedule from './Schedule';
 import TeachingPrice from './TeachingPrice';
+import TutorExperience from './TutorExperience';
 import TutorStudent from './TutorStudent';
 
 export default class Tutor extends BaseModel {
@@ -100,6 +101,14 @@ export default class Tutor extends BaseModel {
         join: {
           from: 'tutor.id',
           to: 'tutor_student.tutorId',
+        },
+      },
+      experiences: {
+        relation: BaseModel.HasManyRelation,
+        modelClass: TutorExperience,
+        join: {
+          from: 'tutor.id',
+          to: 'tutor_experience.tutorId',
         },
       },
     };
@@ -197,8 +206,12 @@ export default class Tutor extends BaseModel {
       );
     },
     selectInGetMe(qb: QueryBuilder<BaseModel>) {
-      qb.modify(['defaultSelect']).withGraphFetched(
-        '[tutorSubjects(defaultSelect), teachings(distinctSubject)]',
+      qb.modify([
+        'defaultSelect',
+        'getTotalStudents',
+        'getTotalCourses',
+      ]).withGraphFetched(
+        '[tutorSubjects(defaultSelect), teachings(distinctSubject), experiences]',
       );
     },
   };
