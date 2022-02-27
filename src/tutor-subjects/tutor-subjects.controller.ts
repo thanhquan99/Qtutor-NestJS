@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Param,
   Patch,
   Post,
@@ -41,5 +42,15 @@ export class TutorSubjectsController {
     @Param() params: IdParam,
   ): Promise<TutorSubject> {
     return this.service.updateOne(params.id, payload, user.id);
+  }
+
+  @Delete('/:id')
+  @ApiBearerAuth()
+  @Role(ROLE.CUSTOMER)
+  deleteOne(
+    @GetUser() user: User,
+    @Param() params: IdParam,
+  ): Promise<{ message: string }> {
+    return this.service.deleteOne(params.id, user.id);
   }
 }

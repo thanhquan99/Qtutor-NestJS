@@ -44,4 +44,14 @@ export class TutorSubjectsService {
     await tutorSubject.$query().patch(payload);
     return tutorSubject;
   }
+
+  async deleteOne(id: string, userId: string): Promise<{ message: string }> {
+    const tutor = await Tutor.query().findOne({ userId });
+    if (!tutor) {
+      throw new NotFoundException('Tutor not found');
+    }
+
+    await TutorSubject.query().where({ id, tutorId: tutor.id }).delete();
+    return { message: 'Delete successfully' };
+  }
 }
