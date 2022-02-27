@@ -106,4 +106,11 @@ export class SuperAdminController {
   ): Promise<Student> {
     return this.service.updateOneStudent(params.id, payload);
   }
+
+  @Post('/collaborative-execution')
+  @ApiBearerAuth()
+  @Role(ROLE.SUPER_ADMIN)
+  executeAI(): Promise<{ message: string }> {
+    return this.service.executeAI();
+  }
 }

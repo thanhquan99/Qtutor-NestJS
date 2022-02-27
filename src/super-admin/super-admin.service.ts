@@ -1,4 +1,10 @@
-import { Student, Tutor, Subject, TutorStudent } from 'src/db/models';
+import {
+  Student,
+  Tutor,
+  Subject,
+  TutorStudent,
+  TutorRating,
+} from 'src/db/models';
 import {
   Injectable,
   UnauthorizedException,
@@ -13,6 +19,8 @@ import { SALoginDto, SAUpdateTutorDto } from './dto';
 import { customFilterInTutors } from '../tutors/utils';
 import { BaseServiceCRUD } from '../base/base-service-CRUD';
 import { customFilterInStudents } from '../students/utils';
+import { collaborativeFilter } from '../service/AI';
+import { knex } from '../db/models/config';
 
 @Injectable()
 export class SuperAdminService extends BaseServiceCRUD<Tutor> {
@@ -121,5 +129,31 @@ export class SuperAdminService extends BaseServiceCRUD<Tutor> {
 
     await student.$query().patch(payload);
     return student;
+  }
+
+  async executeAI(): Promise<{ message: string }> {
+    const ratings = await TutorRating.query().select('reviewerId', 'tutorId');
+    const users = await User.query().whereIn(
+      'id',
+      TutorRating.query().select('reviewerId'),
+    );
+    const updateUsers = collaborativeFilter(users, ratings);
+
+    const updateUserIdsString = `'${updateUsers
+      .map((e) => e.userId)
+      .join(`','`)}'`;
+    const updateRecommendationTutorIdsString = `'${updateUsers
+      .map((e) => `{${e.recommendationTutorIds}}`)
+      .join(`','`)}'`;
+
+    await knex.raw(`
+      UPDATE users
+      SET "recommendationTutorIds" = data_table.recommendation_tutor
+      FROM
+        (SELECT UNNEST(ARRAY[${updateUserIdsString}])::bigint as user_id, 
+                UNNEST(ARRAY[${updateRecommendationTutorIdsString}])::bigint[] as recommendation_tutor) as data_table
+      WHERE users."id" = data_table.user_id
+    `);
+    return { message: 'Success' };
   }
 }
