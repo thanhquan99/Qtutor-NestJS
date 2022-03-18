@@ -15,6 +15,7 @@ export default class User extends BaseModel {
   verifyEmailCode: string;
   forgotPasswordCode: string;
   paypalEmail: string;
+  recommendationTutorIds: bigint[];
 
   role?: ModelFields<Role>;
   profile?: ModelFields<Profile>;

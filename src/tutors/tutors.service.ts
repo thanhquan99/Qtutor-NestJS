@@ -17,9 +17,11 @@ import {
   TutorSubject,
   TutorView,
   Transaction,
+  User,
 } from 'src/db/models';
 import Tutor from 'src/db/models/Tutor';
 import { QueryBuilder } from 'typeorm';
+import { QueryParams } from '../base/dto/query-params.dto';
 import {
   DEFAULT_EMAIL,
   DEFAULT_WEB_CLIENT_URL,
@@ -322,5 +324,20 @@ export class TutorsService extends BaseServiceCRUD<Tutor> {
       totalUnpaid,
       schedules: schedules,
     };
+  }
+
+  async getMyRecommendations(
+    query: QueryParams,
+    userId: string,
+  ): Promise<{ results: Tutor[]; total }> {
+    const user = await User.query()
+      .select('recommendationTutorIds')
+      .findOne({ id: userId });
+    const builder = Tutor.query()
+      .whereIn('id', user.recommendationTutorIds as any)
+      .modify('selectInSuggestion')
+      .andWhere({ isActive: true })
+      .andWhere('userId', '!=', userId);
+    return await this.paginate(builder, query);
   }
 }

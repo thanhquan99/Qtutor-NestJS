@@ -65,6 +65,25 @@ export class TutorsController {
     return this.service.getSuggestion(query, user.id);
   }
 
+  @Get('/my-recommendations')
+  @ApiBearerAuth()
+  @Role(ROLE.CUSTOMER)
+  getMyRecommendations(
+    @Query() query: QueryParams,
+    @GetUser() user: User,
+  ): Promise<{ results: Tutor[]; total }> {
+    if (query.filter) {
+      query.filter = JSON.parse(query.filter);
+    }
+    if (query.orderBy) {
+      query.orderBy = JSON.parse(query.orderBy);
+    }
+    query.page = query.page || 1;
+    query.perPage = query.perPage || 10;
+
+    return this.service.getMyRecommendations(query, user.id);
+  }
+
   @Post('/my-teachings')
   @ApiBearerAuth()
   @Role(ROLE.CUSTOMER)
