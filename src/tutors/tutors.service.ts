@@ -334,7 +334,7 @@ export class TutorsService extends BaseServiceCRUD<Tutor> {
       .select('recommendationTutorIds')
       .findOne({ id: userId });
     const builder = Tutor.query()
-      .whereIn('id', user.recommendationTutorIds as any)
+      .whereIn('id', (user.recommendationTutorIds as any) || [])
       .modify('selectInSuggestion')
       .andWhere({ isActive: true })
       .andWhere('userId', '!=', userId);
