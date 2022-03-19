@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Tutor, TutorSubject } from '../db/models';
 import { CreateTutorSubjectDto, UpdateTutorSubjectDto } from './dto';
 
@@ -11,6 +15,14 @@ export class TutorSubjectsService {
     const tutor = await Tutor.query().findOne({ userId });
     if (!tutor) {
       throw new NotFoundException('Tutor not found');
+    }
+
+    const tutorSubject = await TutorSubject.query().findOne({
+      tutorId: tutor.id,
+      subjectId: payload.subjectId,
+    });
+    if (tutorSubject) {
+      throw new BadRequestException('You already have this subject');
     }
 
     return await TutorSubject.query()
